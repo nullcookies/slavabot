@@ -8,11 +8,14 @@ $params = array_merge(
 
 return [
     'id' => 'app-frontend',
+    'sourceLanguage' => 'en-US',
+    'language' => 'ru-RU',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
         'request' => [
+            'baseUrl' => '/',
             'csrfParam' => '_csrf-frontend',
         ],
         'user' => [
@@ -36,14 +39,17 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        /*
         'urlManager' => [
+            'baseUrl' => '/',
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                '/' => 'site/index',
+                'index.php' => 'site/index',
             ],
         ],
-        */
+
     ],
     'params' => $params,
 ];
+
