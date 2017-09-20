@@ -1,0 +1,25 @@
+Options +FollowSymLinks
+IndexIgnore */*
+RewriteEngine on
+
+AddDefaultCharset UTF-8
+
+# if begin /admin => /backend/web/
+RewriteCond %{REQUEST_URI} ^/admin($|/)
+RewriteRule ^admin/?(.*) /backend/web/$1
+
+# add /frontend/web/$1
+RewriteCond %{REQUEST_URI} !^/(frontend/web|backend/web|admin)
+RewriteRule (.*) /frontend/web/$1
+
+# if frontend
+RewriteCond %{REQUEST_URI} ^/frontend/web
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /frontend/web/index.php
+
+# if backend
+RewriteCond %{REQUEST_URI} ^/backend/web
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /backend/web/index.php
