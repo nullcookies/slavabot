@@ -7,6 +7,23 @@ $params = array_merge(
 );
 
 return [
+//    'as beforeRequest' => [  //if guest user access site so, redirect to login page.
+//        'class' => 'yii\filters\AccessControl',
+//        'rules' => [
+//            [
+//                'actions' => ['login','signup', 'error'],
+//                'allow' => true,
+//                'roles' => ['?'],
+//            ],
+//            [
+//                'allow' => true,
+//                'roles' => ['@'],
+//            ],
+//        ],
+////        'denyCallback' => function () {
+////            return Yii::$app->response->redirect(['site/login']);
+////        },
+//    ],
     'id' => 'app-frontend',
     'sourceLanguage' => 'en-US',
     'language' => 'ru-RU',
@@ -46,6 +63,18 @@ return [
             'rules' => [
                 '/' => 'site/index',
                 'index.php' => 'site/index',
+            ],
+        ],
+        'i18n' => [
+            'translations' => [
+                '*' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => '@frontend/messages',
+                    'sourceLanguage' => 'en',
+                    'fileMap' => [
+                        'main' => 'main.php',
+                    ],
+                ],
             ],
         ],
 

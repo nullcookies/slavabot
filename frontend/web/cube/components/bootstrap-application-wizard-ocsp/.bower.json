@@ -1,0 +1,33 @@
+{
+  "name": "bootstrap-application-wizard",
+  "homepage": "https://github.com/lishan/bootstrap-application-wizard",
+  "version": "1.0.4",
+  "authors": [
+    {
+      "name": "lishan",
+      "homepage": "https://github.com/lishan/bootstrap-application-wizard"
+    }
+  ],
+  "description": "Bootstrap application wizard, support step by step workflow",
+  "main": [
+    "dist/bootstrap-wizard.js",
+    "dist/bootstrap-wizard.css"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "_release": "1.0.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.0.4",
+    "commit": "8d1c9e2e3b669f8bf7723f764238db29c57a0659"
+  },
+  "_source": "https://github.com/lishan/bootstrap-application-wizard.git",
+  "_target": "*",
+  "_originalSource": "bootstrap-application-wizard-ocsp"
+}
