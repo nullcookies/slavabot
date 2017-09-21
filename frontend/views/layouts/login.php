@@ -37,29 +37,7 @@ AppAsset::register($this);
 <div class="container">
     <div class="row">
         <div class="col-xs-12">
-            <div id="login-box">
-                <div id="login-box-holder">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <header id="login-header">
-                                <div id="login-logo">
-                                    <img src="/cube/img/logo.png" alt=""/>
-                                </div>
-                            </header>
-                            <?= $content ?>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="login-box-footer">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <?=\Yii::t('main', 'Do not have an account?')?>
-                            <?= Html::a(\Yii::t('main', 'Register now'), ['site/signup']) ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <?= $content ?>
         </div>
     </div>
 </div>

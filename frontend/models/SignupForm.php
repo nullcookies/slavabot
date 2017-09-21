@@ -12,6 +12,8 @@ class SignupForm extends Model
     public $username;
     public $email;
     public $password;
+    public $usr_password_repeat;
+    public $terms_cond = true;
 
 
     /**
@@ -24,7 +26,6 @@ class SignupForm extends Model
             ['username', 'required'],
             ['username', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This username has already been taken.'],
             ['username', 'string', 'min' => 2, 'max' => 255],
-
             ['email', 'trim'],
             ['email', 'required'],
             ['email', 'email'],
@@ -33,6 +34,11 @@ class SignupForm extends Model
 
             ['password', 'required'],
             ['password', 'string', 'min' => 6],
+            ['usr_password_repeat', 'required'],
+            ['terms_cond', 'boolean'],
+
+            ['terms_cond', 'required', 'requiredValue' => true],
+            ['usr_password_repeat', 'compare', 'compareAttribute'=>'password']
         ];
     }
 
