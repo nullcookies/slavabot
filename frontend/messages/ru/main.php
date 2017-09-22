@@ -21,5 +21,6 @@ return [
     'Enter password' => 'Введите пароль',
     'Register' => 'Зарегистрироваться',
     'Re-enter password' => 'Введите пароль еще раз',
-    'I accept terms and conditions'=> 'Я принимаю условия и правила'
+    'I accept terms and conditions'=> 'Я принимаю условия и правила',
+    'Logout' => 'Выход'
 ];
