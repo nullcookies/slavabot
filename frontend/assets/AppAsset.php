@@ -20,7 +20,7 @@ class AppAsset extends AssetBundle
     ];
     public $js = [
         '/cube/js/demo-skin-changer.js',
-        '/cube/components/jquery/dist/jquery.min.js',
+        //'/cube/components/jquery/dist/jquery.min.js',
         '/cube/components/bootstrap/dist/js/bootstrap.js',
         '/cube/components/nanoscroller/bin/javascripts/jquery.nanoscroller.min.js',
         '/cube/js/demo.js',

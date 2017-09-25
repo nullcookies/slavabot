@@ -18,6 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <header id="login-header">
                     <div id="login-logo">
                         <img src="/cube/img/logo.png" alt=""/>
+                        <span>BotSales</span>
                     </div>
                 </header>
                     <div id="login-box-inner">
@@ -27,12 +28,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ]
                         ); ?>
 
-                        <?= $form->field($model, 'username',
+                        <?= $form->field($model, 'email',
                             [
                                 'options'=>['class'=>'input-group'],
                                 'template' => '<span class="input-group-addon"><i class="fa fa-user"></i></span>{input}'
                             ])
-                            ->textInput(['autofocus' => true,'placeholder' =>  \Yii::t('main', 'Username')])
+                            ->textInput(['autofocus' => true,'placeholder' =>  \Yii::t('main', 'Email')])
                         ?>
 
                         <?= $form->field($model, 'password',
@@ -62,23 +63,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <?= Html::submitButton(\Yii::t('main', 'Login'), ['class' => 'btn btn-success col-xs-12', 'name' => 'login-button_']) ?>
                             </div>
                         </div>
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <p class="social-text"><?=\Yii::t('main', 'Or login with')?></p>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-xs-12 col-sm-6">
-                                    <button type="submit" class="btn btn-primary col-xs-12 btn-facebook">
-                                        <i class="fa fa-facebook"></i> facebook
-                                    </button>
-                                </div>
-                                <div class="col-xs-12 col-sm-6">
-                                    <button type="submit" class="btn btn-primary col-xs-12 btn-twitter">
-                                        <i class="fa fa-twitter"></i> Twitter
-                                    </button>
-                                </div>
-                            </div>
+
                         <?php ActiveForm::end(); ?>
                     </div>
             </div>

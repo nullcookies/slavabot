@@ -10,24 +10,25 @@ use yii\bootstrap\ActiveForm;
 $this->title = \Yii::t('main', 'Signup');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+
 <div id="login-box">
     <div class="row">
         <div class="col-xs-12">
             <header id="login-header">
                 <div id="login-logo">
                     <img src="/cube/img/logo.png" alt=""/>
+                    <span>BotSales</span>
                 </div>
             </header>
             <div id="login-box-inner">
                 <?php $form = ActiveForm::begin(['id' => 'form-signup']); ?>
 
-                <form role="form" action="registration.html">
                     <?= $form->field($model, 'username',
                         [
                             'options'=>['class'=>'input-group'],
                             'template' => '<span class="input-group-addon"><i class="fa fa-user"></i></span>{input}'
                         ])
-                        ->textInput(['autofocus' => true,'placeholder' =>  \Yii::t('main', 'Username')])
+                        ->textInput(['placeholder' =>  \Yii::t('main', 'Username')])
                     ?>
                     <?= $form->field($model, 'email',
                         [
@@ -36,22 +37,16 @@ $this->params['breadcrumbs'][] = $this->title;
                         ])
                         ->textInput(['placeholder' =>  \Yii::t('main', 'Email address')])
                     ?>
-                    <?= $form->field($model, 'password',
+                    <?= $form->field($model, 'phone',
                         [
                             'options'=>['class'=>'input-group'],
-                            'template' => '<span class="input-group-addon"><i class="fa fa-lock"></i></span>{input}'
+                            'template' => '<span class="input-group-addon"><i class="fa fa-phone"></i></span>{input}'
                         ])
-                        ->passwordInput(['placeholder' =>  \Yii::t('main', 'Enter password')])
-                    ?>
+                        ->widget(\yii\widgets\MaskedInput::className(),['mask'=>'+7 (999) 999-99-99'])
+                        ->textInput(['placeholder' => \Yii::t('main', 'Phone')])
+                        ->label(false)
 
-                    <?= $form->field($model, 'usr_password_repeat',
-                        [
-                            'options'=>['class'=>'input-group'],
-                            'template' => '<span class="input-group-addon"><i class="fa fa-unlock-alt"></i></span>{input}'
-                        ])
-                        ->passwordInput(['placeholder' =>  \Yii::t('main', 'Re-enter password')])
                     ?>
-
                     <div id="remember-me-wrapper">
                         <div class="row">
                             <div class="col-xs-12">

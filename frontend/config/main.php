@@ -35,6 +35,11 @@ return [
             'baseUrl' => '/',
             'csrfParam' => '_csrf-frontend',
         ],
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+            'viewPath' => '@app/views/mail',
+            'useFileTransport' => false
+        ],
         'user' => [
             'identityClass' => 'common\models\User',
             'enableAutoLogin' => true,

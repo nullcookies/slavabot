@@ -22,5 +22,7 @@ return [
     'Register' => 'Зарегистрироваться',
     'Re-enter password' => 'Введите пароль еще раз',
     'I accept terms and conditions'=> 'Я принимаю условия и правила',
-    'Logout' => 'Выход'
+    'Logout' => 'Выход',
+    'Full Name' => 'Имя и фамилия',
+    'Phone' => 'Телефон'
 ];

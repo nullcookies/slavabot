@@ -29,10 +29,15 @@ AppAsset::register($this);
     <script src="js/html5shiv.js"></script>
     <script src="js/respond.min.js"></script>
     <![endif]-->
+    <style>
+        #user-left-box {
+            padding: 20px 15px 20px 0px;
+        }
+    </style>
 </head>
 <?php $this->beginBody() ?>
 
-<body>
+<body class=" fixed-header pace-done">
 <div id="theme-wrapper">
     <header class="navbar" id="header-navbar">
         <div class="container">
@@ -114,24 +119,9 @@ AppAsset::register($this);
 
                 <div class="nav-no-collapse pull-right" id="header-nav">
                     <ul class="nav navbar-nav pull-right">
-                        <li class="mobile-search">
-                            <a class="btn">
-                                <i class="fa fa-search"></i>
-                            </a>
-
-                            <div class="drowdown-search">
-                                <form role="search">
-                                    <div class="form-group">
-                                        <input type="text" class="form-control" placeholder="Search...">
-                                        <i class="fa fa-search nav-search-icon"></i>
-                                    </div>
-                                </form>
-                            </div>
-
-                        </li>
                         <li class="dropdown profile-dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <img src="/cube/img/samples/159.png" alt=""/>
+<!--                                <img src="/cube/img/samples/159.png" alt=""/>-->
                                 <span class="hidden-xs"><?=Yii::$app->user->identity->username?></span> <b class="caret"></b>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-right">
@@ -156,7 +146,7 @@ AppAsset::register($this);
                 <section id="col-left" class="col-left-nano">
                     <div id="col-left-inner" class="col-left-nano-content">
                         <div id="user-left-box" class="clearfix hidden-sm hidden-xs dropdown profile2-dropdown">
-                            <img alt="" src="/cube/img/samples/159.png" />
+<!--                            <img alt="" src="/cube/img/samples/159.png" />-->
                             <div class="user-box">
 									<span class="name">
 										<a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -689,8 +679,6 @@ AppAsset::register($this);
         </ul>
     </div>
 </div>
-
-
 <?php $this->endBody() ?>
 </body>
 </html>
