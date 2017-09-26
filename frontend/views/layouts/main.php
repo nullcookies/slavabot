@@ -161,9 +161,8 @@ AppAsset::register($this);
                     <ul class="nav navbar-nav pull-right">
                         <li class="dropdown profile-dropdown">
                             <span class="hidden-xs">Баланс: 2 000</span>
-                            <a href="#" style="    float: left;">
+                            <a href="#" style="float: left;">
                                 Пополнить
-
                             </a>
                         </li>
                     </ul>
@@ -198,14 +197,27 @@ AppAsset::register($this);
                                     'url' => '/integration/',
                                     'options'=>['class'=>'header-nav__item'],
                                     'template' => '<a href="{url}" ><i class="fa fa-cloud-upload"></i><span>{label}</span></a>',
-                                ]
+                                ],
+                                ['label' => \Yii::t('main', 'Settings'),
+                                    'url' => '/site/config',
+                                    'options'=>['class'=>'header-nav__item'],
+                                    'template' => '<a href="{url}" ><i class="fa fa-sliders"></i><span>{label}</span></a>',
+                                ],
+                                ['label' => \Yii::t('main', 'Help'),
+                                    'url' => '/site/help',
+                                    'options'=>['class'=>'header-nav__item'],
+                                    'template' => '<a href="{url}" ><i class="fa fa-life-ring"></i><span>{label}</span></a>',
+                                ],
+
                             ],
                             'options' => [
                                 'class' => 'nav nav-pills nav-stacked',
                             ],
                             'activeCssClass'=>'active',
                         ]);
+
                         ?>
+
                         </div>
                     </div>
                 </section>
