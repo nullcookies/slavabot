@@ -61,7 +61,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?= Html::submitButton(\Yii::t('main', 'Register'), ['class' => 'btn btn-success col-xs-12', 'name' => 'login-button_']) ?>
                         </div>
                     </div>
-                </form>
                 <?php ActiveForm::end(); ?>
             </div>
         </div>

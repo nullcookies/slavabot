@@ -7,11 +7,11 @@ $params = array_merge(
 );
 
 return [
-    'as beforeRequest' => [  //if guest user access site so, redirect to login page.
+    'as beforeRequest' => [
         'class' => 'yii\filters\AccessControl',
         'rules' => [
             [
-                'actions' => ['login','signup', 'error'],
+                'actions' => ['login','signup', 'error', 'request-password-reset', 'reset-password'],
                 'allow' => true,
                 'roles' => ['?'],
             ],
@@ -20,9 +20,6 @@ return [
                 'roles' => ['@'],
             ],
         ],
-//        'denyCallback' => function () {
-//            return Yii::$app->response->redirect(['site/login']);
-//        },
     ],
     'id' => 'app-frontend',
     'sourceLanguage' => 'en-US',
