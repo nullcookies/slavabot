@@ -15,7 +15,10 @@ use frontend\models\UserConfig;
 use frontend\models\ContactForm;
 use frontend\models\PasswordConfig;
 use common\models\User;
-
+use common\models\Location;
+use common\models\Category;
+use common\models\Priority;
+use common\models\Theme;
 
 /**
  * Site controller
@@ -45,11 +48,19 @@ class SiteController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'logout' => ['get'],
+                    //'getdata' => ['post']
                 ],
             ],
         ];
     }
+    public function beforeAction($action)
+    {
+        if ($action->id == 'getdata') {
+            $this->enableCsrfValidation = false;
+        }
 
+        return parent::beforeAction($action);
+    }
     public function actions()
     {
         return [
@@ -65,7 +76,19 @@ class SiteController extends Controller
 
     public function actionIndex()
     {
-        return $this->render('index');
+        $file = 'webhooks.txt';
+
+        $current = file_get_contents($file);
+
+        $current = count(explode("\n", $current))-1;
+
+        return $this->render('index', [
+            'location' => Location::find()->all(),
+            'category' => Category::find()->all(),
+            'priority' => Priority::find()->all(),
+            'theme' => Theme::find()->all(),
+            'webhooks' => $current
+        ]);
     }
 
     public function actionLogin()
@@ -94,7 +117,43 @@ class SiteController extends Controller
         return Yii::$app->response->redirect(['site/login']);
     }
 
+    public function actionGetdata()
+    {
 
+        $file = 'webhooks.txt';
+
+        $current = file_get_contents($file);
+        if(\Yii::$app->request->isPost){
+
+
+            $current .= file_get_contents("php://input")."\n";
+
+            file_put_contents($file, $current);
+
+        }else{
+            $current = explode("\n", $current);
+
+            foreach ($current as $item) {
+                $item = json_decode($item);
+
+
+                $location = Location::saveReference($item);
+                $category = Category::saveReference($item);
+                $priority = Priority::saveReference($item);
+                $theme = Theme::saveReference($item);
+
+                $res = array(
+                    'loc' => $location,
+                    'cat' => $category,
+                    'pri' => $priority,
+                    'theme' => $theme
+                );
+
+                //var_dump($res);
+            }
+            var_dump(count($current));
+        }
+    }
     public function actionConfig()
     {
 
