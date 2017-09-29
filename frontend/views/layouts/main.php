@@ -62,6 +62,9 @@ AppAsset::register($this);
         #header-navbar .profile-dropdown > button{
             margin-top: 10px;
         }
+        #header-navbar .nav > li > a > i, #sidebar-nav .nav > li > a > i {
+            margin-right: 10px;
+        }
     </style>
 </head>
 <?php $this->beginBody() ?>
@@ -151,17 +154,18 @@ AppAsset::register($this);
                 <div class="nav-no-collapse pull-right" id="header-nav">
                     <ul class="nav navbar-nav pull-right">
                         <li class="dropdown profile-dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <span class="hidden-xs"><?=Yii::$app->user->identity->username?></span> <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-right">
-                                <li><?= Html::a('<i class="fa fa-life-ring"></i>'.\Yii::t('main', 'Help'), ['site/help'], []) ?></li>
-                                <li><?= Html::a('<i class="fa fa-cog"></i>'.\Yii::t('main', 'Settings'), ['site/config'], []) ?></li>
-                                <li><?= Html::a('<i class="fa fa-power-off"></i>'.\Yii::t('main', 'Logout'), ['site/logout'], []) ?></li>
-                            </ul>
+                            <span>
+                                <span class="hidden-xs"><?=Yii::$app->user->identity->username?></span>
+                            </span>
                         </li>
                         <li class="hidden-xxs">
-                            <?= Html::a('<i class="fa fa-power-off"></i>', ['site/logout'], ['class' => 'btn']) ?>
+                            <?= Html::a('<i class="fa fa-cog"></i>'.\Yii::t('main', 'Settings'), ['site/config'], ['class' => 'btn']) ?>
+                        </li>
+                        <li class="hidden-xxs">
+                            <?= Html::a('<i class="fa fa-life-ring"></i>'.\Yii::t('main', 'Help'), ['site/help'], ['class' => 'btn']) ?>
+                        </li>
+                        <li class="hidden-xxs">
+                            <?= Html::a('<i class="fa fa-power-off"></i>'.\Yii::t('main', 'Logout'), ['site/logout'], ['class' => 'btn']) ?>
                         </li>
                     </ul>
                 </div>

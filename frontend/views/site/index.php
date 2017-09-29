@@ -25,25 +25,25 @@ $this->params['breadcrumbs'][] = $this->title;
                         <div class="col-lg-3">
                             <h2>Локации:</h2>
                             <? foreach($location as $item){ ?>
-                                <p>[<?=$item->id?>] <?=$item->name?></p>
+                                <p>[<?=$item->mlg_id?>] <?=$item->name?></p>
                             <? } ?>
                         </div>
                         <div class="col-lg-3">
                             <h2>Категории:</h2>
                             <? foreach($category as $item){ ?>
-                                <p>[<?=$item->id?>] <?=$item->name?></p>
+                                <p>[<?=$item->mlg_id?>] <?=$item->name?></p>
                             <? } ?>
                         </div>
                         <div class="col-lg-3">
                             <h2>Приоритет:</h2>
                             <? foreach($priority as $item){ ?>
-                                <p>[<?=$item->id?>] <?=$item->name?></p>
+                                <p>[<?=$item->mlg_id?>] <?=$item->name?></p>
                             <? } ?>
                         </div>
                         <div class="col-lg-3">
                             <h2>Темы:</h2>
                             <? foreach($theme as $item){ ?>
-                                <p>[<?=$item->id?>] <?=$item->name?></p>
+                                <p>[<?=$item->mlg_id?>] <?=$item->name?></p>
                             <? } ?>
                         </div>
                     </div>

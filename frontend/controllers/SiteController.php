@@ -149,9 +149,9 @@ class SiteController extends Controller
                     'theme' => $theme
                 );
 
-                //var_dump($res);
+                var_dump($item);
             }
-            var_dump(count($current));
+
         }
     }
     public function actionConfig()
