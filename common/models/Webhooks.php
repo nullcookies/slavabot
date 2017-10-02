@@ -34,6 +34,27 @@ class Webhooks  extends \yii\db\ActiveRecord
         ];
     }
 
+    public function getLocationValue()
+    {
+        return $this->hasOne(Location::className(), ['id' => 'location']);
+    }
+    public function getCategoryValue()
+    {
+        return $this->hasOne(Category::className(), ['id' => 'category']);
+    }
+    public function getPriorityValue()
+    {
+        return $this->hasOne(Priority::className(), ['id' => 'priority']);
+    }
+    public function getThemeValue()
+    {
+        return $this->hasOne(Theme::className(), ['id' => 'theme']);
+    }
+
+    public static function getWebHooks()
+    {
+        return Webhooks::find()->all();
+    }
 
     public static function checkWebHook($mlg_id)
     {
