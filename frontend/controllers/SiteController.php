@@ -15,10 +15,12 @@ use frontend\models\UserConfig;
 use frontend\models\ContactForm;
 use frontend\models\PasswordConfig;
 use common\models\User;
+use common\models\Webhooks;
 use common\models\Location;
 use common\models\Category;
 use common\models\Priority;
 use common\models\Theme;
+use common\models\Additional;
 
 /**
  * Site controller
@@ -117,6 +119,11 @@ class SiteController extends Controller
         return Yii::$app->response->redirect(['site/login']);
     }
 
+    /**
+     * Обработчик веб-хуков.
+     * Пишем в файлик бэкап, пишем в бд
+     */
+
     public function actionGetdata()
     {
 
@@ -125,31 +132,26 @@ class SiteController extends Controller
         $current = file_get_contents($file);
         if(\Yii::$app->request->isPost){
 
+            $new = file_get_contents("php://input");
 
-            $current .= file_get_contents("php://input")."\n";
-
+            $current .= $new."\n";
             file_put_contents($file, $current);
+            $item = json_decode($new);
+
+            Webhooks::SaveWebHook($item);
 
         }else{
+
+            /**
+             * Принудительный запуск записи вебхуков из файла.
+             */
+
             $current = explode("\n", $current);
 
             foreach ($current as $item) {
+
                 $item = json_decode($item);
-
-
-                $location = Location::saveReference($item);
-                $category = Category::saveReference($item);
-                $priority = Priority::saveReference($item);
-                $theme = Theme::saveReference($item);
-
-                $res = array(
-                    'loc' => $location,
-                    'cat' => $category,
-                    'pri' => $priority,
-                    'theme' => $theme
-                );
-
-                var_dump($item);
+                Webhooks::SaveWebHook($item);
             }
 
         }
