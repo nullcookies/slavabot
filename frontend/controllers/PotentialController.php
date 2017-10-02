@@ -16,12 +16,15 @@ use frontend\models\ContactForm;
 use frontend\models\PasswordConfig;
 use common\models\User;
 use common\models\Webhooks;
+use yii\web\Response;
+
 
 /**
  * Site controller
  */
 class PotentialController extends Controller
 {
+
     public function behaviors()
     {
         return [
@@ -48,7 +51,15 @@ class PotentialController extends Controller
                     //'getdata' => ['post']
                 ],
             ],
+            [
+                'class' => \yii\filters\ContentNegotiator::className(),
+                'only' => ['list'],
+                'formats' => [
+                    'application/json' => Response::FORMAT_JSON,
+                ],
+            ],
         ];
+
     }
 
     public function actions()
@@ -64,13 +75,11 @@ class PotentialController extends Controller
         ];
     }
 
-    public function actionIndex()
+    public function actionList()
     {
-
-        return $this->render('index', [
+        return array(
             'webhooks' => Webhooks::getWebHooks(),
-            'count' => count(Webhooks::getWebHooks())
-        ]);
+        );
     }
 
 }

@@ -17,13 +17,14 @@ AppAsset::register($this);
 <?php $this->beginPage() ?>
 
 <!DOCTYPE html>
-<html lang="<?= Yii::$app->language ?>">
+<html lang="<?= Yii::$app->language ?>"  ng-app="cubeWebApp">
 <head>
     <meta  charset="<?= Yii::$app->charset ?>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <?= Html::csrfMetaTags() ?>
-    <title><?= Html::encode($this->title) ?></title>
+
+    <title ng-bind="title"><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
     <link href='//fonts.googleapis.com/css?family=Open+Sans:400,600,700,300|Titillium+Web:200,300,400' rel='stylesheet' type='text/css'>
 
@@ -185,11 +186,11 @@ AppAsset::register($this);
             <div id="nav-col">
                 <section id="col-left" class="col-left-nano">
                     <div id="col-left-inner" class="col-left-nano-content">
-                        <div class="collapse navbar-collapse navbar-ex1-collapse" id="sidebar-nav">
+                        <div class="collapse navbar-collapse navbar-ex1-collapse" id="sidebar-nav" bs-navbar>
                         <?=Menu::widget([
                             'items' => [
                                 ['label' => \Yii::t('main', 'Potential clients'),
-                                    'url' => '/potential/',
+                                    'url' => '#/potential',
                                     'options'=>['class'=>'header-nav__item'],
                                     'template' => '<a href="{url}" ><i class="fa fa-list"></i><span style="font-size: 0.775em;">{label}</span></a>',
                                 ],
@@ -218,6 +219,11 @@ AppAsset::register($this);
                                     'options'=>['class'=>'header-nav__item'],
                                     'template' => '<a href="{url}" ><i class="fa fa-life-ring"></i><span>{label}</span></a>',
                                 ],
+                                ['label' => \Yii::t('main', 'Test'),
+                                    'url' => '#/pages/user-profile',
+                                    'options'=>['class'=>'header-nav__item'],
+                                    'template' => '<a href="{url}" ><i class="fa fa-life-ring"></i><span>{label}</span></a>',
+                                ],
 
                             ],
                             'options' => [
@@ -227,7 +233,6 @@ AppAsset::register($this);
                         ]);
 
                         ?>
-
                         </div>
                     </div>
                 </section>
@@ -236,25 +241,37 @@ AppAsset::register($this);
             <div id="content-wrapper">
                 <div class="row">
                     <div class="col-lg-12">
-
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <?= Breadcrumbs::widget([
-                                    'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-                                ]) ?>
-                                <h1><?= Html::encode($this->title) ?></h1>
-                            </div>
+                        <div class="slide-main-container">
+                            <div ng-view autoscroll="true" class="slide-main-animation"></div>
                         </div>
-                        <?= $content ?>
+
                     </div>
                 </div>
 
-                <footer id="footer-bar" class="row">
-                    <p id="footer-copyright" class="col-xs-12">
-                        Powered by Cube Theme.
-                    </p>
-                </footer>
+                <div ng-include='"views/common/footer.html"'></div>
             </div>
+<!--            <div id="content-wrapper">-->
+<!--                <div class="row">-->
+<!--                    <div class="col-lg-12">-->
+<!---->
+<!--                        <div class="row">-->
+<!--                            <div class="col-lg-12">-->
+<!--                                --><?//= Breadcrumbs::widget([
+//                                    'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+//                                ]) ?>
+<!--                                <h1>--><?//= Html::encode($this->title) ?><!--</h1>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        --><?//= $content ?>
+<!--                    </div>-->
+<!--                </div>-->
+<!---->
+<!--                <footer id="footer-bar" class="row">-->
+<!--                    <p id="footer-copyright" class="col-xs-12">-->
+<!--                        Powered by Cube Theme.-->
+<!--                    </p>-->
+<!--                </footer>-->
+<!--            </div>-->
         </div>
     </div>
 </div>

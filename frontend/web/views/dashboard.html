@@ -1,0 +1,37 @@
+<div class="row">
+	<div class="col-lg-12">
+		<div class="main-box clearfix">
+			<header class="main-box-header clearfix">
+				<h2>Отчетная страница</h2>
+			</header>
+
+			<div class="main-box-body clearfix">
+				<div class="jumbotron">
+					<h1>Принято WebHooks: <span ng-bind="webhooks"></span></h1>
+				</div>
+
+				<div class="body-content">
+					<h1>Наполнение справочников:</h1>
+					<div class="row">
+						<div class="col-lg-3">
+							<h2>Локации:</h2>
+							<p ng-repeat="loc in location">[{{loc.id}}] {{loc.name}}</p>
+						</div>
+						<div class="col-lg-3">
+							<h2>Категории:</h2>
+							<p ng-repeat="cat in category">[{{cat.id}}] {{cat.name}}</p>
+						</div>
+						<div class="col-lg-3">
+							<h2>Приоритет:</h2>
+							<p ng-repeat="pri in priority">[{{pri.id}}] {{pri.name}}</p>
+						</div>
+						<div class="col-lg-3">
+							<h2>Темы:</h2>
+							<p ng-repeat="the in theme">[{{the.id}}] {{the.name}}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

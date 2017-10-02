@@ -21,6 +21,8 @@ use common\models\Category;
 use common\models\Priority;
 use common\models\Theme;
 use common\models\Additional;
+use yii\web\Response;
+
 
 /**
  * Site controller
@@ -53,6 +55,13 @@ class SiteController extends Controller
                     //'getdata' => ['post']
                 ],
             ],
+            [
+                'class' => \yii\filters\ContentNegotiator::className(),
+                'only' => ['main'],
+                'formats' => [
+                    'application/json' => Response::FORMAT_JSON,
+                ],
+            ],
         ];
     }
     public function beforeAction($action)
@@ -78,19 +87,24 @@ class SiteController extends Controller
 
     public function actionIndex()
     {
+        return $this->render('index');
+    }
+
+    public function actionMain()
+    {
         $file = 'webhooks.txt';
 
         $current = file_get_contents($file);
 
         $current = count(explode("\n", $current))-1;
 
-        return $this->render('index', [
+        return array(
             'location' => Location::find()->all(),
             'category' => Category::find()->all(),
             'priority' => Priority::find()->all(),
             'theme' => Theme::find()->all(),
             'webhooks' => $current
-        ]);
+        );
     }
 
     public function actionLogin()
@@ -151,6 +165,7 @@ class SiteController extends Controller
             foreach ($current as $item) {
 
                 $item = json_decode($item);
+                //var_dump($item);
                 Webhooks::SaveWebHook($item);
             }
 

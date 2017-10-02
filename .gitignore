@@ -35,5 +35,4 @@ phpunit.phar
 /.vagrant
 backend/web/upload
 .github
-*.html
 /frontend/web/cube/angularjs/img/samples
