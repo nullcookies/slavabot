@@ -9,7 +9,6 @@ var app = angular.module('cubeWebApp', [
 	'ngAnimate',
 	'easypiechart',
     'angularMoment'
-
 ]);
 
 app.config(['cfpLoadingBarProvider', function(cfpLoadingBarProvider) {

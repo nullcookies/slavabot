@@ -41,21 +41,27 @@ class Webhooks  extends \yii\db\ActiveRecord
 
     public static function getWebHooks()
     {
-        return Webhooks::find()
-            ->orderBy('created_at DESC')
-            ->select([
-                self::tableName().'.*',
-                Location::tableName().'.name AS locationValue',
-                Category::tableName().'.name AS categoryValue',
-                Theme::tableName().'.name AS themeValue',
-                Social::tableName().'.name AS socialValue',
-            ])
-            ->leftJoin(Location::tableName(), '`'.self::tableName().'`.`location` = `'.Location::tableName().'`.`id`')
-            ->leftJoin(Category::tableName(), '`'.self::tableName().'`.`category` = `'.Category::tableName().'`.`id`')
-            ->leftJoin(Theme::tableName(), '`'.self::tableName().'`.`theme` = `'.Theme::tableName().'`.`id`')
-            ->leftJoin(Social::tableName(), '`'.self::tableName().'`.`social` = `'.Social::tableName().'`.`id`')
-            ->asArray()
-            ->all();
+        return array(
+            'webhooks'  =>  Webhooks::find()
+                            ->orderBy('created_at DESC')
+                            ->select([
+                                self::tableName().'.*',
+                                Location::tableName().'.name AS locationValue',
+                                Category::tableName().'.name AS categoryValue',
+                                Theme::tableName().'.name AS themeValue',
+                                Social::tableName().'.code AS socialValue',
+                            ])
+                            ->leftJoin(Location::tableName(), '`'.self::tableName().'`.`location` = `'.Location::tableName().'`.`id`')
+                            ->leftJoin(Category::tableName(), '`'.self::tableName().'`.`category` = `'.Category::tableName().'`.`id`')
+                            ->leftJoin(Theme::tableName(), '`'.self::tableName().'`.`theme` = `'.Theme::tableName().'`.`id`')
+                            ->leftJoin(Social::tableName(), '`'.self::tableName().'`.`social` = `'.Social::tableName().'`.`id`')
+                            ->asArray()
+                            ->all(),
+            'location'  =>  Location::find()->asArray()->all(),
+            'category'  =>  Category::find()->asArray()->all(),
+            'priority'  =>  Priority::find()->asArray()->all(),
+            'theme'     =>  Theme::find()->asArray()->all()
+        );
     }
 
     public static function checkWebHook($mlg_id)

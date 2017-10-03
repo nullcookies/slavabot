@@ -17,6 +17,7 @@ class AppAsset extends AssetBundle
         '/cube/components/font-awesome/css/font-awesome.css',
         '/cube/css/libs/nanoscroller.css',
         '/cube/css/compiled/theme_styles.css',
+        '/cube/angularjs/css/back.css',
     ];
     public $js = [
         '/cube/js/demo-skin-changer.js',

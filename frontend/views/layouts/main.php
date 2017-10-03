@@ -32,41 +32,6 @@ AppAsset::register($this);
     <script src="js/html5shiv.js"></script>
     <script src="js/respond.min.js"></script>
     <![endif]-->
-    <style>
-        #user-left-box {
-            padding: 20px 15px 20px 0px;
-        }
-        #logo img{
-            float: left;
-        }
-        #logo span{
-            line-height: 30px;
-            margin-left: 15px;
-        }
-        #header-navbar .profile-dropdown > span {
-            float: left;
-            display: block;
-            margin-right: 3px;
-            font-size: em;
-            color: #fff;
-            font-size: 0.875em;
-            padding-left: 18px;
-            padding-right: 18px;
-            border: none;
-            border-radius: 0;
-            background-clip: padding-box;
-            height: 50px;
-            padding-top: 8px;
-            padding-bottom: 7px;
-            line-height: 35px;
-        }
-        #header-navbar .profile-dropdown > button{
-            margin-top: 10px;
-        }
-        #header-navbar .nav > li > a > i, #sidebar-nav .nav > li > a > i {
-            margin-right: 10px;
-        }
-    </style>
 </head>
 <?php $this->beginBody() ?>
 

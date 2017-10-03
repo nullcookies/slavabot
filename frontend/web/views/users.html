@@ -1,416 +1,58 @@
 <div class="row">
 	<div class="col-lg-12">
-		<ol class="breadcrumb">
-			<li><a href="">Home</a></li>
-			<li class="active"><span>Users</span></li>
-		</ol>
-		
-		<div class="clearfix">
-			<h1 class="pull-left">Users</h1>
-			
-			<div class="pull-right top-page-ui">
-				<a href="" class="btn btn-primary pull-right">
-					<i class="fa fa-plus-circle fa-lg"></i> Add user
-				</a>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div class="row">
-	<div class="col-lg-12">
 		<div class="main-box no-header clearfix">
 			<div class="main-box-body clearfix">
 				<div class="table-responsive">
-					<input type="text" class="form-control" placeholder="Поиск" ng-model="search">
-					<table class="table user-list table-hover">
-						<thead>
-							<tr>
-								<th><span>Запись</span></th>
-								<th><span>Дата создания</span></th>
-								<th class="text-center"><span>Город</span></th>
-								<th><span>Email</span></th>
-								<th>&nbsp;</th>
-							</tr>
-						</thead>
+					<div class="row webhooks__filters">
+						<div class="col-lg-4">
+							<input type="text" class="form-control" placeholder="Поиск" ng-model="search" ng-change="currentPage=0">
+						</div>
+						<div class="col-lg-4">
+							<select class="form-control" ng-model="city" placeholder="Поиск" ng-change="currentPage=0">
+								<option value="" disabled selected>Город</option>
+
+								<option value="{{location.id}}"  ng-repeat="location in locations">{{location.name}}</option>
+							</select>
+						</div>
+						<div class="col-lg-4">
+							<select class="form-control" ng-model="theme" ng-change="currentPage=0">
+								<option value="" disabled selected>Тема</option>
+								<option value="{{theme.id}}"  ng-repeat="theme in themes">{{theme.name}}</option>
+							</select>
+						</div>
+					</div>
+					<table class="table user-list">
+
 						<tbody>
-						<tr ng-repeat="webhook in webhooks | filter:search">
-							<td>
-								<img src="https://orteka.ru/local/templates/.default/components/bitrix/news.detail/salon_item/images/no-photo.png" alt=""/>
-								<span class="user-subhead">{{webhook.author_name}}</span>
-								<a target="_blank" href="{{webhook.post_url}}" class="user-link">{{webhook.post_url}}</a>
-								<span class="user-subhead" ng-bind-html="sce.trustAsHtml(webhook.post_content)"></span>
+							<tr ng-repeat="webhook in webhooks | filter:search | filter: { location : city } : true | filter: { theme : theme } : true | startFrom:currentPage*pageSize | limitTo:pageSize">
+								<td>
+									<div class="webhooks">
+										<div class="ss {{webhook.socialValue.replace('.', '')}}"></div>
+										<div class="webhooks__photo">
+											<img src="https://orteka.ru/local/templates/.default/components/bitrix/news.detail/salon_item/images/no-photo.png" alt=""/>
+											<time am-time-ago="webhook.created_at * 1000"></time>
+										</div>
 
-							</td>
-							<td>
-								<time am-time-ago="webhook.created_at * 1000"></time>
-							</td>
-							<td class="text-center">
-								{{webhook.locationValue}}
-							</td>
-							<td class="text-center">
-								{{webhook.socialValue}}
-							</td>
-							<td class="text-center">
-								<span class="label label-default">{{webhook.themeValue}}</span>
-							</td>
-						</tr>
-							<!--<tr>-->
-
-								<!--<td class="text-center">-->
-									<!--<span class="label label-default">Inactive</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--<a href="">mila@kunis.com</a>-->
-								<!--</td>-->
-								<!--<td style="width: 20%;">-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-pencil fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link danger">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-								<!--</td>-->
-							<!--</tr>-->
-							<!--<tr>-->
-								<!--<td>-->
-									<!--<img src="img/samples/robert-300.jpg" alt=""/>-->
-									<!--<a href="" class="user-link">Robert Downey Jr.</a>-->
-									<!--<span class="user-subhead">Member</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--2013/08/12-->
-								<!--</td>-->
-								<!--<td class="text-center">-->
-									<!--<span class="label label-success">Active</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--<a href="">marlon@brando.com</a>-->
-								<!--</td>-->
-								<!--<td style="width: 20%;">-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-pencil fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link danger">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-								<!--</td>-->
-							<!--</tr>-->
-							<!--<tr>-->
-								<!--<td>-->
-									<!--<img src="img/samples/ryan-300.jpg" alt=""/>-->
-									<!--<a href="" class="user-link">Ryan Gossling</a>-->
-									<!--<span class="user-subhead">Registered</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--2013/03/03-->
-								<!--</td>-->
-								<!--<td class="text-center">-->
-									<!--<span class="label label-danger">Banned</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--<a href="">jack@nicholson</a>-->
-								<!--</td>-->
-								<!--<td style="width: 20%;">-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-pencil fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link danger">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-								<!--</td>-->
-							<!--</tr>-->
-							<!--<tr>-->
-								<!--<td>-->
-									<!--<img src="img/samples/emma-300.jpg" alt=""/>-->
-									<!--<a href="" class="user-link">Emma Watson</a>-->
-									<!--<span class="user-subhead">Registered</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--2004/01/24-->
-								<!--</td>-->
-								<!--<td class="text-center">-->
-									<!--<span class="label label-warning">Pending</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--<a href="">humphrey@bogart.com</a>-->
-								<!--</td>-->
-								<!--<td style="width: 20%;">-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-pencil fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link danger">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-								<!--</td>-->
-							<!--</tr>-->
-							<!--<tr>-->
-								<!--<td>-->
-									<!--<img src="img/samples/robert-300.jpg" alt=""/>-->
-									<!--<a href="" class="user-link">Robert Downey Jr.</a>-->
-									<!--<span class="user-subhead">Admin</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--2013/12/31-->
-								<!--</td>-->
-								<!--<td class="text-center">-->
-									<!--<span class="label label-success">Active</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--<a href="">spencer@tracy</a>-->
-								<!--</td>-->
-								<!--<td style="width: 20%;">-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-pencil fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link danger">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-								<!--</td>-->
-							<!--</tr>-->
-							<!--<tr>-->
-								<!--<td>-->
-									<!--<img src="img/samples/kunis-300.jpg" alt=""/>-->
-									<!--<a href="" class="user-link">Mila Kunis</a>-->
-									<!--<span class="user-subhead">Admin</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--2013/08/08-->
-								<!--</td>-->
-								<!--<td class="text-center">-->
-									<!--<span class="label label-default">Inactive</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--<a href="">mila@kunis.com</a>-->
-								<!--</td>-->
-								<!--<td style="width: 20%;">-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-pencil fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link danger">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-								<!--</td>-->
-							<!--</tr>-->
-							<!--<tr>-->
-								<!--<td>-->
-									<!--<img src="img/samples/lima-300.jpg" alt=""/>-->
-									<!--<a href="" class="user-link">George Clooney</a>-->
-									<!--<span class="user-subhead">Member</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--2013/08/12-->
-								<!--</td>-->
-								<!--<td class="text-center">-->
-									<!--<span class="label label-success">Active</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--<a href="">marlon@brando.com</a>-->
-								<!--</td>-->
-								<!--<td style="width: 20%;">-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-pencil fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link danger">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-								<!--</td>-->
-							<!--</tr>-->
-							<!--<tr>-->
-								<!--<td>-->
-									<!--<img src="img/samples/ryan-300.jpg" alt=""/>-->
-									<!--<a href="" class="user-link">Ryan Gossling</a>-->
-									<!--<span class="user-subhead">Registered</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--2013/03/03-->
-								<!--</td>-->
-								<!--<td class="text-center">-->
-									<!--<span class="label label-danger">Banned</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--<a href="">jack@nicholson</a>-->
-								<!--</td>-->
-								<!--<td style="width: 20%;">-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-pencil fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link danger">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-								<!--</td>-->
-							<!--</tr>-->
-							<!--<tr>-->
-								<!--<td>-->
-									<!--<img src="img/samples/emma-300.jpg" alt=""/>-->
-									<!--<a href="" class="user-link">Emma Watson</a>-->
-									<!--<span class="user-subhead">Registered</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--2004/01/24-->
-								<!--</td>-->
-								<!--<td class="text-center">-->
-									<!--<span class="label label-warning">Pending</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--<a href="">humphrey@bogart.com</a>-->
-								<!--</td>-->
-								<!--<td style="width: 20%;">-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-pencil fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link danger">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-								<!--</td>-->
-							<!--</tr>-->
-							<!--<tr>-->
-								<!--<td>-->
-									<!--<img src="img/samples/robert-300.jpg" alt=""/>-->
-									<!--<a href="" class="user-link">Robert Downey Jr.</a>-->
-									<!--<span class="user-subhead">Admin</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--2013/12/31-->
-								<!--</td>-->
-								<!--<td class="text-center">-->
-									<!--<span class="label label-success">Active</span>-->
-								<!--</td>-->
-								<!--<td>-->
-									<!--<a href="">spencer@tracy</a>-->
-								<!--</td>-->
-								<!--<td style="width: 20%;">-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-search-plus fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-pencil fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-									<!--<a href="" class="table-link danger">-->
-										<!--<span class="fa-stack">-->
-											<!--<i class="fa fa-square fa-stack-2x"></i>-->
-											<!--<i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>-->
-										<!--</span>-->
-									<!--</a>-->
-								<!--</td>-->
-							<!--</tr>-->
+										<p ng-bind-html="sce.trustAsHtml(webhook.post_content)"></p>
+										<div class="webhook__get">Получить контакт</div>
+										<div class="webhooks__point">{{webhook.locationValue}}</div>
+									</div>
+								</td>
+							</tr>
 						</tbody>
 					</table>
 				</div>
+				<ul class="pagination pull-left" ng-show="(((webhooks| filter:search | filter: { location : city } : true | filter: { theme : theme } : true).length)/pageSize)>1">
+					<li>
+						<a href="" ng-click="disabledBack()" ><i class="fa fa-chevron-left"></i></a>
+					</li>
+					<li ng-repeat="n in [] | range : (((webhooks| filter:search | filter: { location : city } : true | filter: { theme : theme } : true).length)/pageSize)"  ng-class="{active : n==currentPage}">
+						<a href="" class="active" ng-click="setPage(n)" ng-show="paginationBlock(n)">{{n+1}}</a>
+					</li>
+					<li>
+						<a href="" ng-click="disabledNext()"><i class="fa fa-chevron-right"></i></a>
+					</li>
+				</ul>
 			</div>
 		</div>
 	</div>
