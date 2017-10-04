@@ -17,6 +17,9 @@ use common\models\ExtraPropsBehaviour;
 class Webhooks  extends \yii\db\ActiveRecord
 {
 
+    public function getClient(){
+        return $this->client+5;
+    }
 
 
     /**
@@ -38,25 +41,48 @@ class Webhooks  extends \yii\db\ActiveRecord
         ];
     }
 
+    public function getLocationValue()
+    {
+        return $this->hasOne(Location::className(), ['id' => 'location']);
+    }
+    public function getSocialValue()
+    {
+        return $this->hasOne(Social::className(), ['id' => 'social']);
+    }
+    public function getThemeValue()
+    {
+        return $this->hasOne(Social::className(), ['id' => 'theme']);
+    }
+
+    public function fields()
+    {
+        return [
+            'mlg_id',
+            'location' => function(){
+                return (string)$this->location;
+            },
+            'theme' => function(){
+                return (string)$this->theme;
+            },
+            'social',
+            'locationValue' => 'locationValue',
+            'post_content' => function(){
+                $body = $this->post_content;
+                $pattern = '~(\(\d{3}\)\s\d{3}\-\d{2}\-\d{2})|(\d{3}\s\d{3}\s\d{2}\s\d{2})|(\d{10})|(\d{3}\s\d{3}\-\d{2}\-\d{2})|(8\(\d{3}\)\s\d{3}\-\d{2}\-\d{2})|(7\s\d{3}\s\d{3}\-\d{2}\-\d{2})~s';
+                $body = preg_replace($pattern, "<b>[номер телефона]</b>", $body);
+                return $body;
+            },
+            'socialValue' => 'socialValue',
+            'themeValue' => 'themeValue',
+            'created_at'
+        ];
+    }
 
     public static function getWebHooks()
     {
+
         return array(
-            'webhooks'  =>  Webhooks::find()
-                            ->orderBy('created_at DESC')
-                            ->select([
-                                self::tableName().'.*',
-                                Location::tableName().'.name AS locationValue',
-                                Category::tableName().'.name AS categoryValue',
-                                Theme::tableName().'.name AS themeValue',
-                                Social::tableName().'.code AS socialValue',
-                            ])
-                            ->leftJoin(Location::tableName(), '`'.self::tableName().'`.`location` = `'.Location::tableName().'`.`id`')
-                            ->leftJoin(Category::tableName(), '`'.self::tableName().'`.`category` = `'.Category::tableName().'`.`id`')
-                            ->leftJoin(Theme::tableName(), '`'.self::tableName().'`.`theme` = `'.Theme::tableName().'`.`id`')
-                            ->leftJoin(Social::tableName(), '`'.self::tableName().'`.`social` = `'.Social::tableName().'`.`id`')
-                            ->asArray()
-                            ->all(),
+            'webhooks'  =>  Webhooks::find()->orderBy(['created_at' => SORT_DESC])->all(),
             'location'  =>  Location::find()->asArray()->all(),
             'category'  =>  Category::find()->asArray()->all(),
             'priority'  =>  Priority::find()->asArray()->all(),

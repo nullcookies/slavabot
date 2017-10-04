@@ -1,33 +1,42 @@
 <div class="row">
 	<div class="col-lg-12">
-		<div class="main-box no-header clearfix">
+		<div class="main-box no-header clearfix" ng-show="webhooks.length==0">
+			<img src="/cube/angularjs/img/loader.gif" style="margin-left: 35%;" alt="">
+		</div>
+		<div class="main-box no-header clearfix" ng-show="webhooks.length>0">
 			<div class="main-box-body clearfix">
-				<div class="table-responsive">
+				<div class="table-responsive" id="top">
 					<div class="row webhooks__filters">
-						<div class="col-lg-4">
+						<div ng-class="{'has-error' : nameError}" class="col-lg-3">
+							<input type="text" class="form-control"  placeholder="Название фильтра" ng-model="filterName">
+						</div>
+						<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
 							<input type="text" class="form-control" placeholder="Поиск" ng-model="search" ng-change="currentPage=0">
 						</div>
-						<div class="col-lg-4">
+						<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
 							<select class="form-control" ng-model="city" placeholder="Поиск" ng-change="currentPage=0">
 								<option value="" disabled selected>Город</option>
-
 								<option value="{{location.id}}"  ng-repeat="location in locations">{{location.name}}</option>
 							</select>
 						</div>
-						<div class="col-lg-4">
+						<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
 							<select class="form-control" ng-model="theme" ng-change="currentPage=0">
 								<option value="" disabled selected>Тема</option>
 								<option value="{{theme.id}}"  ng-repeat="theme in themes">{{theme.name}}</option>
 							</select>
 						</div>
+						<div class="col-lg-3">
+							<button class="btn btn-success col-lg-12" ng-click="saveFilter()">
+								Сохранить фильтр
+							</button>
+						</div>
 					</div>
 					<table class="table user-list">
-
 						<tbody>
 							<tr ng-repeat="webhook in webhooks | filter:search | filter: { location : city } : true | filter: { theme : theme } : true | startFrom:currentPage*pageSize | limitTo:pageSize">
 								<td>
 									<div class="webhooks">
-										<div class="ss {{webhook.socialValue.replace('.', '')}}"></div>
+										<div class="ss {{webhook.socialValue.code.replace('.', '')}}"></div>
 										<div class="webhooks__photo">
 											<img src="https://orteka.ru/local/templates/.default/components/bitrix/news.detail/salon_item/images/no-photo.png" alt=""/>
 											<time am-time-ago="webhook.created_at * 1000"></time>
@@ -35,24 +44,29 @@
 
 										<p ng-bind-html="sce.trustAsHtml(webhook.post_content)"></p>
 										<div class="webhook__get">Получить контакт</div>
-										<div class="webhooks__point">{{webhook.locationValue}}</div>
+										<div class="webhooks__point">{{webhook.locationValue.name}}</div>
 									</div>
 								</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
-				<ul class="pagination pull-left" ng-show="(((webhooks| filter:search | filter: { location : city } : true | filter: { theme : theme } : true).length)/pageSize)>1">
-					<li>
-						<a href="" ng-click="disabledBack()" ><i class="fa fa-chevron-left"></i></a>
-					</li>
-					<li ng-repeat="n in [] | range : (((webhooks| filter:search | filter: { location : city } : true | filter: { theme : theme } : true).length)/pageSize)"  ng-class="{active : n==currentPage}">
-						<a href="" class="active" ng-click="setPage(n)" ng-show="paginationBlock(n)">{{n+1}}</a>
-					</li>
-					<li>
-						<a href="" ng-click="disabledNext()"><i class="fa fa-chevron-right"></i></a>
-					</li>
-				</ul>
+				<div class="row">
+					<div class="col-lg-6 col-lg-offset-3">
+						<ul class="pagination pull-left" ng-show="(((webhooks| filter:search | filter: { location : city } : true | filter: { theme : theme } : true).length)/pageSize)>1">
+							<li>
+								<a href="" scroll-on-click ng-click="disabledBack()" ><i class="fa fa-chevron-left"></i></a>
+							</li>
+							<li ng-repeat="n in [] | range : (((webhooks| filter:search | filter: { location : city } : true | filter: { theme : theme } : true).length)/pageSize)"  ng-class="{active : n==currentPage}">
+								<a href="" scroll-on-click class="active" ng-click="setPage(n)" ng-show="paginationBlock(n)">{{n+1}}</a>
+							</li>
+							<li>
+								<a href="" scroll-on-click  ng-click="disabledNext()"><i class="fa fa-chevron-right"></i></a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
 			</div>
 		</div>
 	</div>

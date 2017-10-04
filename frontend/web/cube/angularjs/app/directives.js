@@ -85,3 +85,20 @@ angular
 	.module('cubeWebApp')
 	.directive('bsNavbar', bsNavbar)
 	.directive('showtab', showtab)
+    .directive('scrollOnClick', function() {
+        return {
+            restrict: 'A',
+            link: function(scope, $elm) {
+                var idToScroll = "#top";
+                $elm.on('click', function() {
+                    var $target;
+                    if (idToScroll) {
+                        $target = $(idToScroll);
+                    } else {
+                        $target = $elm;
+                    }
+                    $("body").animate({scrollTop: $target.offset().top}, "slow");
+                });
+            }
+        }
+    })

@@ -39,7 +39,7 @@ AppAsset::register($this);
 <div id="theme-wrapper">
     <header class="navbar" id="header-navbar">
         <div class="container">
-            <a href="index.html" id="logo" class="navbar-brand">
+            <a href="#/dasboard" id="logo" class="navbar-brand">
                 <img src="/cube/img/logo.png" alt="" class="normal-logo logo-white"/>
                 <img src="/cube/img/logo-black.png" alt="" class="normal-logo logo-black"/>
                 <img src="/cube/img/logo-small.png" alt="" class="small-logo hidden-xs hidden-sm hidden"/>
@@ -125,10 +125,10 @@ AppAsset::register($this);
                             </span>
                         </li>
                         <li class="hidden-xxs">
-                            <?= Html::a('<i class="fa fa-cog"></i>'.\Yii::t('main', 'Settings'), ['site/config'], ['class' => 'btn']) ?>
+                            <?= Html::a('<i class="fa fa-cog"></i>'.\Yii::t('main', 'Settings'), ['#/pages/config'], ['class' => 'btn']) ?>
                         </li>
                         <li class="hidden-xxs">
-                            <?= Html::a('<i class="fa fa-life-ring"></i>'.\Yii::t('main', 'Help'), ['site/help'], ['class' => 'btn']) ?>
+                            <?= Html::a('<i class="fa fa-life-ring"></i>'.\Yii::t('main', 'Help'), ['#/pages/help'], ['class' => 'btn']) ?>
                         </li>
                         <li class="hidden-xxs">
                             <?= Html::a('<i class="fa fa-power-off"></i>'.\Yii::t('main', 'Logout'), ['site/logout'], ['class' => 'btn']) ?>
@@ -160,32 +160,27 @@ AppAsset::register($this);
                                     'template' => '<a href="{url}" ><i class="fa fa-list"></i><span style="font-size: 0.775em;">{label}</span></a>',
                                 ],
                                 ['label' => \Yii::t('main', 'My contacts'),
-                                    'url' => '/contacts/',
+                                    'url' => '#/pages/contacts',
                                     'options'=>['class'=>'header-nav__item'],
                                     'template' => '<a href="{url}" ><i class="fa fa-folder-open-o"></i><span>{label}</span></a>',
                                 ],
                                 ['label' => \Yii::t('main', 'Notifications'),
-                                    'url' => '/site/notifications',
+                                    'url' => '#/pages/notifications',
                                     'options'=>['class'=>'header-nav__item'],
                                     'template' => '<a href="{url}" ><i class="fa fa-bell-o"></i><span>{label}</span></a>',
                                 ],
                                 ['label' => \Yii::t('main', 'Integration'),
-                                    'url' => '/integration/',
+                                    'url' => '#/pages/integration',
                                     'options'=>['class'=>'header-nav__item'],
                                     'template' => '<a href="{url}" ><i class="fa fa-cloud-upload"></i><span>{label}</span></a>',
                                 ],
                                 ['label' => \Yii::t('main', 'Settings'),
-                                    'url' => '/site/config',
+                                    'url' => '#/pages/config',
                                     'options'=>['class'=>'header-nav__item'],
                                     'template' => '<a href="{url}" ><i class="fa fa-sliders"></i><span>{label}</span></a>',
                                 ],
                                 ['label' => \Yii::t('main', 'Help'),
-                                    'url' => '/site/help',
-                                    'options'=>['class'=>'header-nav__item'],
-                                    'template' => '<a href="{url}" ><i class="fa fa-life-ring"></i><span>{label}</span></a>',
-                                ],
-                                ['label' => \Yii::t('main', 'Test'),
-                                    'url' => '#/pages/user-profile',
+                                    'url' => '#/pages/help',
                                     'options'=>['class'=>'header-nav__item'],
                                     'template' => '<a href="{url}" ><i class="fa fa-life-ring"></i><span>{label}</span></a>',
                                 ],

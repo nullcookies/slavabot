@@ -23,18 +23,14 @@ angular.module('cubeWebApp')
         $scope.webhooks = [];
         $scope.city;
 
-
-
         $scope.sce = $sce;
-
-        var vm = this;
-
         moment.locale('ru');
-
         $scope.search   = '';
-
+        $scope.filterName = '';
         $scope.currentPage = 0;
         $scope.pageSize = 10;
+        $scope.nameError = false;
+        $scope.noFilter = false;
 
         $scope.numberOfPages = function(){
             return Math.ceil($scope.webhooks.length / $scope.pageSize);
@@ -46,7 +42,6 @@ angular.module('cubeWebApp')
             $scope.webhooks = response.data.webhooks.webhooks;
             $scope.locations = response.data.webhooks.location;
             $scope.themes = response.data.webhooks.theme;
-            $scope.categoryes = response.data.webhooks.category;
         });
 
         $scope.paginationBlock = function(n){
@@ -60,7 +55,7 @@ angular.module('cubeWebApp')
                 }
             }
 
-        }
+        };
 
         $scope.disabledBack = function() {
             if($scope.currentPage == 0){
@@ -68,7 +63,31 @@ angular.module('cubeWebApp')
             }else{
                 $scope.currentPage = $scope.currentPage-1
             }
-        }
+        };
+
+        $scope.saveFilter = function() {
+            $scope.arrFilter = {
+                'search' : $scope.search,
+                'city' : $scope.city,
+                'theme' : $scope.theme
+            };
+
+            if($scope.filterName.length<3){
+                $scope.nameError = true;
+                return false;
+            }
+
+            if($scope.search.length==0 && $scope.city === undefined && $scope.theme === undefined){
+                $scope.noFilter = true;
+                return false;
+            }
+
+            $scope.nameError = false;
+            $scope.noFilter = false;
+
+            console.log(JSON.stringify($scope.arrFilter));
+
+        };
 
         $scope.disabledNext = function() {
             if($scope.currentPage >= $scope.numberOfPages() - 1){
@@ -76,11 +95,11 @@ angular.module('cubeWebApp')
             }else{
                 $scope.currentPage = $scope.currentPage+1
             }
-        }
+        };
 
-        $scope.setPage= function(n){
+        $scope.setPage = function(n){
             $scope.currentPage = n;
-        }
+        };
     });
 
 app.filter('startFrom', function() {
