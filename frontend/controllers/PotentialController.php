@@ -7,14 +7,7 @@ use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-use common\models\LoginForm;
-use frontend\models\PasswordResetRequestForm;
-use frontend\models\ResetPasswordForm;
-use frontend\models\SignupForm;
-use frontend\models\UserConfig;
-use frontend\models\ContactForm;
-use frontend\models\PasswordConfig;
-use common\models\User;
+use common\models\Filters;
 use common\models\Webhooks;
 use yii\web\Response;
 
@@ -30,7 +23,7 @@ class PotentialController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout', 'signup', 'repassword'],
+                'only' => ['logout', 'signup', 'repassword', 'newfilter'],
                 'rules' => [
                     [
                         'actions' => ['signup', 'repassword'],
@@ -38,7 +31,7 @@ class PotentialController extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['logout'],
+                        'actions' => ['logout', 'newfilter'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -48,12 +41,12 @@ class PotentialController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'logout' => ['get'],
-                    //'getdata' => ['post']
+                    'savefilter' => ['post']
                 ],
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['list'],
+                'only' => ['list', 'newfilter'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -80,6 +73,17 @@ class PotentialController extends Controller
         return array(
             'webhooks' => Webhooks::getWebHooks(),
         );
+    }
+
+    public function beforeAction($action)
+    {
+        $this->enableCsrfValidation = false;
+        return parent::beforeAction($action);
+    }
+
+    public function actionNewFilter()
+    {
+        return Filters::saveFilter(Yii::$app->request->post());
     }
 
 }

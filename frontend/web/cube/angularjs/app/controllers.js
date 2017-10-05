@@ -64,7 +64,6 @@ angular.module('cubeWebApp')
                 $scope.currentPage = $scope.currentPage-1
             }
         };
-
         $scope.saveFilter = function() {
             $scope.arrFilter = {
                 'search' : $scope.search,
@@ -85,10 +84,21 @@ angular.module('cubeWebApp')
             $scope.nameError = false;
             $scope.noFilter = false;
 
-            console.log(JSON.stringify($scope.arrFilter));
+            var data = $.param({
+                name: $scope.filterName,
+                filter: JSON.stringify($scope.arrFilter)
+            });
 
+            var config = {
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            }
+
+            $http.post('/potential/new-filter', data, config).then(function success(response) {
+                console.log(response);
+            });
         };
-
         $scope.disabledNext = function() {
             if($scope.currentPage >= $scope.numberOfPages() - 1){
                 return false;
@@ -96,7 +106,6 @@ angular.module('cubeWebApp')
                 $scope.currentPage = $scope.currentPage+1
             }
         };
-
         $scope.setPage = function(n){
             $scope.currentPage = n;
         };

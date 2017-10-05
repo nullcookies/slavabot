@@ -9,7 +9,7 @@ class m171004_081602_filters_table extends Migration
         $this->createTable('filters', [
             'id' => $this->primaryKey(),
             'user_id' => $this->integer()->notNull(),
-            'name' => $this->integer()->notNull(),
+            'name' => $this->string()->notNull(),
             'filter' => $this->string()->notNull()
         ]);
     }

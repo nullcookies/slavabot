@@ -34,7 +34,7 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout', 'signup', 'repassword'],
+                'only' => ['logout', 'signup', 'repassword', 'index'],
                 'rules' => [
                     [
                         'actions' => ['signup', 'repassword'],
@@ -173,6 +173,7 @@ class SiteController extends Controller
     }
     public function actionConfig()
     {
+
 
         $usermodel = new UserConfig();
         $passwordmodel = new PasswordConfig();
