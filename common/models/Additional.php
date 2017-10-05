@@ -5,6 +5,15 @@ namespace common\models;
 use Yii;
 use common\models\ADTypes;
 
+/**
+ * Модель для работы с контактами приходящими с вебхуками.
+ *
+ * @property integer $id
+ * @property integer $type - тип контакта (модель ADTypes)
+ * @property integer $webhook - id вебхука которому принадлежит контакт (модель Webhooks)
+ * @property string $value - содержимое контакта (непосредственно номер, почта и т.п.)
+ */
+
 class Additional extends \yii\db\ActiveRecord
 {
 
@@ -45,7 +54,7 @@ class Additional extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     *  Дергаем данные из модели ADTypes (типы контактов)
      */
 
     public function getContactsType()
@@ -53,10 +62,11 @@ class Additional extends \yii\db\ActiveRecord
         return $this->hasOne(ADTypes::className(), ['id' => 'type']);
     }
 
-    /**
-     * @inheritdoc
+    /***
+     * Указываем поля, которые нам необходимо вернуть.
+     * name - берем из модели ADTypes название типа контакта
+     * @return array
      */
-
     public function fields()
     {
         return [
@@ -69,7 +79,7 @@ class Additional extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * Проверка существования контактов относящихся к тому же вебхуку и имеющих тот же тип.
      */
 
     public static function checkReference($type, $webhook)
@@ -84,7 +94,7 @@ class Additional extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * Сохраняем контакты, проверив их на существование
      */
 
     public static function saveReference($item, $id)

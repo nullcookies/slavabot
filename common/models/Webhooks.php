@@ -17,11 +17,6 @@ use common\models\ExtraPropsBehaviour;
 class Webhooks  extends \yii\db\ActiveRecord
 {
 
-    public function getClient(){
-        return $this->client+5;
-    }
-
-
     /**
      * @inheritdoc
      */

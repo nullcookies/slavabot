@@ -5,23 +5,13 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "clubs".
+ * Модель для работы с категориями. Наполняется при получении новых вебхуков.
  *
  * @property integer $id
- * @property integer $active
- * @property string $ru_name
- * @property string $en_name
- * @property string $ru_description
- * @property string $en_description
- * @property integer $sort
- * @property string $city
- * @property string $adress
- * @property integer $level
- * @property string $lat
- * @property string $lng
- * @property integer $created_at
- * @property integer $updated_at
+ * @property integer $mlg_id - идентификатор из медиалогии
+ * @property string $name - Текстовое название категории
  */
+
 class Category extends \yii\db\ActiveRecord
 {
 
@@ -37,6 +27,7 @@ class Category extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
+
     public function rules()
     {
         return [
@@ -49,6 +40,7 @@ class Category extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
+
     public function attributeLabels()
     {
         return [
@@ -57,6 +49,13 @@ class Category extends \yii\db\ActiveRecord
             'name' => 'Name'
         ];
     }
+
+    /**
+     * Проверяем категорию на существование.
+     *
+     * @param $mlg_id - идентификатор из медиалогии
+     * @return bool - в случае отсутсвия |int - идентификатор salesbot найденной категории
+     */
 
     public static function checkMLG($mlg_id)
     {
@@ -68,6 +67,16 @@ class Category extends \yii\db\ActiveRecord
             return false;
         }
     }
+
+    /**
+     * Сохраняем новую категорию / Возвращаем id существующей
+     *
+     * @param $item - содержимое вэбхука
+     *
+     * @return bool - в случае отсутсвия содержимого вебхука |
+     *         int - id существующей категории |
+     *         int - id новой категории
+     */
 
     public static function saveReference($item)
     {

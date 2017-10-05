@@ -5,23 +5,13 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "clubs".
+ * Модель для работы с локациями. Наполняется при получении новых вебхуков.
  *
  * @property integer $id
- * @property integer $active
- * @property string $ru_name
- * @property string $en_name
- * @property string $ru_description
- * @property string $en_description
- * @property integer $sort
- * @property string $city
- * @property string $adress
- * @property integer $level
- * @property string $lat
- * @property string $lng
- * @property integer $created_at
- * @property integer $updated_at
+ * @property integer $mlg_id - идентификатор медиалогии
+ * @property string $name - текстовое название локации (города)
  */
+
 class Location extends \yii\db\ActiveRecord
 {
 
@@ -37,6 +27,7 @@ class Location extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
+
     public function rules()
     {
         return [
@@ -46,17 +37,14 @@ class Location extends \yii\db\ActiveRecord
         ];
     }
 
+
     /**
-     * @inheritdoc
+     * Проверка существования локаций с этим идентификатором медиалогии.
+     *
+     * @param $mlg_id - идентификатор медиалогии
+     * @return bool - в случае отсутсвия
+     *         int - id локации в случае наличия
      */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'mlg_id' => 'ID MLG',
-            'name' => 'Name'
-        ];
-    }
 
     public static function checkMLG($mlg_id)
     {
@@ -68,6 +56,15 @@ class Location extends \yii\db\ActiveRecord
             return false;
         }
     }
+
+    /**
+     * Сохраняем поступившую локацию.
+     *
+     * @param $item - объект вебхука
+     * @return bool - в случае пустого вебхука |
+     *         int - id новой локации |
+     *         int - id существующей локации
+     */
 
     public static function saveReference($item)
     {

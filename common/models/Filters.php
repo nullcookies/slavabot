@@ -5,23 +5,14 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "clubs".
+ * Модель для работы с клиентскими фильтрами по поиску потенциальных клиентов
  *
  * @property integer $id
- * @property integer $active
- * @property string $ru_name
- * @property string $en_name
- * @property string $ru_description
- * @property string $en_description
- * @property integer $sort
- * @property string $city
- * @property string $adress
- * @property integer $level
- * @property string $lat
- * @property string $lng
- * @property integer $created_at
- * @property integer $updated_at
+ * @property integer $user_id - привязка к пользователю
+ * @property string $name - пользовательское название фильтра
+ * @property string $filter - содержимое фильтра в JSON
  */
+
 class Filters extends \yii\db\ActiveRecord
 {
 
@@ -47,6 +38,10 @@ class Filters extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * Возвращаем только имя и содержимое фильтра
+     * @return array
+     */
     public function fields()
     {
         return [
@@ -56,37 +51,43 @@ class Filters extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * Получить все фильтры пользователя
+     *
+     * @return object - сохраненные фильтры |
+     *         bool - в случае отсутсвия сохраненных фильтров
      */
 
     public static function getFilters()
     {
-        $id = static::find()->where(['user_id' => Yii::$app->user->id])->asArray()->all();
+        $model = static::find()->where(['user_id' => Yii::$app->user->id])->asArray()->all();
 
-        if($id){
-            return $id;
+        if($model){
+            return $model;
         }else{
             return false;
         }
     }
 
     /**
-     * @inheritdoc
+     * Получить конкретный фильтр по его id
+     *
+     * @return object - найденный фильтр |
+     *         bool - в случае отсутсвия фильтра
      */
 
     public static function getFilter($id)
     {
-        $id = static::findOne(['id' => $id]);
+        $model = static::findOne(['id' => $id]);
 
-        if($id){
-            return $id;
+        if($model){
+            return $model;
         }else{
             return false;
         }
     }
 
     /**
-     * @inheritdoc
+     * Сохраняем новый фильтр
      */
 
     public function saveFilter($item)
@@ -102,7 +103,7 @@ class Filters extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * Обновляем существующий фильтр
      */
 
     public function updateFilter($item)

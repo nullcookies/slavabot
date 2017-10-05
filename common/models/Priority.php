@@ -5,30 +5,19 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "clubs".
+ * Модель для работы с приоритетами. Наполняется при получении новых вебхуков.
  *
  * @property integer $id
- * @property integer $active
- * @property string $ru_name
- * @property string $en_name
- * @property string $ru_description
- * @property string $en_description
- * @property integer $sort
- * @property string $city
- * @property string $adress
- * @property integer $level
- * @property string $lat
- * @property string $lng
- * @property integer $created_at
- * @property integer $updated_at
+ * @property integer $mlg_id - идентификатор медиалогии
+ * @property string $name - текстовое название приоритетами
  */
+
 class Priority extends \yii\db\ActiveRecord
 {
 
     /**
      * @inheritdoc
      */
-
     public static function tableName()
     {
         return 'priority';
@@ -47,17 +36,12 @@ class Priority extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * Проверка существования приоритета с этим идентификатором медиалогии.
+     *
+     * @param $mlg_id - идентификатор медиалогии
+     * @return bool - в случае отсутсвия
+     *         int - id приоритета в случае наличия
      */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'mlg_id' => 'ID MLG',
-            'name' => 'Name'
-        ];
-    }
-
     public static function checkMLG($mlg_id)
     {
         $id = static::findOne(['mlg_id' => $mlg_id]);
@@ -69,6 +53,14 @@ class Priority extends \yii\db\ActiveRecord
         }
     }
 
+    /**
+     * Сохраняем поступивший приоритет.
+     *
+     * @param $item - объект вебхука
+     * @return bool - в случае пустого вебхука |
+     *         int - id нового приоритета |
+     *         int - id существующго приоритета
+     */
     public static function saveReference($item)
     {
         $status = self::checkMLG($item->priority->id);
