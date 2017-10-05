@@ -165,7 +165,6 @@ class SiteController extends Controller
             foreach ($current as $item) {
 
                 $item = json_decode($item);
-                //var_dump($item);
                 Webhooks::SaveWebHook($item);
             }
 

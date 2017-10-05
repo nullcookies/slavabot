@@ -38,13 +38,19 @@
 									<div class="webhooks">
 										<div class="ss {{webhook.socialValue.code.replace('.', '')}}"></div>
 										<div class="webhooks__photo">
-											<img src="https://orteka.ru/local/templates/.default/components/bitrix/news.detail/salon_item/images/no-photo.png" alt=""/>
+											<img src="{{webhook.author_image_url}}" alt=""/>
 											<p class="webhooks__authorName">{{webhook.author_name}}</p>
 											<time am-time-ago="webhook.created_at * 1000"></time>
 										</div>
 
 										<p ng-bind-html="sce.trustAsHtml(webhook.post_content)"></p>
 										<div class="webhook__get">Получить контакт</div>
+										<div class="webhook__datas">
+											<ul>
+												<li ng-show="webhook.author_url">Ссылка на профиль</li>
+												<li ng-repeat="contact in webhook.contacts">{{contact.name}}</li>
+											</ul>
+										</div>
 										<div class="webhooks__point">{{webhook.locationValue.name}}</div>
 									</div>
 								</td>

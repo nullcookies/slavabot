@@ -37,7 +37,7 @@ class Webhooks  extends \yii\db\ActiveRecord
     {
         return [
             [['mlg_id', 'number', 'client', 'location', 'category', 'priority', 'theme', 'social', 'created_at'], 'integer'],
-            [['post_url', 'post_content', 'author_name'], 'string'],
+            [['post_url', 'post_content', 'author_name', 'author_image_url', 'author_url'], 'string'],
         ];
     }
 
@@ -52,6 +52,10 @@ class Webhooks  extends \yii\db\ActiveRecord
     public function getThemeValue()
     {
         return $this->hasOne(Social::className(), ['id' => 'theme']);
+    }
+    public function getContactsValue()
+    {
+        return $this->hasMany(Additional::className(), ['webhook' => 'id']);
     }
 
     public function fields()
@@ -73,8 +77,17 @@ class Webhooks  extends \yii\db\ActiveRecord
                 return $body;
             },
             'author_name',
+            'author_image_url'=> function(){
+                if(strlen($this->author_image_url)>0){
+                    return $this->author_image_url;
+                }else{
+                    return 'https://orteka.ru/local/templates/.default/components/bitrix/news.detail/salon_item/images/no-photo.png';
+                }
+            },
+            'author_url',
             'socialValue' => 'socialValue',
             'themeValue' => 'themeValue',
+            'contacts' => 'contactsValue',
             'created_at'
         ];
     }
@@ -102,7 +115,6 @@ class Webhooks  extends \yii\db\ActiveRecord
         }
     }
 
-
     public static function SaveWebHook($item)
     {
         $elem = self::checkWebHook($item->id);
@@ -117,6 +129,8 @@ class Webhooks  extends \yii\db\ActiveRecord
         $elem->theme = Theme::saveReference($item);
 
         $elem->post_url = $item->post_url;
+        $elem->author_image_url  = $item->author_image_url;
+        $elem->author_url = $item->author_url;
         $elem->post_content = $item->post_content;
         $elem->author_name = $item->author_name;
         $elem->social = Social::checkSocial($item);

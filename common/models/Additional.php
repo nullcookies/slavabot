@@ -44,6 +44,34 @@ class Additional extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
+
+    public function getContactsType()
+    {
+        return $this->hasOne(ADTypes::className(), ['id' => 'type']);
+    }
+
+    /**
+     * @inheritdoc
+     */
+
+    public function fields()
+    {
+        return [
+                'type',
+                'value',
+                'name' => function(){
+                    return $this->contactsType->name;
+                }
+            ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+
     public static function checkReference($type, $webhook)
     {
         $id = static::findOne(['type' => $type, 'webhook' => $webhook]);

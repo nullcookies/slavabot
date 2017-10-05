@@ -101,7 +101,7 @@
     padding-top: 21px;
     margin-left: 16px;
     margin-top: 30px;
-    max-width: 820px;
+    width: 750px;
     word-wrap: break-word;
 }
 .webhooks .webhook__get{
@@ -149,4 +149,22 @@
     word-wrap: break-word;
     text-align: center;
     display: block;
+}
+
+.webhooks .webhook__datas{
+    float: right;
+    width: 185px;
+    /* clear: both; */
+    margin-top: 0;
+    padding: 10px;
+}
+
+.webhooks .webhook__datas ul{
+    padding-left: 22px;
+}
+.webhooks .webhook__datas ul li{
+    font-size: 12px;
+    list-style: none;
+    border-bottom: 1px solid #00c771;
+    /*background: #00c771;*/
 }
