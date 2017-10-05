@@ -72,6 +72,7 @@ class Webhooks  extends \yii\db\ActiveRecord
                 $body = preg_replace($pattern, "<b>[номер телефона]</b>", $body);
                 return $body;
             },
+            'author_name',
             'socialValue' => 'socialValue',
             'themeValue' => 'themeValue',
             'created_at'

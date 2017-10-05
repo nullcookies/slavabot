@@ -14,20 +14,18 @@
 							<input type="text" class="form-control" placeholder="Поиск" ng-model="search" ng-change="currentPage=0">
 						</div>
 						<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
-							<select class="form-control" ng-model="city" ng-change="changeFilter()">
+							<select class="form-control" ng-model="city" ng-change="changeFilter()"  ng-options="location.id as location.name for location in locations">
 								<option value="" selected>{{cityPlaceholder}}</option>
-								<option value="{{location.id}}"  ng-repeat="location in locations">{{location.name}}</option>
 							</select>
 						</div>
 						<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
-							<select class="form-control" ng-model="theme" ng-change="changeFilter()">
+							<select class="form-control" ng-model="theme" ng-change="changeFilter()" ng-options="theme.id as theme.name for theme in themes">
 								<option value="" selected>{{themePlaceholder}}</option>
-								<option value="{{theme.id}}"  ng-repeat="theme in themes">{{theme.name}}</option>
 							</select>
 						</div>
 						<div class="col-lg-3">
 							<button class="btn btn-success col-lg-12" ng-click="saveFilter()">
-								Сохранить как новый фильтр
+								Обновить фильтр
 							</button>
 						</div>
 					</div>
@@ -39,7 +37,6 @@
 										<div class="ss {{webhook.socialValue.code.replace('.', '')}}"></div>
 										<div class="webhooks__photo">
 											<img src="https://orteka.ru/local/templates/.default/components/bitrix/news.detail/salon_item/images/no-photo.png" alt=""/>
-											<p class="webhooks__authorName">{{webhook.author_name}}</p>
 											<time am-time-ago="webhook.created_at * 1000"></time>
 										</div>
 

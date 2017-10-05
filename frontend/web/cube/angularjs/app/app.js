@@ -20,6 +20,7 @@ app.config(['cfpLoadingBarProvider', function(cfpLoadingBarProvider) {
 /**
  * Configure the Routes
  */
+
 app.config(['$routeProvider', function ($routeProvider) {
 	$routeProvider
 		.when("/", {
@@ -30,6 +31,11 @@ app.config(['$routeProvider', function ($routeProvider) {
             controller: "potentialCtrl",
             title: 'Потенциальные клиенты',
         })
+		.when("/potential/:id", {
+			templateUrl: "views/filter.html",
+			controller:'filterCtrl',
+            title: 'Сохраненный фильтр'
+		})
 		.when("/dasboard", {
 			templateUrl: "views/dashboard.html",
 			controller: "dashboardCtrl",

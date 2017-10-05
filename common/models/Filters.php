@@ -37,6 +37,7 @@ class Filters extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
+
     public function rules()
     {
         return [
@@ -46,11 +47,68 @@ class Filters extends \yii\db\ActiveRecord
         ];
     }
 
+    public function fields()
+    {
+        return [
+            'name',
+            'filter'
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+
+    public static function getFilters()
+    {
+        $id = static::find()->where(['user_id' => Yii::$app->user->id])->asArray()->all();
+
+        if($id){
+            return $id;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+
+    public static function getFilter($id)
+    {
+        $id = static::findOne(['id' => $id]);
+
+        if($id){
+            return $id;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+
     public function saveFilter($item)
     {
         $model = new Filters();
 
         $model->user_id = Yii::$app->user->id;
+        $model->name = $item['name'];
+        $model->filter = $item['filter'];
+
+        $model->save();
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+
+    public function updateFilter($item)
+    {
+        $model = Filters::findOne(['id' => $item['id']]);
+
         $model->name = $item['name'];
         $model->filter = $item['filter'];
 

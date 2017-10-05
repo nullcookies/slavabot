@@ -1,5 +1,4 @@
 angular.module('cubeWebApp')
-
     .controller('dashboardCtrl', function ($scope, $http) {
 
         $scope.category = [];
@@ -19,6 +18,15 @@ angular.module('cubeWebApp')
             $scope.webhooks = response.data.webhooks;
         });
     })
+    .controller('header', function ($scope, $http) {})
+    .controller('menu', function ($scope, $http) {
+
+        $scope.potentialSubMenu = [];
+
+        $http({method: 'GET', url: '/potential/filters'}).then(function success(response) {
+            $scope.potentialSubMenu = response.data;
+        });
+    })
     .controller('potentialCtrl', function ($scope, $http, $sce) {
         $scope.webhooks = [];
         $scope.city;
@@ -31,10 +39,26 @@ angular.module('cubeWebApp')
         $scope.pageSize = 10;
         $scope.nameError = false;
         $scope.noFilter = false;
+        $scope.cityPlaceholder = 'Город';
+        $scope.themePlaceholder = 'Тема';
+
+
+        $scope.changeFilter = function(){
+            $scope.currentPage = 0;
+
+            if($scope.city==''){
+                delete $scope.city;
+            }
+
+            if($scope.theme==''){
+                delete $scope.theme;
+            }
+
+        };
 
         $scope.numberOfPages = function(){
             return Math.ceil($scope.webhooks.length / $scope.pageSize);
-        }
+        };
 
         $scope.time = moment(new Date());
 
@@ -109,7 +133,128 @@ angular.module('cubeWebApp')
         $scope.setPage = function(n){
             $scope.currentPage = n;
         };
+    })
+    .controller('filterCtrl', function ($scope, $http, $sce, $routeParams) {
+    $scope.webhooks = [];
+    $scope.locations = [];
+    $scope.themes = [];
+    $scope.city;
+
+    $scope.sce = $sce;
+    moment.locale('ru');
+    $scope.search   = '';
+    $scope.filterName = '';
+    $scope.currentPage = 0;
+    $scope.pageSize = 10;
+    $scope.nameError = false;
+    $scope.noFilter = false;
+    $scope.cityPlaceholder = 'Город';
+    $scope.themePlaceholder = 'Тема';
+
+    $scope.changeFilter = function(){
+            $scope.currentPage = 0;
+
+            if($scope.city==''){
+                delete $scope.city;
+            }
+
+            if($scope.theme==''){
+                delete $scope.theme;
+            }
+
+        };
+
+    $scope.numberOfPages = function(){
+        return Math.ceil($scope.webhooks.length / $scope.pageSize);
+    }
+
+    $scope.time = moment(new Date());
+
+    var id = $routeParams["id"];
+
+    $http({method: 'GET', url: '/potential/filter?id='+id}).then(function success(response) {
+        $scope.filter = response.data.filter;
+        $scope.filter.filter = JSON.parse(response.data.filter.filter);
+
+        $scope.filterName = $scope.filter.name;
+
+        $scope.search = $scope.filter.filter.search;
+        $scope.city = $scope.filter.filter.city;
+        $scope.theme = $scope.filter.filter.theme;
+        console.log($scope.theme);
+        $scope.webhooks = response.data.webhooks.webhooks;
+        $scope.locations = response.data.webhooks.location;
+        $scope.themes = response.data.webhooks.theme;
     });
+
+    $scope.paginationBlock = function(n){
+        if($scope.currentPage < 4 && n < 7){
+            return true;
+        }else{
+            if($scope.currentPage >  n + 3 || $scope.currentPage <  n - 3){
+                return false;
+            }else{
+                return true;
+            }
+        }
+
+    };
+
+    $scope.disabledBack = function() {
+        if($scope.currentPage == 0){
+            return false;
+        }else{
+            $scope.currentPage = $scope.currentPage-1
+        }
+    };
+    $scope.saveFilter = function() {
+        $scope.arrFilter = {
+            'search' : $scope.search,
+            'city' : $scope.city,
+            'theme' : $scope.theme
+        };
+
+        if($scope.filterName.length<3){
+            $scope.nameError = true;
+            return false;
+        }
+
+        if($scope.search.length==0 && $scope.city === undefined && $scope.theme === undefined){
+            $scope.noFilter = true;
+            return false;
+        }
+
+        $scope.nameError = false;
+        $scope.noFilter = false;
+
+        var data = $.param({
+            id: id,
+            name: $scope.filterName,
+            filter: JSON.stringify($scope.arrFilter)
+        });
+
+        var config = {
+            headers : {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+            }
+        }
+
+        $http.post('/potential/update-filter', data, config).then(function success(response) {
+            console.log(response);
+        });
+    };
+    $scope.disabledNext = function() {
+        if($scope.currentPage >= $scope.numberOfPages() - 1){
+            return false;
+        }else{
+            $scope.currentPage = $scope.currentPage+1
+        }
+    };
+    $scope.setPage = function(n){
+        $scope.currentPage = n;
+    };
+});
+
 
 app.filter('startFrom', function() {
     return function(input, start) {

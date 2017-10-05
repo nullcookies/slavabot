@@ -46,7 +46,7 @@ class PotentialController extends Controller
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['list', 'newfilter'],
+                'only' => ['list', 'newfilter', 'filter', 'filters'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -75,6 +75,19 @@ class PotentialController extends Controller
         );
     }
 
+    public function actionFilter()
+    {
+        return array(
+            'filter' => Filters::getFilter(Yii::$app->request->get('id')),
+            'webhooks' => Webhooks::getWebHooks(),
+        );
+    }
+
+    public function actionFilters()
+    {
+        return Filters::getFilters();
+    }
+
     public function beforeAction($action)
     {
         $this->enableCsrfValidation = false;
@@ -84,6 +97,11 @@ class PotentialController extends Controller
     public function actionNewFilter()
     {
         return Filters::saveFilter(Yii::$app->request->post());
+    }
+
+    public function actionUpdateFilter()
+    {
+        return Filters::UpdateFilter(Yii::$app->request->post());
     }
 
 }

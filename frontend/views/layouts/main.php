@@ -37,7 +37,7 @@ AppAsset::register($this);
 
 <body class=" fixed-header pace-done">
 <div id="theme-wrapper">
-    <header class="navbar" id="header-navbar">
+    <header class="navbar" id="header-navbar" ng-controller="header">
         <div class="container">
             <a href="#/dasboard" id="logo" class="navbar-brand">
                 <img src="/cube/img/logo.png" alt="" class="normal-logo logo-white"/>
@@ -148,51 +148,30 @@ AppAsset::register($this);
     </header>
     <div id="page-wrapper" class="container">
         <div class="row">
-            <div id="nav-col">
+            <div id="nav-col" ng-controller="menu">
                 <section id="col-left" class="col-left-nano">
                     <div id="col-left-inner" class="col-left-nano-content">
                         <div class="collapse navbar-collapse navbar-ex1-collapse" id="sidebar-nav" bs-navbar>
-                        <?=Menu::widget([
-                            'items' => [
-                                ['label' => \Yii::t('main', 'Potential clients'),
-                                    'url' => '#/potential',
-                                    'options'=>['class'=>'header-nav__item'],
-                                    'template' => '<a href="{url}" ><i class="fa fa-list"></i><span style="font-size: 0.775em;">{label}</span></a>',
-                                ],
-                                ['label' => \Yii::t('main', 'My contacts'),
-                                    'url' => '#/pages/contacts',
-                                    'options'=>['class'=>'header-nav__item'],
-                                    'template' => '<a href="{url}" ><i class="fa fa-folder-open-o"></i><span>{label}</span></a>',
-                                ],
-                                ['label' => \Yii::t('main', 'Notifications'),
-                                    'url' => '#/pages/notifications',
-                                    'options'=>['class'=>'header-nav__item'],
-                                    'template' => '<a href="{url}" ><i class="fa fa-bell-o"></i><span>{label}</span></a>',
-                                ],
-                                ['label' => \Yii::t('main', 'Integration'),
-                                    'url' => '#/pages/integration',
-                                    'options'=>['class'=>'header-nav__item'],
-                                    'template' => '<a href="{url}" ><i class="fa fa-cloud-upload"></i><span>{label}</span></a>',
-                                ],
-                                ['label' => \Yii::t('main', 'Settings'),
-                                    'url' => '#/pages/config',
-                                    'options'=>['class'=>'header-nav__item'],
-                                    'template' => '<a href="{url}" ><i class="fa fa-sliders"></i><span>{label}</span></a>',
-                                ],
-                                ['label' => \Yii::t('main', 'Help'),
-                                    'url' => '#/pages/help',
-                                    'options'=>['class'=>'header-nav__item'],
-                                    'template' => '<a href="{url}" ><i class="fa fa-life-ring"></i><span>{label}</span></a>',
-                                ],
-
-                            ],
-                            'options' => [
-                                'class' => 'nav nav-pills nav-stacked',
-                            ],
-                            'activeCssClass'=>'active',
-                        ]);
-
-                        ?>
+                            <ul class="nav nav-pills nav-stacked">
+                                <li data-match-route="/potential*" class="header-nav__item">
+                                    <a href="#/potential">
+                                        <i class="fa fa-list"></i>
+                                        <span style="font-size: 0.775em;">Потенциальные клиенты</span>
+                                    </a>
+                                    <ul class="submenu">
+                                        <li ng-repeat="menu in potentialSubMenu">
+                                            <a data-match-route="/potential/{{menu.id}}" href="#/potential/{{menu.id}}">
+                                                {{menu.name}}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="header-nav__item"><a href="#/pages/contacts"><i class="fa fa-folder-open-o"></i><span>Купленные контакты</span></a></li>
+                                <li class="header-nav__item"><a href="#/pages/notifications"><i class="fa fa-bell-o"></i><span>Уведомления</span></a></li>
+                                <li class="header-nav__item"><a href="#/pages/integration"><i class="fa fa-cloud-upload"></i><span>Интеграция</span></a></li>
+                                <li class="header-nav__item"><a href="#/pages/config"><i class="fa fa-sliders"></i><span>Настройки</span></a></li>
+                                <li class="header-nav__item"><a href="#/pages/help"><i class="fa fa-life-ring"></i><span>Помощь</span></a></li>
+                            </ul>
                         </div>
                     </div>
                 </section>
@@ -210,28 +189,6 @@ AppAsset::register($this);
 
                 <div ng-include='"views/common/footer.html"'></div>
             </div>
-<!--            <div id="content-wrapper">-->
-<!--                <div class="row">-->
-<!--                    <div class="col-lg-12">-->
-<!---->
-<!--                        <div class="row">-->
-<!--                            <div class="col-lg-12">-->
-<!--                                --><?//= Breadcrumbs::widget([
-//                                    'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-//                                ]) ?>
-<!--                                <h1>--><?//= Html::encode($this->title) ?><!--</h1>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                        --><?//= $content ?>
-<!--                    </div>-->
-<!--                </div>-->
-<!---->
-<!--                <footer id="footer-bar" class="row">-->
-<!--                    <p id="footer-copyright" class="col-xs-12">-->
-<!--                        Powered by Cube Theme.-->
-<!--                    </p>-->
-<!--                </footer>-->
-<!--            </div>-->
         </div>
     </div>
 </div>
