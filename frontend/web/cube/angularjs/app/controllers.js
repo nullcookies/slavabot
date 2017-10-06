@@ -9,12 +9,14 @@ angular.module('cubeWebApp')
 
         $http({method: 'GET', url: '/site/main'}).
         then(function success(response) {
-            console.log(response);
+            $scope.indb = response.data.indb;
+            $scope.vk = response.data.vk;
+            $scope.ok = response.data.ok;
+            $scope.fb = response.data.fb;
+            $scope.twitter = response.data.twitter;
+            $scope.inst = response.data.inst;
+            $scope.norm = response.data.norm;
 
-            $scope.category = response.data.category;
-            $scope.location = response.data.location;
-            $scope.priority = response.data.priority;
-            $scope.theme = response.data.theme;
             $scope.webhooks = response.data.webhooks;
         });
     })

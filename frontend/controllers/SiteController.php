@@ -99,10 +99,13 @@ class SiteController extends Controller
         $current = count(explode("\n", $current))-1;
 
         return array(
-            'location' => Location::find()->all(),
-            'category' => Category::find()->all(),
-            'priority' => Priority::find()->all(),
-            'theme' => Theme::find()->all(),
+            'indb' => Webhooks::find()->count(),
+            'vk' => Webhooks::find()->where(['social'=> 1])->count(),
+            'ok' => Webhooks::find()->where(['social'=> 4])->count(),
+            'fb' => Webhooks::find()->where(['social'=> 2])->count(),
+            'twitter' => Webhooks::find()->where(['social'=> 3])->count(),
+            'inst' => Webhooks::find()->where(['social'=> 5])->count(),
+            'norm' => Webhooks::find()->where(['not', ['author_url' => null]])->count(),
             'webhooks' => $current
         );
     }
@@ -165,7 +168,8 @@ class SiteController extends Controller
             foreach ($current as $item) {
 
                 $item = json_decode($item);
-                Webhooks::SaveWebHook($item);
+                var_dump($item);
+                //Webhooks::SaveWebHook($item);
             }
 
         }

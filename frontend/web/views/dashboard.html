@@ -1,34 +1,116 @@
 <div class="row">
-	<div class="col-lg-12">
-		<div class="main-box clearfix">
+	<div class="col-lg-3 col-sm-6 col-xs-12">
+		<div class="main-box infographic-box colored emerald-bg">
+			<i class="fa fa-file-code-o"></i>
+			<span class="headline">В файле</span>
+			<span ng-bind="webhooks" class="value"></span>
+		</div>
+	</div>
+
+	<div class="col-lg-3 col-sm-6 col-xs-12">
+		<div class="main-box infographic-box colored green-bg">
+			<i class="fa fa-database "></i>
+			<span class="headline">В базе</span>
+			<span class="value" ng-bind="indb"></span>
+		</div>
+	</div>
+
+	<div class="col-lg-3 col-sm-6 col-xs-12">
+		<div class="main-box infographic-box colored red-bg">
+			<i class="fa fa-user"></i>
+			<span class="headline">Ссылок на профили</span>
+			<span class="value" ng-bind="norm"></span>
+		</div>
+	</div>
+
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="main-box">
 			<header class="main-box-header clearfix">
-				<h2>Отчетная страница</h2>
+				<h2 class="pull-left">Распределение данных по социальным сетям</h2>
 			</header>
 
 			<div class="main-box-body clearfix">
-				<div class="jumbotron">
-					<h1>Принято WebHooks: <span ng-bind="webhooks"></span></h1>
-				</div>
-
-				<div class="body-content">
-					<h1>Наполнение справочников:</h1>
-					<div class="row">
-						<div class="col-lg-3">
-							<h2>Локации:</h2>
-							<p ng-repeat="loc in location">[{{loc.id}}] {{loc.name}}</p>
-						</div>
-						<div class="col-lg-3">
-							<h2>Категории:</h2>
-							<p ng-repeat="cat in category">[{{cat.id}}] {{cat.name}}</p>
-						</div>
-						<div class="col-lg-3">
-							<h2>Приоритет:</h2>
-							<p ng-repeat="pri in priority">[{{pri.id}}] {{pri.name}}</p>
-						</div>
-						<div class="col-lg-3">
-							<h2>Темы:</h2>
-							<p ng-repeat="the in theme">[{{the.id}}] {{the.name}}</p>
-						</div>
+				<div class="row">
+					<div class="col-md-12">
+						<ul class="graph-stats">
+							<li>
+								<div class="clearfix">
+									<div class="title pull-left">
+										Вконтакте
+									</div>
+									<div class="value pull-right" title="{{( vk/indb )*100}}%" data-toggle="tooltip">
+										{{vk}}
+									</div>
+								</div>
+								<div class="progress">
+									<div style="width: {{( vk/indb )*100}}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="{{( vk/indb )*100}}" role="progressbar" class="progress-bar">
+										<span class="sr-only">{{( vk/indb )*100}}%</span>
+									</div>
+								</div>
+							</li>
+							<li>
+								<div class="clearfix">
+									<div class="title pull-left">
+										Facebook
+									</div>
+									<div class="value pull-right" title="{{( fb/indb )*100}}%" data-toggle="tooltip">
+										{{fb}}
+									</div>
+								</div>
+								<div class="progress">
+									<div style="width: {{( fb/indb )*100}}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="{{( fb/indb )*100}}" role="progressbar" class="progress-bar">
+										<span class="sr-only">{{( fb/indb )*100}}%</span>
+									</div>
+								</div>
+							</li>
+							<li>
+								<div class="clearfix">
+									<div class="title pull-left">
+										Одноклассники
+									</div>
+									<div class="value pull-right" title="{{( ok/indb )*100}}%" data-toggle="tooltip">
+										{{ok}}
+									</div>
+								</div>
+								<div class="progress">
+									<div style="width: {{( ok/indb )*100}}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="{{( ok/indb )*100}}" role="progressbar" class="progress-bar">
+										<span class="sr-only">{{( ok/indb )*100}}%</span>
+									</div>
+								</div>
+							</li>
+							<li>
+								<div class="clearfix">
+									<div class="title pull-left">
+										Twitter
+									</div>
+									<div class="value pull-right" title="{{( twitter/indb )*100}}%" data-toggle="tooltip">
+										{{twitter}}
+									</div>
+								</div>
+								<div class="progress">
+									<div style="width: {{( twitter/indb )*100}}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="{{( twitter/indb )*100}}" role="progressbar" class="progress-bar">
+										<span class="sr-only">{{( twitter/indb )*100}}%</span>
+									</div>
+								</div>
+							</li>
+							<li>
+								<div class="clearfix">
+									<div class="title pull-left">
+										Instagram
+									</div>
+									<div class="value pull-right" title="{{( inst/indb )*100}}%" data-toggle="tooltip">
+										{{inst}}
+									</div>
+								</div>
+								<div class="progress">
+									<div style="width: {{( inst/indb )*100}}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="{{( inst/indb )*100}}" role="progressbar" class="progress-bar">
+										<span class="sr-only">{{( inst/indb )*100}}%</span>
+									</div>
+								</div>
+							</li>
+						</ul>
 					</div>
 				</div>
 			</div>
