@@ -50,7 +50,7 @@ class PotentialController extends Controller
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['list', 'newfilter', 'filter', 'filters'],
+                'only' => ['list', 'newfilter', 'filter', 'filters', 'detail'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -76,6 +76,13 @@ class PotentialController extends Controller
     {
         return array(
             'webhooks' => Webhooks::getWebHooks(),
+        );
+    }
+
+    public function actionDetail()
+    {
+        return array(
+            'webhooks' => Webhooks::getDetail(),
         );
     }
 

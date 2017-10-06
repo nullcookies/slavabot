@@ -1,0 +1,82 @@
+<div class="row">
+	<div class="col-lg-12">
+		<ol class="breadcrumb">
+			<li><a href="/#/dasboard">Главная</a></li>
+			<li><a href="/#/potential">Потенциальные клиенты</a></li>
+			<li class="active"><span>Детальный просмотр</span></li>
+		</ol>
+
+		<h1>Профиль пользователя</h1>
+	</div>
+</div>
+
+<div class="row" id="user-profile">
+	<div class="col-lg-3 col-md-4 col-sm-4">
+		<div class="main-box clearfix">
+			<header class="main-box-header clearfix">
+				<h2>{{webhook.author_name}}</h2>
+			</header>
+
+			<div class="main-box-body clearfix">
+				<img src="{{webhook.author_image_url}}" alt="" class="profile-img img-responsive center-block" />
+
+
+				<div class="profile-details">
+					<ul class="fa-ul">
+						<li><i class="fa-li fa fa-map-marker"></i>Город: <span>{{webhook.locationValue.name}}</span></li>
+					</ul>
+				</div>
+
+				<div class="profile-message-btn center-block text-center">
+					<a href="" class="btn btn-success">
+						<i class="fa fa-get-pocket"></i>
+						Получить контакт
+					</a>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<div class="col-lg-9 col-md-8 col-sm-8">
+		<div class="main-box clearfix">
+			<div class="tabs-wrapper profile-tabs">
+
+				<div class="tab-content">
+					<div class="tab-pane fade in active" id="tab-newsfeed">
+
+						<div id="newsfeed">
+							<div class="story">
+								<div class="story-user">
+									<a href="">
+										<img src="{{webhook.author_image_url}}" alt=""/>
+									</a>
+								</div>
+
+								<div class="story-content">
+									<header class="story-header">
+										<div class="story-author">
+											<a href="" class="story-author-link">
+												{{webhook.author_name}}
+											</a>
+										</div>
+										<div class="story-time">
+											<i class="fa fa-clock-o"></i><span style="margin-left:10px" am-time-ago="webhook.created_at * 1000"></span>
+										</div>
+									</header>
+									<div class="story-inner-content">
+										<span ng-bind-html="sce.trustAsHtml(webhook.post_content)"></span>
+									</div>
+									<footer class="story-footer">
+
+									</footer>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>

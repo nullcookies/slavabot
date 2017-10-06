@@ -96,7 +96,8 @@ class Webhooks  extends \yii\db\ActiveRecord
             'socialValue' => 'socialValue',
             'themeValue' => 'themeValue',
             'contacts' => 'contactsValue',
-            'created_at'
+            'created_at',
+            'id'
         ];
     }
 
@@ -145,6 +146,15 @@ class Webhooks  extends \yii\db\ActiveRecord
             'category'  =>  Category::find()->asArray()->all(),
             'priority'  =>  Priority::find()->asArray()->all(),
             'theme'     =>  Theme::find()->asArray()->all()
+        );
+    }
+
+    public static function getDetail()
+    {
+        $webhooks = Webhooks::find()->where(['id' => Yii::$app->request->post()['id']])->one();
+
+        return array(
+            'webhooks'  =>  $webhooks
         );
     }
 

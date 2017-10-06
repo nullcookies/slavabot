@@ -156,7 +156,7 @@ angular.module('cubeWebApp')
             });
         };
     })
-    .controller('filterCtrl', function ($scope, $http, $sce, $routeParams) {
+    .controller('filterCtrl', function ($scope, $http, $sce, $routeParams,$location) {
     $scope.webhooks = [];
     $scope.locations = [];
     $scope.themes = [];
@@ -173,6 +173,10 @@ angular.module('cubeWebApp')
     $scope.cityPlaceholder = 'Город';
     $scope.themePlaceholder = 'Тема';
     $scope.numberOfPages = 0;
+
+    //     #/pages/contacts
+
+
 
     $scope.changeFilter = function(){
 
@@ -292,9 +296,28 @@ angular.module('cubeWebApp')
             $scope.currentPage = n;
         });
     };
-});
+})
+    .controller('detailCtrl', function($scope, $http, $routeParams, $sce){
+        $scope.webhook = [];
+        $scope.sce = $sce;
+        moment.locale('ru');
+        $scope.getDetail = function(n){
 
+            var data = $.param({'id' : $routeParams["id"]});
+            var config = {
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
 
+            $http.post('/potential/detail', data, config).then(function success(response) {
+                $scope.webhook = response.data.webhooks.webhooks;
+                console.log($scope.webhook);
+            });
+        };
+
+        $scope.getDetail();
+    })
 app.filter('startFrom', function() {
     return function(input, start) {
         start = +start; //parse to int

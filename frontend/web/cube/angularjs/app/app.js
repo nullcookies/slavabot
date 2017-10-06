@@ -36,6 +36,11 @@ app.config(['$routeProvider', function ($routeProvider) {
 			controller:'filterCtrl',
             title: 'Сохраненный фильтр'
 		})
+        .when("/potential/detail/:id", {
+            templateUrl: "views/detail.html",
+            controller:'detailCtrl',
+            title: 'Детальный просмотр'
+        })
 		.when("/dasboard", {
 			templateUrl: "views/dashboard.html",
 			controller: "dashboardCtrl",
