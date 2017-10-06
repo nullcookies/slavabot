@@ -74,6 +74,9 @@ class Additional extends \yii\db\ActiveRecord
                 'value',
                 'name' => function(){
                     return $this->contactsType->name;
+                },
+                'type' => function(){
+                    return $this->contactsType->code;
                 }
             ];
     }

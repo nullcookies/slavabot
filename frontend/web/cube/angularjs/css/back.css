@@ -168,3 +168,52 @@
     border-bottom: 1px solid #00c771;
     /*background: #00c771;*/
 }
+
+.contact {
+    border-top: 5px solid #78ddfc;
+    border-bottom: 2px solid #ccc;
+    border-left: 2px solid #ccc;
+    border-right: 2px solid #ccc;
+}
+
+.contact__image{
+    width: 70px;
+    height:70px;
+    border-radius:100%;
+}
+.ss{
+    width: 18px;
+    height: 18px;
+    margin-top: 10%;
+}
+.contact__text{
+    text-align: center;
+    font-size: 13px;
+    line-height: 25px;
+}
+.contact__post{
+    text-align: left;
+    font-size: 13px;
+}
+.webhooks__point{
+    font-size: 13px;
+    line-height: 50px;
+}
+.webhooks__point i {
+    margin-right:10px;
+}
+.top-margin-10{
+    margin-top:10px;
+}
+.top-margin-15{
+    margin-top:15px;
+}
+.top-margin-20{
+    margin-top:20px;
+}
+.top-margin-25{
+    margin-top:25px;
+}
+.right-margin-10{
+    margin-right: 10px;
+}

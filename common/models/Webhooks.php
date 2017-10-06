@@ -10,6 +10,7 @@ use common\models\Priority;
 use common\models\Theme;
 use common\models\Social;
 use common\models\Additional;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use common\models\ExtraPropsBehaviour;
 use yii\data\Pagination;
@@ -80,6 +81,17 @@ class Webhooks  extends \yii\db\ActiveRecord
                     return 'https://orteka.ru/local/templates/.default/components/bitrix/news.detail/salon_item/images/no-photo.png';
                 }
             },
+            'tags' => function(){
+
+                $res  = false;
+
+                foreach($this->contactsValue as $contact){
+                    if($contact->type==3){
+                        $res  = explode(',', $contact->value);
+                    }
+                }
+                return $res;
+            },
             'author_url',
             'socialValue' => 'socialValue',
             'themeValue' => 'themeValue',
@@ -105,8 +117,7 @@ class Webhooks  extends \yii\db\ActiveRecord
             $filter['theme'] = $theme;
         }
         if(strlen($search)>3){
-        $searchArr = array('LIKE', 'post_content', $search);
-
+            $searchArr = array('LIKE', 'post_content', $search);
         }
 
         $webhooks = Webhooks::find()->where($filter)->andWhere($searchArr)->orderBy(['created_at' => SORT_DESC]);
@@ -130,12 +141,6 @@ class Webhooks  extends \yii\db\ActiveRecord
         return array(
             'webhooks'  =>  $models,
             'pages'     => $pages,
-            'test'      => [
-                'page'      => Yii::$app->request->post()['page'],
-                'search'    => Yii::$app->request->post()['search'],
-                'location'  => Yii::$app->request->post()['city'],
-                'theme'     => Yii::$app->request->post()['theme'],
-            ],
             'location'  =>  Location::find()->asArray()->all(),
             'category'  =>  Category::find()->asArray()->all(),
             'priority'  =>  Priority::find()->asArray()->all(),

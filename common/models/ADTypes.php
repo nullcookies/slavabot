@@ -40,4 +40,16 @@ class ADTypes  extends \yii\db\ActiveRecord
 
         ];
     }
+
+    public static function checkMLG($mlg_id)
+    {
+        $id = static::findOne(['mlg_id' => $mlg_id]);
+
+        if($id){
+            return $id->id;
+        }else{
+
+            return false;
+        }
+    }
 }

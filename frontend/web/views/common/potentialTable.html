@@ -1,26 +1,68 @@
 <table class="table user-list">
     <tbody>
-    <tr ng-repeat="webhook in webhooks">
-        <td>
-            <div class="webhooks">
-                <div class="ss {{webhook.socialValue.code.replace('.', '')}}"></div>
-                <div class="webhooks__photo">
-                    <img src="{{webhook.author_image_url}}" alt=""/>
-                    <p class="webhooks__authorName">{{webhook.author_name}}</p>
-                    <time am-time-ago="webhook.created_at * 1000"></time>
+        <tr ng-repeat="webhook in webhooks">
+            <td>
+                <div class="col-md-12 contact">
+                    <div class="row">
+                        <div class="col-md-1">
+                            <div class="ss {{webhook.socialValue.code.replace('.', '')}}"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="row">
+                                <div class="col-md-6 col-md-offset-3 contact__text">
+                                    <img class="contact__image" src="{{webhook.author_image_url}}" alt=""/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 contact__text">
+                                    {{webhook.author_name}}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 contact__text">
+                                    <time am-time-ago="webhook.created_at * 1000"></time>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8 contact__post">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <span ng-bind-html="sce.trustAsHtml(webhook.post_content)"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 top-margin-10">
+                                    <span class="label label-success right-margin-10" ng-repeat="tag in webhook.tags">{{tag}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button class="btn btn-success col-lg-12">
+                                        Получить контакт
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <ul class="list-group" style="font-size: 13px;">
+                                        <li ng-show="webhook.author_url" class="list-group-item">Ссылка на профиль</li>
+                                        <li ng-repeat="contact in webhook.contacts" ng-show="contact.type!='tag'" class="list-group-item">{{contact.name}}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="webhooks__point"><i class="fa fa-map-marker" aria-hidden="true"></i>{{webhook.locationValue.name}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                <p ng-bind-html="sce.trustAsHtml(webhook.post_content)"></p>
-                <div class="webhook__get">Получить контакт</div>
-                <div class="webhook__datas">
-                    <ul>
-                        <li ng-show="webhook.author_url">Ссылка на профиль</li>
-                        <li ng-repeat="contact in webhook.contacts">{{contact.name}}</li>
-                    </ul>
-                </div>
-                <div class="webhooks__point">{{webhook.locationValue.name}}</div>
-            </div>
-        </td>
-    </tr>
+            </td>
+        </tr>
     </tbody>
 </table>
