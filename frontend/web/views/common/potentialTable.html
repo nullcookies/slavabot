@@ -1,6 +1,6 @@
 <table class="table user-list">
     <tbody>
-    <tr ng-repeat="webhook in webhooks | filter:search | filter: { location : city } : true | filter: { theme : theme } : true | startFrom:currentPage*pageSize | limitTo:pageSize">
+    <tr ng-repeat="webhook in webhooks">
         <td>
             <div class="webhooks">
                 <div class="ss {{webhook.socialValue.code.replace('.', '')}}"></div>

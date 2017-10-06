@@ -12,6 +12,7 @@ use common\models\Social;
 use common\models\Additional;
 use yii\helpers\ArrayHelper;
 use common\models\ExtraPropsBehaviour;
+use yii\data\Pagination;
 
 
 class Webhooks  extends \yii\db\ActiveRecord
@@ -89,9 +90,52 @@ class Webhooks  extends \yii\db\ActiveRecord
 
     public static function getWebHooks()
     {
+        $filter = [];
+        $searchArr = [];
+
+        $page = Yii::$app->request->post()['page'];
+        $search = Yii::$app->request->post()['search'];
+        $location = Yii::$app->request->post()['city'];
+        $theme = Yii::$app->request->post()['theme'];
+
+        if($location>0){
+            $filter['location'] = $location;
+        }
+        if($theme>0){
+            $filter['theme'] = $theme;
+        }
+        if(strlen($search)>3){
+        $searchArr = array('LIKE', 'post_content', $search);
+
+        }
+
+        $webhooks = Webhooks::find()->where($filter)->andWhere($searchArr)->orderBy(['created_at' => SORT_DESC]);
+
+        $countQuery = clone $webhooks;
+
+        $pages = new Pagination(
+            [
+                'totalCount' => $countQuery->count(),
+                'pageSize' => 10,
+                'page' => ($page > 0 ? $page : 0 )
+            ]
+        );
+
+        $pages->pageSizeParam = false;
+
+        $models = $webhooks->offset($pages->offset)
+             ->limit($pages->limit)
+             ->all();
 
         return array(
-            'webhooks'  =>  Webhooks::find()->orderBy(['created_at' => SORT_DESC])->all(),
+            'webhooks'  =>  $models,
+            'pages'     => $pages,
+            'test'      => [
+                'page'      => Yii::$app->request->post()['page'],
+                'search'    => Yii::$app->request->post()['search'],
+                'location'  => Yii::$app->request->post()['city'],
+                'theme'     => Yii::$app->request->post()['theme'],
+            ],
             'location'  =>  Location::find()->asArray()->all(),
             'category'  =>  Category::find()->asArray()->all(),
             'priority'  =>  Priority::find()->asArray()->all(),

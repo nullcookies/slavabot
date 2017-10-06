@@ -11,7 +11,7 @@
 							<input type="text" class="form-control"  placeholder="Название фильтра" ng-model="filterName">
 						</div>
 						<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
-							<input type="text" class="form-control" placeholder="Поиск" ng-model="search" ng-change="currentPage=0">
+							<input type="text" class="form-control" placeholder="Поиск" ng-model="search" ng-keyup="changeFilter()">
 						</div>
 						<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
 							<select class="form-control" ng-model="city" ng-change="changeFilter()">
@@ -33,21 +33,7 @@
 					</div>
 					<div ng-include='"views/common/potentialTable.html"'></div>
 				</div>
-				<div class="row">
-					<div class="col-lg-6 col-lg-offset-3">
-						<ul class="pagination pull-left" ng-show="(((webhooks| filter:search | filter: { location : city } : true | filter: { theme : theme } : true).length)/pageSize)>1">
-							<li>
-								<a href="" scroll-on-click ng-click="disabledBack()" ><i class="fa fa-chevron-left"></i></a>
-							</li>
-							<li ng-repeat="n in [] | range : (((webhooks| filter:search | filter: { location : city } : true | filter: { theme : theme } : true).length)/pageSize)"  ng-class="{active : n==currentPage}">
-								<a href="" scroll-on-click class="active" ng-click="setPage(n)" ng-show="paginationBlock(n)">{{n+1}}</a>
-							</li>
-							<li>
-								<a href="" scroll-on-click  ng-click="disabledNext()"><i class="fa fa-chevron-right"></i></a>
-							</li>
-						</ul>
-					</div>
-				</div>
+				<div ng-include='"views/common/potentialPagination.html"'></div>
 			</div>
 			</div>
 		</div>

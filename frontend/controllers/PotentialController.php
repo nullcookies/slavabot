@@ -4,6 +4,10 @@ namespace frontend\controllers;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\web\BadRequestHttpException;
+use common\models\Location;
+use common\models\Category;
+use common\models\Priority;
+use common\models\Theme;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
@@ -79,7 +83,10 @@ class PotentialController extends Controller
     {
         return array(
             'filter' => Filters::getFilter(Yii::$app->request->get('id')),
-            'webhooks' => Webhooks::getWebHooks(),
+            'location'  =>  Location::find()->asArray()->all(),
+            'category'  =>  Category::find()->asArray()->all(),
+            'priority'  =>  Priority::find()->asArray()->all(),
+            'theme'     =>  Theme::find()->asArray()->all()
         );
     }
 
