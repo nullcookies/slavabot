@@ -41,7 +41,11 @@
                         <div class="col-md-2">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <a href="#/potential/detail/{{webhook.id}}" class="btn btn-success col-lg-12">
+                                        <a href="{{(webhook.owner === user.id) ? '#/potential/detail/' + webhook.id : ''}}" class="btn btn-warning col-lg-12" ng-show="webhook.owner>0">
+                                            <i class="fa fa-get-pocket"></i>
+                                            {{(webhook.owner === user.id) ? 'Ваш контакт' : 'Контакт забронированн'}}
+                                        </a>
+                                    <a ng-click="getContact(webhook.id)" class="btn btn-success col-lg-12" ng-show="webhook.owner === null">
                                         Получить контакт
                                     </a>
                                 </div>

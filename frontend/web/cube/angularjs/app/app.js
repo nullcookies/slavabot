@@ -41,6 +41,11 @@ app.config(['$routeProvider', function ($routeProvider) {
             controller:'detailCtrl',
             title: 'Детальный просмотр'
         })
+        .when("/pages/contacts", {
+            templateUrl: "views/contacts.html",
+            controller: "contactsCtrl",
+            title: 'Купленные контакты',
+        })
 		.when("/dasboard", {
 			templateUrl: "views/dashboard.html",
 			controller: "dashboardCtrl",

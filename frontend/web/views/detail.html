@@ -19,18 +19,29 @@
 
 			<div class="main-box-body clearfix">
 				<img src="{{webhook.author_image_url}}" alt="" class="profile-img img-responsive center-block" />
-
-
 				<div class="profile-details">
 					<ul class="fa-ul">
 						<li><i class="fa-li fa fa-map-marker"></i>Город: <span>{{webhook.locationValue.name}}</span></li>
+						<li ng-show="webhook.author_url">
+							<i class="fa-li fa fa-address-card-o"></i><a target="_blank" href="{{webhook.author_url}}">{{webhook.author_url}}</a>
+						</li>
+						<li ng-repeat="contact in webhook.contacts">
+							<i class="fa-li fa fa-{{contact.type}}"></i>{{contact.name}}: <span>{{contact.value}}</span>
+						</li>
 					</ul>
 				</div>
 
-				<div class="profile-message-btn center-block text-center">
-					<a href="" class="btn btn-success">
+				<div class="profile-message-btn center-block text-center" ng-show="webhook.owner === null">
+					<a href="" class="btn btn-success" ng-click="getContact()">
 						<i class="fa fa-get-pocket"></i>
 						Получить контакт
+					</a>
+				</div>
+
+				<div class="profile-message-btn center-block text-center" ng-show="webhook.owner>0">
+					<a class="btn btn-warning">
+						<i class="fa fa-get-pocket"></i>
+						{{(webhook.owner === user.id) ? 'Ваш контакт' : 'Контакт забронированн'}}
 					</a>
 				</div>
 			</div>

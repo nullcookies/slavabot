@@ -45,12 +45,13 @@ class PotentialController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'logout' => ['get'],
-                    'savefilter' => ['post']
+                    'savefilter' => ['post'],
+                    'setowner' => ['post']
                 ],
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['list', 'newfilter', 'filter', 'filters', 'detail'],
+                'only' => ['list', 'newfilter', 'filter', 'filters', 'detail', 'setowner', 'contacts'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -75,20 +76,39 @@ class PotentialController extends Controller
     public function actionList()
     {
         return array(
+            'user' => Yii::$app->user->identity,
             'webhooks' => Webhooks::getWebHooks(),
+        );
+    }
+
+    public function actionContacts()
+    {
+        return array(
+            'user' => Yii::$app->user->identity,
+            'webhooks' => Webhooks::getMyWebHooks(),
         );
     }
 
     public function actionDetail()
     {
         return array(
+            'user' => Yii::$app->user->identity,
             'webhooks' => Webhooks::getDetail(),
         );
+    }
+
+    public function actionSetOwner()
+    {
+        $id = Yii::$app->request->post('id');
+        $user  = Yii::$app->user->identity->id;
+
+        return Webhooks::SetWebhookOwner($user, $id);
     }
 
     public function actionFilter()
     {
         return array(
+            'user' => Yii::$app->user->identity,
             'filter' => Filters::getFilter(Yii::$app->request->get('id')),
             'location'  =>  Location::find()->asArray()->all(),
             'category'  =>  Category::find()->asArray()->all(),

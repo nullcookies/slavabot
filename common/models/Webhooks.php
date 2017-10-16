@@ -33,7 +33,7 @@ class Webhooks  extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mlg_id', 'number', 'client', 'location', 'category', 'priority', 'theme', 'social', 'created_at'], 'integer'],
+            [['mlg_id', 'number', 'client', 'location', 'category', 'priority', 'theme', 'social', 'created_at', 'owner'], 'integer'],
             [['post_url', 'post_content', 'author_name', 'author_image_url', 'author_url'], 'string'],
         ];
     }
@@ -48,7 +48,7 @@ class Webhooks  extends \yii\db\ActiveRecord
     }
     public function getThemeValue()
     {
-        return $this->hasOne(Social::className(), ['id' => 'theme']);
+        return $this->hasOne(Theme::className(), ['id' => 'theme']);
     }
     public function getContactsValue()
     {
@@ -68,10 +68,14 @@ class Webhooks  extends \yii\db\ActiveRecord
             'social',
             'locationValue' => 'locationValue',
             'post_content' => function(){
-                $body = $this->post_content;
-                $pattern = '~(\(\d{3}\)\s\d{3}\-\d{2}\-\d{2})|(\d{3}\s\d{3}\s\d{2}\s\d{2})|(\d{10})|(\d{3}\s\d{3}\-\d{2}\-\d{2})|(8\(\d{3}\)\s\d{3}\-\d{2}\-\d{2})|(7\s\d{3}\s\d{3}\-\d{2}\-\d{2})~s';
-                $body = preg_replace($pattern, "<b>[номер телефона]</b>", $body);
-                return $body;
+                if($this->owner != Yii::$app->user->identity->id) {
+                    $body = $this->post_content;
+                    $pattern = '~(\(\d{3}\)\s\d{3}\-\d{2}\-\d{2})|(\d{3}\s\d{3}\s\d{2}\s\d{2})|(\d{10})|(\d{3}\s\d{3}\-\d{2}\-\d{2})|(8\(\d{3}\)\s\d{3}\-\d{2}\-\d{2})|(7\s\d{3}\s\d{3}\-\d{2}\-\d{2})~s';
+                    $body = preg_replace($pattern, "<b>[номер телефона]</b>", $body);
+                    return $body;
+                }else{
+                    return $this->post_content;
+                }
             },
             'author_name',
             'author_image_url'=> function(){
@@ -95,9 +99,29 @@ class Webhooks  extends \yii\db\ActiveRecord
             'author_url',
             'socialValue' => 'socialValue',
             'themeValue' => 'themeValue',
-            'contacts' => 'contactsValue',
+            'contacts' => function(){
+                $res = array();
+                if($this->owner != Yii::$app->user->identity->id){
+                    foreach($this->contactsValue as $contact){
+
+                        unset($contact['value']);
+
+                        if($contact['type']!=3){
+                            $res[] = $contact;
+                        }
+                    }
+                }else{
+                    foreach($this->contactsValue as $contact){
+                        if($contact['type']!=3){
+                            $res[] = $contact;
+                        }
+                    }
+                }
+                return $res;
+            },
             'created_at',
-            'id'
+            'id',
+            'owner'
         ];
     }
 
@@ -147,6 +171,67 @@ class Webhooks  extends \yii\db\ActiveRecord
             'priority'  =>  Priority::find()->asArray()->all(),
             'theme'     =>  Theme::find()->asArray()->all()
         );
+    }
+    public static function getMyWebHooks()
+    {
+        $filter = [];
+        $searchArr = [];
+
+        $page = Yii::$app->request->post()['page'];
+        $search = Yii::$app->request->post()['search'];
+        $location = Yii::$app->request->post()['city'];
+        $theme = Yii::$app->request->post()['theme'];
+
+        $filter['owner'] = Yii::$app->user->identity->id;
+
+        if($location>0){
+            $filter['location'] = $location;
+        }
+        if($theme>0){
+            $filter['theme'] = $theme;
+        }
+        if(strlen($search)>3){
+            $searchArr = array('LIKE', 'post_content', $search);
+        }
+
+        $webhooks = Webhooks::find()->where($filter)->andWhere($searchArr)->orderBy(['created_at' => SORT_DESC]);
+
+        $countQuery = clone $webhooks;
+
+        $pages = new Pagination(
+            [
+                'totalCount' => $countQuery->count(),
+                'pageSize' => 10,
+                'page' => ($page > 0 ? $page : 0 )
+            ]
+        );
+
+        $pages->pageSizeParam = false;
+
+        $models = $webhooks->offset($pages->offset)
+            ->limit($pages->limit)
+            ->all();
+
+        return array(
+            'webhooks'  =>  $models,
+            'pages'     => $pages,
+            'location'  =>  Location::find()->asArray()->all(),
+            'category'  =>  Category::find()->asArray()->all(),
+            'priority'  =>  Priority::find()->asArray()->all(),
+            'theme'     =>  Theme::find()->asArray()->all()
+        );
+    }
+
+    public static function SetWebhookOwner($user, $webhook)
+    {
+        $elem = self::findOne(['id' => $webhook]);
+        $elem->owner = $user;
+
+        if($elem->save(false)){
+            return 'success';
+        }else{
+            return 'error';
+        }
     }
 
     public static function getDetail()
