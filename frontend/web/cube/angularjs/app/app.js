@@ -8,7 +8,7 @@ var app = angular.module('cubeWebApp', [
 	'angular-loading-bar',
 	'ngAnimate',
 	'easypiechart',
-    'angularMoment'
+    'angularMoment',
 ]);
 
 app.config(['cfpLoadingBarProvider', function(cfpLoadingBarProvider) {
@@ -51,6 +51,11 @@ app.config(['$routeProvider', function ($routeProvider) {
 			controller: "dashboardCtrl",
 			title: 'Главная'
 		})
+        .when("/pages/config", {
+            templateUrl: "/site/config/",
+            controller: "dashboardCtrl",
+            title: 'Главная'
+        })
 		.otherwise({
 			redirectTo:'/error-404'
 		});

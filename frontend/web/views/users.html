@@ -14,7 +14,7 @@
 							<input type="text" class="form-control" placeholder="Поиск" ng-model="search" ng-keyup="changeFilter()">
 						</div>
 						<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
-							<select class="form-control" ng-model="city" ng-change="changeFilter()">
+							<select class="form-control" ng-model="location" ng-change="changeFilter()">
 								<option value="" selected>{{cityPlaceholder}}</option>
 								<option value="{{location.id}}"  ng-repeat="location in locations">{{location.name}}</option>
 							</select>

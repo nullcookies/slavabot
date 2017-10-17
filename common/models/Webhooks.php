@@ -8,6 +8,7 @@ use common\models\Location;
 use common\models\Category;
 use common\models\Priority;
 use common\models\Theme;
+use common\models\Filters;
 use common\models\Social;
 use common\models\Additional;
 use yii\db\Expression;
@@ -145,7 +146,7 @@ class Webhooks  extends \yii\db\ActiveRecord
             $searchArr = array('LIKE', 'post_content', $search);
         }
 
-        $webhooks = Webhooks::find()->where($filter)->andWhere($searchArr)->orderBy(['created_at' => SORT_DESC]);
+        $webhooks = Webhooks::find()->where($filter)->andWhere($searchArr)->andWhere(['OR', ['owner' => null], ['owner' => Yii::$app->user->identity->id]])->orderBy(['created_at' => SORT_DESC]);
 
         $countQuery = clone $webhooks;
 

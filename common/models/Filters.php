@@ -32,21 +32,28 @@ class Filters extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id'], 'integer'],
-            [['name', 'filter'], 'string']
+            [['user_id', 'location', 'theme'], 'integer'],
+            [['name', 'search', 'email'], 'string']
 
         ];
     }
 
     /**
-     * Возвращаем только имя и содержимое фильтра
+     * Возвращаем только имя, содержимое фильтра и почту для уведомлений
      * @return array
      */
     public function fields()
     {
         return [
             'name',
-            'filter'
+            'search',
+            'location' => function(){
+                return (string)$this->location;
+            },
+            'theme' => function(){
+                return (string)$this->theme;
+            },
+            'email'
         ];
     }
 
@@ -67,6 +74,25 @@ class Filters extends \yii\db\ActiveRecord
             return false;
         }
     }
+
+    /**
+     * Получить все фильтры у которых включенны уведомления
+     *
+     * @return object - сохраненные фильтры |
+     *         bool - в случае отсутсвия сохраненных фильтров
+     */
+
+    public static function getNotifFilters()
+    {
+        $model = static::find()->where(['notification' => 'true'])->asArray()->all();
+
+        if($model){
+            return $model;
+        }else{
+            return false;
+        }
+    }
+
 
     /**
      * Получить конкретный фильтр по его id
@@ -96,7 +122,9 @@ class Filters extends \yii\db\ActiveRecord
 
         $model->user_id = Yii::$app->user->id;
         $model->name = $item['name'];
-        $model->filter = $item['filter'];
+        $model->search = $item['search'];
+        $model->location = $item['location'];
+        $model->theme = $item['theme'];
 
         $model->save();
 
@@ -111,7 +139,10 @@ class Filters extends \yii\db\ActiveRecord
         $model = Filters::findOne(['id' => $item['id']]);
 
         $model->name = $item['name'];
-        $model->filter = $item['filter'];
+        $model->search = $item['search'];
+        $model->location = $item['city'];
+        $model->theme = $item['theme'];
+        $model->email = $item['email'];
 
         $model->save();
 

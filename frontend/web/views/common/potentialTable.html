@@ -28,6 +28,13 @@
                         </div>
                         <div class="col-md-8 contact__post">
                             <div class="row">
+                                <div class="col-md-6">
+                                    <h2 style="color: #03a9f4;">
+                                        {{webhook.themeValue.name}}
+                                    </h2>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-12">
                                     <span ng-bind-html="sce.trustAsHtml(webhook.post_content)"></span>
                                 </div>

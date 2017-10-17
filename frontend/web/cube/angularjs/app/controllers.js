@@ -29,9 +29,9 @@ angular.module('cubeWebApp')
             $scope.potentialSubMenu = response.data;
         });
     })
-    .controller('potentialCtrl', function ($scope, $http, $sce) {
+    .controller('potentialCtrl', function ($scope, $http, $sce, $location, $interval) {
         $scope.webhooks = [];
-        $scope.city;
+        $scope.location;
 
         $scope.sce = $sce;
         moment.locale('ru');
@@ -59,15 +59,18 @@ angular.module('cubeWebApp')
 
         };
         $scope.time = moment(new Date());
+        $scope.getList = function(){
+            $http({method: 'GET', url: '/potential/list'}).then(function success(response) {
+                $scope.user = response.data.user;
+                $scope.webhooks = response.data.webhooks.webhooks;
+                $scope.locations = response.data.webhooks.location;
+                $scope.themes = response.data.webhooks.theme;
+                $scope.pages = response.data.webhooks.pages;
+                $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
+            });
+        };
 
-        $http({method: 'GET', url: '/potential/list'}).then(function success(response) {
-            $scope.user = response.data.user;
-            $scope.webhooks = response.data.webhooks.webhooks;
-            $scope.locations = response.data.webhooks.location;
-            $scope.themes = response.data.webhooks.theme;
-            $scope.pages = response.data.webhooks.pages;
-            $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
-        });
+        $scope.getList();
 
         $scope.getContact = function(id){
             var data = $.param({'id' : id});
@@ -77,7 +80,9 @@ angular.module('cubeWebApp')
                 }
             };
 
-            $http.post('/potential/set-owner', data, config).then(function success(response) {});
+            $http.post('/potential/set-owner', data, config).then(function success(response) {
+               $location.path('/potential/detail/'+id);
+            });
         };
 
         $scope.paginationBlock = function(n){
@@ -100,18 +105,13 @@ angular.module('cubeWebApp')
             }
         };
         $scope.saveFilter = function() {
-            $scope.arrFilter = {
-                'search' : $scope.search,
-                'city' : $scope.city,
-                'theme' : $scope.theme
-            };
 
             if($scope.filterName.length<3){
                 $scope.nameError = true;
                 return false;
             }
 
-            if($scope.search.length==0 && $scope.city === undefined && $scope.theme === undefined){
+            if($scope.search.length==0 && $scope.location === undefined && $scope.theme === undefined){
                 $scope.noFilter = true;
                 return false;
             }
@@ -121,7 +121,9 @@ angular.module('cubeWebApp')
 
             var data = $.param({
                 name: $scope.filterName,
-                filter: JSON.stringify($scope.arrFilter)
+                search : $scope.search,
+                location : $scope.location,
+                theme : $scope.theme
             });
 
             var config = {
@@ -143,7 +145,7 @@ angular.module('cubeWebApp')
 
             $scope.pagination = {
                 'search' : $scope.search,
-                'city' : $scope.city,
+                'city' : $scope.location,
                 'theme' : $scope.theme,
                 'page' : n
             };
@@ -165,8 +167,13 @@ angular.module('cubeWebApp')
                 $scope.currentPage = n;
             });
         };
+
+        $scope.Timer = $interval(function () {
+            $scope.setPage($scope.currentPage)
+        }, 1000);
+
     })
-    .controller('filterCtrl', function ($scope, $http, $sce, $routeParams,$location) {
+    .controller('filterCtrl', function ($scope, $http, $sce, $routeParams,$location, $interval) {
     $scope.webhooks = [];
     $scope.locations = [];
     $scope.themes = [];
@@ -183,10 +190,8 @@ angular.module('cubeWebApp')
     $scope.cityPlaceholder = 'Город';
     $scope.themePlaceholder = 'Тема';
     $scope.numberOfPages = 0;
-
-    //     #/pages/contacts
-
-
+    $scope.notif = false;
+    $scope.notifEmail = '';
 
     $scope.changeFilter = function(){
 
@@ -205,19 +210,18 @@ angular.module('cubeWebApp')
     var id = $routeParams["id"];
 
     $http({method: 'GET', url: '/potential/filter?id='+id}).then(function success(response) {
-        $scope.filter = response.data.filter;
         $scope.user = response.data.user;
 
-        $scope.filter.filter = JSON.parse(response.data.filter.filter);
+        $scope.notifEmail = response.data.filter.email;
 
-        $scope.filterName = $scope.filter.name;
+        $scope.search = response.data.filter.search;
+        $scope.city = response.data.filter.location;
+        $scope.theme = response.data.filter.theme;
+        $scope.filterName = response.data.filter.name;
 
         $scope.locations = response.data.location;
         $scope.themes = response.data.theme;
 
-        $scope.search = $scope.filter.filter.search;
-        $scope.city = $scope.filter.filter.city;
-        $scope.theme = $scope.filter.filter.theme;
 
         $scope.setPage(0);
     });
@@ -230,7 +234,9 @@ angular.module('cubeWebApp')
             }
         };
 
-        $http.post('/potential/set-owner', data, config).then(function success(response) {});
+        $http.post('/potential/set-owner', data, config).then(function success(response) {
+            $location.path('/potential/detail/'+id);
+        });
     };
 
     $scope.paginationBlock = function(n){
@@ -252,13 +258,8 @@ angular.module('cubeWebApp')
             $scope.currentPage = $scope.currentPage-1
         }
     };
-    $scope.saveFilter = function() {
-        $scope.arrFilter = {
-            'search' : $scope.search,
-            'city' : $scope.city,
-            'theme' : $scope.theme
-        };
 
+    $scope.saveFilter = function() {
         if($scope.filterName.length<3){
             $scope.nameError = true;
             return false;
@@ -275,14 +276,17 @@ angular.module('cubeWebApp')
         var data = $.param({
             id: id,
             name: $scope.filterName,
-            filter: JSON.stringify($scope.arrFilter)
+            search: $scope.search,
+            city: $scope.city,
+            theme: $scope.theme,
+            email : $scope.notifEmail,
         });
 
         var config = {
             headers : {
                 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
             }
-        }
+        };
 
         $http.post('/potential/update-filter', data, config).then(function success(response) {});
     };
@@ -317,8 +321,12 @@ angular.module('cubeWebApp')
             $scope.currentPage = n;
         });
     };
+        $scope.Timer = $interval(function () {
+            $scope.setPage($scope.currentPage)
+        }, 10000);
 })
-    .controller('detailCtrl', function($scope, $http, $routeParams, $sce){
+    .controller('detailCtrl', function($scope, $http, $routeParams, $sce,$location){
+        console.log($location.path());
         $scope.webhook = [];
         $scope.sce = $sce;
         moment.locale('ru');

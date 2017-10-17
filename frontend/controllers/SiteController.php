@@ -16,6 +16,7 @@ use frontend\models\ContactForm;
 use frontend\models\PasswordConfig;
 use common\models\User;
 use common\models\Webhooks;
+use common\models\Filters;
 use common\models\Location;
 use common\models\Category;
 use common\models\Priority;
@@ -163,12 +164,14 @@ class SiteController extends Controller
              * Принудительный запуск записи вебхуков из файла.
              */
 
+
             $current = explode("\n", $current);
 
             foreach ($current as $item) {
 
                 $item = json_decode($item);
-                Webhooks::SaveWebHook($item);
+                var_dump($item);
+                //Webhooks::SaveWebHook($item);
             }
 
         }

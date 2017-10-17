@@ -167,8 +167,6 @@ AppAsset::register($this);
                                     </ul>
                                 </li>
                                 <li class="header-nav__item" data-match-route="/pages/contacts"><a href="#/pages/contacts"><i class="fa fa-folder-open-o"></i><span>Купленные контакты</span></a></li>
-                                <li class="header-nav__item"><a href="#/pages/notifications"><i class="fa fa-bell-o"></i><span>Уведомления</span></a></li>
-                                <li class="header-nav__item"><a href="#/pages/integration"><i class="fa fa-cloud-upload"></i><span>Интеграция</span></a></li>
                                 <li class="header-nav__item"><a href="#/pages/config"><i class="fa fa-sliders"></i><span>Настройки</span></a></li>
                                 <li class="header-nav__item"><a href="#/pages/help"><i class="fa fa-life-ring"></i><span>Помощь</span></a></li>
                             </ul>
