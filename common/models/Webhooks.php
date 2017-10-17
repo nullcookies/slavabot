@@ -279,5 +279,8 @@ class Webhooks  extends \yii\db\ActiveRecord
         $elem->save();
 
         Additional::saveReference($item, $elem->id);
+
+        Filters::sendNotification($elem);
+
     }
 }

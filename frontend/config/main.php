@@ -21,6 +21,7 @@ return [
             ],
         ],
     ],
+    'name' => 'Salesbot',
     'id' => 'app-frontend',
     'sourceLanguage' => 'en-US',
     'language' => 'ru-RU',
