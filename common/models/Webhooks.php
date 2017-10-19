@@ -38,7 +38,6 @@ class Webhooks  extends \yii\db\ActiveRecord
             [['post_url', 'post_content', 'author_name', 'author_image_url', 'author_url'], 'string'],
         ];
     }
-
     public function getLocationValue()
     {
         return $this->hasOne(Location::className(), ['id' => 'location']);
@@ -55,7 +54,6 @@ class Webhooks  extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Additional::className(), ['webhook' => 'id']);
     }
-
     public function fields()
     {
         return [
@@ -125,7 +123,6 @@ class Webhooks  extends \yii\db\ActiveRecord
             'owner'
         ];
     }
-
     public static function getWebHooks()
     {
         $filter = [];
@@ -222,7 +219,6 @@ class Webhooks  extends \yii\db\ActiveRecord
             'theme'     =>  Theme::find()->asArray()->all()
         );
     }
-
     public static function SetWebhookOwner($user, $webhook)
     {
         $elem = self::findOne(['id' => $webhook]);
@@ -234,7 +230,6 @@ class Webhooks  extends \yii\db\ActiveRecord
             return 'error';
         }
     }
-
     public static function getDetail()
     {
         $webhooks = Webhooks::find()->where(['id' => Yii::$app->request->post()['id']])->one();
@@ -243,7 +238,6 @@ class Webhooks  extends \yii\db\ActiveRecord
             'webhooks'  =>  $webhooks
         );
     }
-
     public static function checkWebHook($mlg_id)
     {
         $id = self::findOne(['mlg_id' => $mlg_id]);
@@ -254,7 +248,6 @@ class Webhooks  extends \yii\db\ActiveRecord
             return new Webhooks();
         }
     }
-
     public static function SaveWebHook($item)
     {
         $elem = self::checkWebHook($item->id);

@@ -23,7 +23,6 @@ AppAsset::register($this);
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <?= Html::csrfMetaTags() ?>
-
     <title ng-bind="title"><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
     <link href='//fonts.googleapis.com/css?family=Open+Sans:400,600,700,300|Titillium+Web:200,300,400' rel='stylesheet' type='text/css'>
@@ -59,60 +58,60 @@ AppAsset::register($this);
                                 <i class="fa fa-bars"></i>
                             </a>
                         </li>
-                        <li class="dropdown hidden-xs">
-                            <a class="btn dropdown-toggle" data-toggle="dropdown">
-                                <i class="fa fa-bell"></i>
-                                <span class="count">8</span>
-                            </a>
-                            <ul class="dropdown-menu notifications-list">
-                                <li class="pointer">
-                                    <div class="pointer-inner">
-                                        <div class="arrow"></div>
-                                    </div>
-                                </li>
-                                <li class="item-header">You have 6 new notifications</li>
-                                <li class="item">
-                                    <a href="#">
-                                        <i class="fa fa-comment"></i>
-                                        <span class="content">New comment on ‘Awesome P...</span>
-                                        <span class="time"><i class="fa fa-clock-o"></i>13 min.</span>
-                                    </a>
-                                </li>
-                                <li class="item">
-                                    <a href="#">
-                                        <i class="fa fa-plus"></i>
-                                        <span class="content">New user registration</span>
-                                        <span class="time"><i class="fa fa-clock-o"></i>13 min.</span>
-                                    </a>
-                                </li>
-                                <li class="item">
-                                    <a href="#">
-                                        <i class="fa fa-envelope"></i>
-                                        <span class="content">New Message from George</span>
-                                        <span class="time"><i class="fa fa-clock-o"></i>13 min.</span>
-                                    </a>
-                                </li>
-                                <li class="item">
-                                    <a href="#">
-                                        <i class="fa fa-shopping-cart"></i>
-                                        <span class="content">New purchase</span>
-                                        <span class="time"><i class="fa fa-clock-o"></i>13 min.</span>
-                                    </a>
-                                </li>
-                                <li class="item">
-                                    <a href="#">
-                                        <i class="fa fa-eye"></i>
-                                        <span class="content">New order</span>
-                                        <span class="time"><i class="fa fa-clock-o"></i>13 min.</span>
-                                    </a>
-                                </li>
-                                <li class="item-footer">
-                                    <a href="#">
-                                        View all notifications
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+<!--                        <li class="dropdown hidden-xs">-->
+<!--                            <a class="btn dropdown-toggle" data-toggle="dropdown">-->
+<!--                                <i class="fa fa-bell"></i>-->
+<!--                                <span class="count">8</span>-->
+<!--                            </a>-->
+<!--                            <ul class="dropdown-menu notifications-list">-->
+<!--                                <li class="pointer">-->
+<!--                                    <div class="pointer-inner">-->
+<!--                                        <div class="arrow"></div>-->
+<!--                                    </div>-->
+<!--                                </li>-->
+<!--                                <li class="item-header">You have 6 new notifications</li>-->
+<!--                                <li class="item">-->
+<!--                                    <a href="#">-->
+<!--                                        <i class="fa fa-comment"></i>-->
+<!--                                        <span class="content">New comment on ‘Awesome P...</span>-->
+<!--                                        <span class="time"><i class="fa fa-clock-o"></i>13 min.</span>-->
+<!--                                    </a>-->
+<!--                                </li>-->
+<!--                                <li class="item">-->
+<!--                                    <a href="#">-->
+<!--                                        <i class="fa fa-plus"></i>-->
+<!--                                        <span class="content">New user registration</span>-->
+<!--                                        <span class="time"><i class="fa fa-clock-o"></i>13 min.</span>-->
+<!--                                    </a>-->
+<!--                                </li>-->
+<!--                                <li class="item">-->
+<!--                                    <a href="#">-->
+<!--                                        <i class="fa fa-envelope"></i>-->
+<!--                                        <span class="content">New Message from George</span>-->
+<!--                                        <span class="time"><i class="fa fa-clock-o"></i>13 min.</span>-->
+<!--                                    </a>-->
+<!--                                </li>-->
+<!--                                <li class="item">-->
+<!--                                    <a href="#">-->
+<!--                                        <i class="fa fa-shopping-cart"></i>-->
+<!--                                        <span class="content">New purchase</span>-->
+<!--                                        <span class="time"><i class="fa fa-clock-o"></i>13 min.</span>-->
+<!--                                    </a>-->
+<!--                                </li>-->
+<!--                                <li class="item">-->
+<!--                                    <a href="#">-->
+<!--                                        <i class="fa fa-eye"></i>-->
+<!--                                        <span class="content">New order</span>-->
+<!--                                        <span class="time"><i class="fa fa-clock-o"></i>13 min.</span>-->
+<!--                                    </a>-->
+<!--                                </li>-->
+<!--                                <li class="item-footer">-->
+<!--                                    <a href="#">-->
+<!--                                        View all notifications-->
+<!--                                    </a>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
                     </ul>
                 </div>
 
@@ -136,12 +135,12 @@ AppAsset::register($this);
                     </ul>
                 </div>
                 <div class="nav-no-collapse pull-right" id="header-nav">
-                    <ul class="nav navbar-nav pull-right">
-                        <li class="dropdown profile-dropdown">
-                            <span class="hidden-xs">Баланс: 2 000</span>
-                            <button type="button" class="btn btn-success">Пополнить</button>
-                        </li>
-                    </ul>
+<!--                    <ul class="nav navbar-nav pull-right">-->
+<!--                        <li class="dropdown profile-dropdown">-->
+<!--                            <span class="hidden-xs">Баланс: 2 000</span>-->
+<!--                            <button type="button" class="btn btn-success">Пополнить</button>-->
+<!--                        </li>-->
+<!--                    </ul>-->
                 </div>
             </div>
         </div>
@@ -167,8 +166,8 @@ AppAsset::register($this);
                                     </ul>
                                 </li>
                                 <li class="header-nav__item" data-match-route="/pages/contacts"><a href="#/pages/contacts"><i class="fa fa-folder-open-o"></i><span>Купленные контакты</span></a></li>
-                                <li class="header-nav__item"><a href="#/pages/config"><i class="fa fa-sliders"></i><span>Настройки</span></a></li>
-                                <li class="header-nav__item"><a href="#/pages/help"><i class="fa fa-life-ring"></i><span>Помощь</span></a></li>
+<!--                                <li class="header-nav__item" data-match-route="/pages/config"><a href="#/pages/config"><i class="fa fa-sliders"></i><span>Настройки</span></a></li>-->
+<!--                                <li class="header-nav__item"><a href="#/pages/help"><i class="fa fa-life-ring"></i><span>Помощь</span></a></li>-->
                             </ul>
                         </div>
                     </div>

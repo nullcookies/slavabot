@@ -1,6 +1,7 @@
 <?php
 
 /* @var $this yii\web\View */
+
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 
@@ -15,11 +16,11 @@ $this->params['breadcrumbs'][] = $this->title;
             <div style="height:25px;"></div>
             <div class="tabs-wrapper">
                 <ul class="nav nav-tabs">
-                    <li class="<?= $active=='main' ? 'active' : ''?>""><a href="#tab-main" data-toggle="tab" aria-expanded="<?= $active=='main' ? 'true' : 'false'?>"><?=\Yii::t('main', 'User settings')?></a></li>
-                    <li class="<?= $active=='password' ? 'active' : ''?>"><a href="#tab-help" data-toggle="tab" aria-expanded="<?= $active=='password' ? 'true' : 'false'?>"><?=\Yii::t('main', 'Change password')?></a></li>
+                    <li ng-class="{'active' : main}"><a ng-click="setMain()"><?=\Yii::t('main', 'User settings')?></a></li>
+                    <li ng-class="{'active' : password}"><a ng-click="setPassword()"><?=\Yii::t('main', 'Change password')?></a></li>
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane fade <?= $active=='main' ? 'active in' : ''?>" id="tab-main">
+                    <div ng-class="{'active in' : main}" class="tab-pane fade" id="tab-main">
                         <div class="main-box-body clearfix">
                             <?php $form = ActiveForm::begin(['id' => 'form-signup']); ?>
 
@@ -49,7 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?php ActiveForm::end(); ?>
                         </div>
                     </div>
-                    <div class="tab-pane fade <?= $active=='password' ? 'active in' : ''?>" id="tab-help">
+                    <div ng-class="{'active in' : password}" class="tab-pane fade" id="tab-help">
                         <div class="main-box-body clearfix">
                             <?php $form = ActiveForm::begin(['id' => 'form-signup']); ?>
 

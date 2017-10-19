@@ -53,8 +53,13 @@ app.config(['$routeProvider', function ($routeProvider) {
 		})
         .when("/pages/config", {
             templateUrl: "/site/config/",
-            controller: "dashboardCtrl",
-            title: 'Главная'
+            controller: "configCtrl",
+            title: 'Настройки'
+        })
+        .when("/pages/help", {
+            templateUrl: "views/help.html",
+            controller: "helpCtrl",
+            title: 'Помощь'
         })
 		.otherwise({
 			redirectTo:'/error-404'

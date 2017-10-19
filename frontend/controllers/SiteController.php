@@ -35,10 +35,10 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout', 'signup', 'repassword', 'index'],
+                'only' => ['logout', 'signup', 'repassword', 'index', 'getdata'],
                 'rules' => [
                     [
-                        'actions' => ['signup', 'repassword'],
+                        'actions' => ['signup', 'repassword', 'getdata'],
                         'allow' => true,
                         'roles' => ['?'],
                     ],
@@ -144,42 +144,32 @@ class SiteController extends Controller
 
     public function actionGetdata()
     {
-
         $file = 'webhooks.txt';
-
         $current = file_get_contents($file);
+
         if(\Yii::$app->request->isPost){
-
             $new = file_get_contents("php://input");
-
             $current .= $new."\n";
             file_put_contents($file, $current);
             $item = json_decode($new);
-
             Webhooks::SaveWebHook($item);
-
         }else{
 
             /**
              * Принудительный запуск записи вебхуков из файла.
              */
 
-
             $current = explode("\n", $current);
-
             foreach ($current as $item) {
-
                 $item = json_decode($item);
-                var_dump(Webhooks::SaveWebHook($item));
-
+                var_dump($item);
             }
-
         }
     }
     public function actionConfig()
     {
 
-
+        $this->layout = '@app/views/layouts/simple.php';
         $usermodel = new UserConfig();
         $passwordmodel = new PasswordConfig();
 

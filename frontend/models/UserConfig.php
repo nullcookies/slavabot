@@ -38,6 +38,18 @@ class UserConfig extends Model
         }
     }
 
+    public function getUserData()
+    {
+        $user = self::findModel(\Yii::$app->user->identity->id);
+
+        return array(
+            'id' => $user->id,
+            'name' => $user->username,
+            'email' => $user->email,
+            'phone' => $user->phone
+        );
+    }
+
     public function save()
     {
         $model = $this->findModel(\Yii::$app->user->identity->id);

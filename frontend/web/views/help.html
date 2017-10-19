@@ -1,0 +1,30 @@
+<div class="row">
+	<div class="col-lg-6 col-md-offset-3">
+		<div class="main-box no-header clearfix">
+			<div class="main-box-body clearfix">
+				<div class="alert alert-success" ng-show="success">
+					<i class="fa fa-check-circle fa-fw fa-lg" ></i>
+					<strong>Сообщение отправлено!</strong> Специалисты технической поддержки свяжутся с вами.
+				</div>
+				<div class="alert alert-warning" ng-show="serverError">
+					<i class="fa fa-warning fa-fw fa-lg"></i>
+					<strong>Ошибка!</strong> Сообщение не отправлено.
+				</div>
+				<div class="alert alert-danger" ng-show="helpMassageError">
+					<i class="fa fa-times-circle fa-fw fa-lg"></i>
+					<strong>Ошибка!</strong> Слишком короткое сообщение.
+				</div>
+			</div>
+			<div class="main-box-body clearfix" ng-hide="success">
+				<div class="col-md-12">
+					<div class="form-group" ng-class="{'has-error' : helpMassageError}">
+						<label for="helpTextarea">Сообщение в тех. поддержку:</label>
+						<textarea class="form-control" id="helpTextarea" rows="12" ng-model="helpMassage"></textarea>
+					</div>
+					<button type="button" ng-click="sendMassage()" class="btn btn-success">Отправить</button>
+				</div>
+			</div>
+			</div>
+		</div>
+	</div>
+</div>

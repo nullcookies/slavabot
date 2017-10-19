@@ -474,22 +474,89 @@ angular.module('cubeWebApp')
             });
         };
     })
-app.filter('startFrom', function() {
-    return function(input, start) {
-        start = +start; //parse to int
-        return input.slice(start);
-    }
-});
+    .controller('helpCtrl', function ($scope, $http, $sce) {
 
-app.filter('range', function() {
-    return function(input, total) {
-        total = Math.ceil(total);
-        for (var i=0; i<total; i++) {
-            input.push(i);
+        $scope.helpMassage = "";
+        $scope.helpMassageError = false;
+        $scope.success = false;
+        $scope.serverError = false;
+
+        function getCSRF() {
+            var metas = document.getElementsByTagName('meta');
+            for (var i=0; i<metas.length; i++) {
+                if (metas[i].getAttribute("name") ==="csrf-token") {
+                    return metas[i].getAttribute("content");
+                }
+            }
+            return "";
         }
-        return input;
-    };
-});
+
+        $scope.sendMassage = function(){
+            var text = $scope.helpMassage;
+            if(text.length > 6){
+                $scope.helpMassageError = false;
+                $scope.data = {
+                    'text' : text,
+                };
+
+                var data = $.param($scope.data);
+
+                var config = {
+                    headers : {
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+                        'X-CSRF-Token' : getCSRF()
+
+                    }
+                };
+
+                $http.post('/system/help', data, config).then(function success(response) {
+                    if(response){
+                        $scope.success = true;
+                        $scope.serverError = false;
+                        $scope.helpMassageError = false;
+                    }else{
+                        $scope.serverError = true;
+                    }
+                });
+
+
+            }else{
+                $scope.helpMassageError = true;
+            }
+        };
+
+    })
+    .controller('configCtrl', function ($scope, $http, $sce) {
+        console.log('Config controller ready to work!');
+
+        $scope.main = true;
+        $scope.password = false;
+
+        $scope.setMain = function(){
+            $scope.main = true;
+            $scope.password = false;
+        }
+        $scope.setPassword = function(){
+            $scope.main = false;
+            $scope.password = true;
+        }
+    })
+    app.filter('startFrom', function() {
+        return function(input, start) {
+            start = +start; //parse to int
+            return input.slice(start);
+        }
+    });
+
+    app.filter('range', function() {
+        return function(input, total) {
+            total = Math.ceil(total);
+            for (var i=0; i<total; i++) {
+                input.push(i);
+            }
+            return input;
+        };
+    });
 
 
 
