@@ -66,7 +66,6 @@ class Webhooks  extends \yii\db\ActiveRecord
             },
             'social',
             'locationValue' => 'locationValue',
-            'test' => 'post_content',
             'post_content' => function(){
                 if($this->owner != Yii::$app->user->identity->id) {
                     $body = $this->post_content;
