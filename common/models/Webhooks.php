@@ -66,11 +66,20 @@ class Webhooks  extends \yii\db\ActiveRecord
             },
             'social',
             'locationValue' => 'locationValue',
+            'test' => 'post_content',
             'post_content' => function(){
                 if($this->owner != Yii::$app->user->identity->id) {
                     $body = $this->post_content;
-                    $pattern = '~(\(\d{3}\)\s\d{3}\-\d{2}\-\d{2})|(\d{3}\s\d{3}\s\d{2}\s\d{2})|(\d{10})|(\d{3}\s\d{3}\-\d{2}\-\d{2})|(8\(\d{3}\)\s\d{3}\-\d{2}\-\d{2})|(7\s\d{3}\s\d{3}\-\d{2}\-\d{2})~s';
+                    //телефон
+                    //$pattern = '~(\(\d{3}\)\s\d{3}\-\d{2}\-\d{2})|(\d{3}\s\d{3}\s\d{2}\s\d{2})|(\d{10})|(\d{3}\s\d{3}\-\d{2}\-\d{2})|(8\(\d{3}\)\s\d{3}\-\d{2}\-\d{2})|(7\s\d{3}\s\d{3}\-\d{2}\-\d{2})~s';
+
+                    $pattern = '~([\d- \(\)]){10,20}~s';
                     $body = preg_replace($pattern, "<b>[номер телефона]</b>", $body);
+
+
+                    //почта
+                    $pattern = '/([a-z0-9_\.\-])+\@(([a-z0-9\-])+\.)+([a-zа-я0-9]{2,4})+/i';
+                    $body = preg_replace($pattern, "<b>[email]</b>", $body);
                     return $body;
                 }else{
                     return $this->post_content;
