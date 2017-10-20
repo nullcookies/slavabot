@@ -284,4 +284,33 @@ class Webhooks  extends \yii\db\ActiveRecord
         Filters::sendNotification($elem);
 
     }
+
+    public static function DemoWebHook($item)
+    {
+        $elem = self::checkWebHook($item->id);
+
+        $elem->mlg_id =  $item->id;
+        $elem->number = $item->number;
+        $elem->client = $item->client;
+
+        $elem->location = Location::saveReference($item);
+        $elem->category = Category::saveReference($item);
+        $elem->priority = Priority::saveReference($item);
+        $elem->theme = Theme::saveReference($item);
+
+        $elem->post_url = $item->post_url;
+        $elem->author_image_url  = $item->author_image_url;
+        $elem->author_url = $item->author_url;
+        $elem->post_content = $item->post_content;
+        $elem->author_name = $item->author_name;
+        $elem->social = Social::checkSocial($item);
+        $elem->created_at = (int)strtotime($item->created);
+
+        $elem->save();
+
+        Additional::saveReference($item, $elem->id);
+
+        Filters::sendNotification($elem);
+
+    }
 }

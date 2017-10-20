@@ -169,6 +169,18 @@ class SiteController extends Controller
             }
         }
     }
+
+    public function actionDemo()
+    {
+        $file = 'webhooks.txt';
+        $current = file_get_contents($file);
+
+        $current = explode("\n", $current);
+        foreach ($current as $item) {
+            $item = json_decode($item);
+            var_dump(Webhooks::DemoWebHook($item));
+        }
+    }
     public function actionConfig()
     {
 
