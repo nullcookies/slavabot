@@ -18,6 +18,86 @@ angular.module('cubeWebApp')
             $scope.norm = response.data.norm;
 
             $scope.webhooks = response.data.webhooks;
+            "2017-09-25"
+            $scope.dateConvert = function(myDate){
+                myDate=myDate.split("-");
+
+                var newDate=myDate[1]+"/"+myDate[0]+"/"+myDate[2];
+
+                return new Date(newDate).getTime();
+            }
+
+            var array = [];
+
+            console.log(response.data.data);
+
+            for (var i = 0; i < response.data.data.length; i++) {
+                array[i]=[$scope.dateConvert(response.data.data[i]['dateNorm']), parseInt(response.data.data[i]['cnt'])];
+            }
+
+            var series = new Array();
+
+            series.push({
+                data: array,
+                color: '#e84e40',
+                lines: {
+                    show : true,
+                    lineWidth: 3,
+                },
+                points: {
+                    fillColor: "#e84e40",
+                    fillColor: '#ffffff',
+                    pointWidth: 1,
+                    show: true
+                },
+                label: 'Клиенты'
+            });
+
+            $.plot("#graph-bar", series, {
+                colors: ['#03a9f4', '#f1c40f', '#2ecc71', '#3498db', '#9b59b6', '#95a5a6'],
+                grid: {
+                    tickColor: "#f2f2f2",
+                    borderWidth: 0,
+                    hoverable: true,
+                    clickable: true
+                },
+                legend: {
+                    noColumns: 1,
+                    labelBoxBorderColor: "#000000",
+                    position: "ne"
+                },
+                shadowSize: 0,
+                xaxis: {
+                    mode: "time",
+                    tickSize: [1, "day"],
+                    tickLength: 0,
+                    // axisLabel: "Date",
+                    axisLabelUseCanvas: true,
+                    axisLabelFontSizePixels: 12,
+                    axisLabelFontFamily: 'Open Sans, sans-serif',
+                    axisLabelPadding: 10
+                }
+            });
+
+            var previousPoint = null;
+            $("#graph-bar").bind("plothover", function (event, pos, item) {
+                if (item) {
+                    if (previousPoint != item.dataIndex) {
+
+                        previousPoint = item.dataIndex;
+
+                        $("#flot-tooltip").remove();
+                        var x = item.datapoint[0],
+                            y = item.datapoint[1];
+
+                        showTooltip(item.pageX, item.pageY, item.series.label, y );
+                    }
+                }
+                else {
+                    $("#flot-tooltip").remove();
+                    previousPoint = [0,0,0];
+                }
+            });
         });
     })
     .controller('header', function ($scope, $http) {})
@@ -168,9 +248,9 @@ angular.module('cubeWebApp')
             });
         };
 
-        $scope.Timer = $interval(function () {
-            $scope.setPage($scope.currentPage)
-        }, 1000);
+        // $scope.Timer = $interval(function () {
+        //     $scope.setPage($scope.currentPage)
+        // }, 1000);
 
     })
     .controller('filterCtrl', function ($scope, $http, $sce, $routeParams,$location, $interval) {
@@ -540,6 +620,11 @@ angular.module('cubeWebApp')
             $scope.main = false;
             $scope.password = true;
         }
+    })
+    .controller('dashboardFlotCtrl', function ($scope, $http, $sce) {
+
+
+
     })
     app.filter('startFrom', function() {
         return function(input, start) {

@@ -40,14 +40,14 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-12 top-margin-10">
-                                    <span class="label label-success right-margin-10" ng-repeat="tag in webhook.tags">{{tag}}</span>
+                                <div class="col-md-12 top-margin-10 bottom-margin-10">
+                                    <span class="label label-success right-margin-10 " ng-repeat="tag in webhook.tags">{{tag}}</span>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-12 getBtn">
                                         <a href="{{(webhook.owner === user.id) ? '#/potential/detail/' + webhook.id : ''}}" class="btn btn-warning col-lg-12" ng-show="webhook.owner>0">
                                             <i class="fa fa-get-pocket"></i>
                                             {{(webhook.owner === user.id) ? 'Ваш контакт' : 'Контакт забронированн'}}

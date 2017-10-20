@@ -98,6 +98,8 @@ class SiteController extends Controller
         $current = file_get_contents($file);
 
         $current = count(explode("\n", $current))-1;
+        $connection=Yii::$app->db;
+        $rez=$connection->createCommand("SELECT FROM_UNIXTIME(created_at,'%d-%m-%Y') as dateNorm, FROM_UNIXTIME(created_at,'%Y-%m-%d') as date, count(*) as cnt FROM `webhooks` GROUP BY date ORDER BY date")->queryAll();
 
         return array(
             'indb' => Webhooks::find()->count(),
@@ -107,7 +109,8 @@ class SiteController extends Controller
             'twitter' => Webhooks::find()->where(['social'=> 3])->count(),
             'inst' => Webhooks::find()->where(['social'=> 5])->count(),
             'norm' => Webhooks::find()->where(['not', ['author_url' => null]])->count(),
-            'webhooks' => $current
+            'webhooks' => $current,
+            'data' => $rez
         );
     }
 

@@ -205,6 +205,9 @@
 .top-margin-10{
     margin-top:10px;
 }
+.bottom-margin-10{
+    margin-bottom: 10px;
+}
 .top-margin-15{
     margin-top:15px;
 }
@@ -216,4 +219,33 @@
 }
 .right-margin-10{
     margin-right: 10px;
+}
+
+.col-lg-6 .pagination>li {
+    display: inline;
+    position: relative;
+    left: -50%;
+    float: left;
+}
+
+.col-lg-6 .pagination {
+    margin: 0 auto;
+    display: block;
+    position: relative;
+    left: 50%;
+}
+
+
+@media (max-width: 419px){
+    .form-control {
+        margin-bottom: 10px;
+    }
+    .getBtn a{
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .main-box-body .pagination>li>a, .main-box-body .pagination>li>span {
+        width: 31px;
+        margin-bottom: 25px;
+    }
 }

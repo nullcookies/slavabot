@@ -79,7 +79,7 @@ class SystemController extends Controller
 
         $mail = Yii::$app->mailer
             ->compose('layouts/html', ['content' => $html])
-            ->setFrom([$user['email'] => Yii::$app->name])
+            ->setFrom([$user['email'] => $user['name']])
             ->setTo($tpmail)
             ->setSubject('Новое сообщение в техническую поддержку: [' . $user['id'] . '] ' . $user['name'])
             ->send();
