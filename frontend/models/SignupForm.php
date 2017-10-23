@@ -25,7 +25,7 @@ class SignupForm extends Model
     {
         return [
 
-            ['username', 'trim'],
+//            ['username', 'trim'],
             ['username', 'required'],
             ['username', 'string', 'min' => 2, 'max' => 255],
             ['phone', 'required'],
