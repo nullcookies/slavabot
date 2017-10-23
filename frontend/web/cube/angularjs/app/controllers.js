@@ -248,9 +248,9 @@ angular.module('cubeWebApp')
             });
         };
 
-        // $scope.Timer = $interval(function () {
-        //     $scope.setPage($scope.currentPage)
-        // }, 1000);
+        $scope.Timer = $interval(function () {
+            $scope.setPage($scope.currentPage)
+        }, 5000);
 
     })
     .controller('filterCtrl', function ($scope, $http, $sce, $routeParams,$location, $interval) {

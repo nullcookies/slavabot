@@ -229,9 +229,8 @@ class Webhooks  extends \yii\db\ActiveRecord
     }
     public static function SetWebhookOwner($user, $webhook)
     {
-        $elem = self::findOne(['id' => $webhook]);
+        $elem = self::findOne(['id' => $webhook, 'owner' => null]);
         $elem->owner = $user;
-
         if($elem->save(false)){
             return 'success';
         }else{
@@ -240,7 +239,7 @@ class Webhooks  extends \yii\db\ActiveRecord
     }
     public static function getDetail()
     {
-        $webhooks = Webhooks::find()->where(['id' => Yii::$app->request->post()['id']])->one();
+        $webhooks = Webhooks::find()->where(['id' => Yii::$app->request->post()['id'], 'owner'=> Yii::$app->user->identity->id])->one();
 
         return array(
             'webhooks'  =>  $webhooks
