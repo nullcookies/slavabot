@@ -284,6 +284,29 @@ class Webhooks  extends \yii\db\ActiveRecord
 
     }
 
+    public static function getTags($item)
+    {
+        $tags = Additional::find()->where(['webhook' => $item, 'type' => 3])->one();
+        if($tags){
+            return explode(',', $tags->value);
+        }else{
+            return false;
+        }
+
+
+    }
+    public static function getCity($item)
+    {
+        $city = Location::find()->where(['id' => $item])->one();
+        return $city->name;
+    }
+
+    public static function getTheme($item)
+    {
+        $theme = Theme::find()->where(['id' => $item])->one();
+        return $theme->name;
+    }
+
     public static function DemoWebHook($item)
     {
         $elem = self::checkWebHook($item->id);

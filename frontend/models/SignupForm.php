@@ -61,12 +61,37 @@ class SignupForm extends Model
 
         $user->setPassword($password);
         $user->generateAuthKey();
+        $html = "
+            <div>
+                <div>
+                    <p>Данные для входа:</p>
+                    <ul>
+                        <li>Адрес: <a href=\"http://app.slavabot.ru/\"  target=\"_blank\">app.slavabot.ru</a>
+                        </li>
+                        <li>Email: <b>".$user->email."</b></li>
+                        <li>Пароль: <b>".$password."</b></li>
+                    </ul>
+                </div>
+                <div>
+                <br>
+            </div>
+            <div>
+                С уважением,<br>
+                Команда СлаваБот<br>
+            </div>
+            <div>
+                <span class=\"wmi-callto\">+7 (495) 108-08-19</span>
+            </div>
+            <div>
+                <a href=\"mailto:support@salesbot.ru\">support@salesbot.ru</a>
+            </div>
+        ";
 
         \Yii::$app->mailer->compose()
-            ->setFrom('admin@slavabot.ru')
+            ->setFrom(['noreply@slavabot.ru' => 'SlavaBot'])
             ->setTo($this->email)
-            ->setSubject('Регистрация')
-            ->setHtmlBody('<b>Логин:</b> '.$user->email.'<br><b>Пароль:</b> '.$password.'')
+            ->setSubject('SlavaBot | Регистрация')
+            ->setHtmlBody($html)
             ->send();
 
         return $user->save() ? $user : null;
