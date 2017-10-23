@@ -139,18 +139,6 @@ angular.module('cubeWebApp')
 
         };
         $scope.time = moment(new Date());
-        $scope.getList = function(){
-            $http({method: 'GET', url: '/potential/list'}).then(function success(response) {
-                $scope.user = response.data.user;
-                $scope.webhooks = response.data.webhooks.webhooks;
-                $scope.locations = response.data.webhooks.location;
-                $scope.themes = response.data.webhooks.theme;
-                $scope.pages = response.data.webhooks.pages;
-                $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
-            });
-        };
-
-        $scope.getList();
 
         $scope.getContact = function(id){
             var data = $.param({'id' : id});
@@ -247,7 +235,7 @@ angular.module('cubeWebApp')
                 $scope.currentPage = n;
             });
         };
-
+        $scope.setPage($scope.currentPage);
         $scope.Timer = $interval(function () {
             $scope.setPage($scope.currentPage)
         }, 5000);
