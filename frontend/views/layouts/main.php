@@ -42,7 +42,7 @@ AppAsset::register($this);
                 <img src="/cube/img/logo.png" alt="" class="normal-logo logo-white"/>
                 <img src="/cube/img/logo-black.png" alt="" class="normal-logo logo-black"/>
                 <img src="/cube/img/logo-small.png" alt="" class="small-logo hidden-xs hidden-sm hidden"/>
-                <span>BotSales</span>
+                <span>Slavabot</span>
             </a>
 
             <div class="clearfix">

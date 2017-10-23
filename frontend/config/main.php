@@ -21,7 +21,7 @@ return [
             ],
         ],
     ],
-    'name' => 'Salesbot',
+    'name' => 'Slavabot',
     'id' => 'app-frontend',
     'sourceLanguage' => 'en-US',
     'language' => 'ru-RU',

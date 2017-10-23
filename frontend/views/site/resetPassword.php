@@ -20,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <header id="login-header">
                     <div id="login-logo">
                         <img src="/cube/img/logo.png" alt=""/>
-                        <span>BotSales</span>
+                        <span>Slavabot</span>
                     </div>
                 </header>
                 <div id="login-box-inner">

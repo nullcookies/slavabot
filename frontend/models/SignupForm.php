@@ -63,7 +63,7 @@ class SignupForm extends Model
         $user->generateAuthKey();
 
         \Yii::$app->mailer->compose()
-            ->setFrom('admin@salesbot.ru')
+            ->setFrom('admin@slavabot.ru')
             ->setTo($this->email)
             ->setSubject('Регистрация')
             ->setHtmlBody('<b>Логин:</b> '.$user->email.'<br><b>Пароль:</b> '.$password.'')
