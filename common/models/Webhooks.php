@@ -138,12 +138,15 @@ class Webhooks  extends \yii\db\ActiveRecord
 
         if(Yii::$app->request->post()){
             $page = Yii::$app->request->post()['page'];
+            $search = Yii::$app->request->post()['search'];
+            $location = Yii::$app->request->post()['city'];
+            $theme = Yii::$app->request->post()['theme'];
         }else{
             $page = 0;
+            $location = 0;
+            $theme = 0;
         }
-        $search = Yii::$app->request->post()['search'];
-        $location = Yii::$app->request->post()['city'];
-        $theme = Yii::$app->request->post()['theme'];
+
 
         if($location>0){
             $filter['location'] = $location;
