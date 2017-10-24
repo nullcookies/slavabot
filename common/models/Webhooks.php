@@ -136,7 +136,7 @@ class Webhooks  extends \yii\db\ActiveRecord
         $filter = [];
         $searchArr = [];
 
-        if(Yii::$app->request->post()['page']){
+        if(Yii::$app->request->post()){
             $page = Yii::$app->request->post()['page'];
         }else{
             $page = 0;
