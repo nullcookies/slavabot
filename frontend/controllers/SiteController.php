@@ -58,7 +58,7 @@ class SiteController extends Controller
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['main'],
+                'only' => ['main', 'user'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -188,25 +188,20 @@ class SiteController extends Controller
         $usermodel = new UserConfig();
         $passwordmodel = new PasswordConfig();
 
-        $active = 'main';
-
         if(isset(\Yii::$app->request->post('UserConfig')['username'])){
             if ($usermodel->load(\Yii::$app->request->post()) && $usermodel->validate()) {
                 if ($usermodel->save()) {
-                    return \Yii::$app->response->redirect(['site/index']);
+                    return true;
                 } else {
-                    return \Yii::$app->response->redirect(['site/index']);
+                    return false;
                 }
             }
         }elseif(isset(\Yii::$app->request->post('PasswordConfig')['password'])){
-
-            $active = 'password';
-
             if ($passwordmodel->load(\Yii::$app->request->post()) && $passwordmodel->validate()) {
                 if ($passwordmodel->save()) {
-                    return \Yii::$app->response->redirect(['site/index']);
+                    return true;
                 } else {
-                    return \Yii::$app->response->redirect(['site/index']);
+                    return false;
                 }
             }
         }
@@ -214,9 +209,13 @@ class SiteController extends Controller
         return $this->render('config', [
             'modelUser' => $usermodel,
             'modelPassword' => $passwordmodel,
-            'active' => $active
         ]);
 
+    }
+
+    public function actionUser()
+    {
+        return \Yii::$app->user->identity;
     }
 
     public function actionNotifications()

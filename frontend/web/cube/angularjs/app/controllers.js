@@ -595,25 +595,136 @@ angular.module('cubeWebApp')
 
     })
     .controller('configCtrl', function ($scope, $http, $sce) {
-        console.log('Config controller ready to work!');
 
-        $scope.main = true;
-        $scope.password = false;
+        $scope.mainPlane = true;
+        $scope.passwordPlane = false;
 
         $scope.setMain = function(){
-            $scope.main = true;
-            $scope.password = false;
+            $scope.mainPlane = true;
+            $scope.passwordPlane = false;
         }
         $scope.setPassword = function(){
-            $scope.main = false;
-            $scope.password = true;
+            $scope.mainPlane = false;
+            $scope.passwordPlane = true;
         }
+
+        $scope.username = '';
+        $scope.phone = '';
+        $scope.userSuccess = false;
+        $scope.userError = false;
+        $scope.password = '';
+        $scope.new_password = '';
+        $scope.new_password_repeat = '';
+
+        function getCSRF() {
+            var metas = document.getElementsByTagName('meta');
+            for (var i=0; i<metas.length; i++) {
+                if (metas[i].getAttribute("name") ==="csrf-token") {
+                    return metas[i].getAttribute("content");
+                }
+            }
+            return "";
+        }
+
+        function checkData($str, $len){
+            return $str.length>$len;
+        }
+
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+                'X-CSRF-Token': getCSRF()
+            }
+        };
+
+        $http.post('/site/user/', [], config).then(function success(response) {
+            if (response) {
+                $scope.username = response.data.username;
+                $scope.phone = response.data.phone;
+            } else {
+                console.log('error');
+            }
+        });
+
+        $scope.saveUser = function() {
+            $scope.data = {
+                'UserConfig[username]': $scope.username,
+                'UserConfig[phone]': $scope.phone,
+            };
+
+            var data = $.param($scope.data);
+
+            if(checkData($scope.username, 2) && checkData($scope.phone, 10)){
+
+                $http.post('/site/config/', data, config).then(function success(response) {
+                    if (response) {
+                        $scope.userSuccess = true;
+                        $scope.userError = false;
+                    } else {
+                        $scope.userSuccess = false;
+                        $scope.userError = true;
+                    }
+                });
+            }
+
+        };
+
+        $scope.savePassword = function() {
+
+            console.log('Try to save new password');
+
+            if(!checkData($scope.password, 2)){
+                $scope.passwordError = true;
+
+                console.log('Old password error');
+
+                return false;
+            }
+
+            if(!checkData($scope.new_password, 3)){
+                $scope.new_passwordError = true;
+
+                console.log('New password error');
+
+                return false;
+            }
+
+            if($scope.new_password!=$scope.new_password_repeat){
+                $scope.new_password_repeatError = true;
+
+                console.log('New password repeat error');
+
+                return false;
+            }
+
+
+            $scope.passwordError = false;
+            $scope.new_passwordError = false;
+            $scope.new_password_repeatError = false;
+
+            $scope.data = {
+                'PasswordConfig[password]': $scope.password,
+                'PasswordConfig[new_password]': $scope.new_password,
+                'PasswordConfig[new_password_repeat]': $scope.new_password_repeat,
+            };
+
+            var data = $.param($scope.data);
+
+            if(checkData($scope.password, 2) && checkData($scope.new_password, 3) && checkData($scope.new_password_repeat, 3) && $scope.new_password==$scope.new_password_repeat){
+
+                $http.post('/site/config/', data, config).then(function success(response) {
+                    if (response) {
+                        $scope.userSuccess = true;
+                        $scope.userError = false;
+                    } else {
+                        $scope.userSuccess = false;
+                        $scope.userError = true;
+                    }
+                });
+            }
+        };
     })
-    .controller('dashboardFlotCtrl', function ($scope, $http, $sce) {
 
-
-
-    })
     app.filter('startFrom', function() {
         return function(input, start) {
             start = +start; //parse to int
