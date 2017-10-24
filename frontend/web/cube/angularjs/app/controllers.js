@@ -156,22 +156,8 @@ angular.module('cubeWebApp')
             });
         };
         $scope.getList = function(){
-            $scope.pagination = {
-                'search' : $scope.search,
-                'city' : $scope.location,
-                'theme' : $scope.theme,
-                'page' : n
-            };
 
-            var data = $.param($scope.pagination);
-
-            var config = {
-                headers : {
-                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-                }
-            };
-
-            $http.post('/potential/list', data, config).then(function success(response) {
+            $http.get('/potential/list').then(function success(response) {
                 $scope.user = response.data.user;
                 $scope.webhooks = response.data.webhooks.webhooks;
                 $scope.locations = response.data.webhooks.location;
