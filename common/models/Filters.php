@@ -240,7 +240,12 @@ class Filters extends \yii\db\ActiveRecord
         $model->location = $item['location'];
         $model->theme = $item['theme'];
 
-        $model->save();
+
+        if($model->save()){
+            return true;
+        }else{
+            return false;
+        }
 
     }
 
@@ -258,7 +263,11 @@ class Filters extends \yii\db\ActiveRecord
         $model->theme = $item['theme'];
         $model->email = $item['email'];
 
-        $model->save();
+        if($model->save()){
+            return true;
+        }else{
+            return false;
+        }
 
     }
 }

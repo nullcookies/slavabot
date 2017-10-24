@@ -114,6 +114,7 @@ angular.module('cubeWebApp')
         $scope.location;
 
         $scope.sce = $sce;
+        $scope.firstLoad = true;
         moment.locale('ru');
         $scope.search   = '';
         $scope.filterName = '';
@@ -124,6 +125,8 @@ angular.module('cubeWebApp')
         $scope.cityPlaceholder = 'Город';
         $scope.themePlaceholder = 'Тема';
         $scope.numberOfPages = 0;
+        $scope.filterSuccess = false;
+        $scope.filterError = false;
 
         $scope.changeFilter = function(){
 
@@ -152,7 +155,18 @@ angular.module('cubeWebApp')
                $location.path('/potential/detail/'+id);
             });
         };
+        $scope.getList = function(){
+            $http({method: 'GET', url: '/potential/list'}).then(function success(response) {
+                $scope.user = response.data.user;
+                $scope.webhooks = response.data.webhooks.webhooks;
+                $scope.locations = response.data.webhooks.location;
+                $scope.themes = response.data.webhooks.theme;
+                $scope.pages = response.data.webhooks.pages;
+                $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
+            });
+        };
 
+        $scope.getList();
         $scope.paginationBlock = function(n){
             if($scope.currentPage < 4 && n < 7){
                 return true;
@@ -198,9 +212,17 @@ angular.module('cubeWebApp')
                 headers : {
                     'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
                 }
-            }
+            };
 
-            $http.post('/potential/new-filter', data, config).then(function success(response) {});
+            $http.post('/potential/new-filter', data, config).then(function success(response) {
+                if(response.data){
+                    $scope.filterSuccess = true;
+                    $scope.filterError = false;
+                }else{
+                    $scope.filterSuccess = true;
+                    $scope.filterError = false;
+                }
+            });
         };
         $scope.disabledNext = function() {
             if($scope.currentPage >= $scope.numberOfPages() - 1){
@@ -227,7 +249,7 @@ angular.module('cubeWebApp')
             };
 
             $http.post('/potential/list', data, config).then(function success(response) {
-
+                $scope.firstLoad = false;
                 $scope.webhooks = response.data.webhooks.webhooks;
                 $scope.pages = response.data.webhooks.pages;
                 $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
@@ -260,6 +282,8 @@ angular.module('cubeWebApp')
     $scope.numberOfPages = 0;
     $scope.notif = false;
     $scope.notifEmail = '';
+    $scope.filterSuccess = false;
+    $scope.filterError = false;
 
     $scope.changeFilter = function(){
 
@@ -356,7 +380,15 @@ angular.module('cubeWebApp')
             }
         };
 
-        $http.post('/potential/update-filter', data, config).then(function success(response) {});
+        $http.post('/potential/update-filter', data, config).then(function success(response) {
+            if(response.data){
+                $scope.filterSuccess = true;
+                $scope.filterError = false;
+            }else{
+                $scope.filterSuccess = true;
+                $scope.filterError = false;
+            }
+        });
     };
     $scope.disabledNext = function() {
         if($scope.currentPage >= $scope.numberOfPages() - 1){
