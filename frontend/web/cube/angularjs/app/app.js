@@ -61,6 +61,11 @@ app.config(['$routeProvider', function ($routeProvider) {
             controller: "helpCtrl",
             title: 'Помощь'
         })
+        .when("/pages/social", {
+            templateUrl: "/social",
+            controller: "socialCtrl",
+            title: 'Соц.сети'
+        })
 		.otherwise({
 			redirectTo:'/error-404'
 		});

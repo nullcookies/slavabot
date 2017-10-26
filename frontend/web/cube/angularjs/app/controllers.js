@@ -757,7 +757,9 @@ angular.module('cubeWebApp')
             }
         };
     })
-
+    .controller('socialCtrl', function($scope){
+        console.log('Social controller ready to work!');
+    })
     app.filter('startFrom', function() {
         return function(input, start) {
             start = +start; //parse to int
