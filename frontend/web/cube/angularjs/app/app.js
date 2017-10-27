@@ -61,6 +61,10 @@ app.config(['$routeProvider', function ($routeProvider) {
             controller: "helpCtrl",
             title: 'Помощь'
         })
+        .when("/error/owner", {
+            templateUrl: "views/errors/owner.html",
+            title: 'Ошибка'
+        })
 		.otherwise({
 			redirectTo:'/error-404'
 		});

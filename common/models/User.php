@@ -205,5 +205,4 @@ class User extends ActiveRecord implements IdentityInterface
         return $randomString;
 
     }
-
 }
