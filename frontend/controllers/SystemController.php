@@ -9,7 +9,8 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Response;
 use frontend\models\UserConfig;
-
+use common\models\User;
+use common\models\Webhooks;
 
 
 /**
@@ -22,10 +23,15 @@ class SystemController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['help'],
+                'only' => ['help', 'contact'],
                 'rules' => [
                     [
-                        'actions' => ['help'],
+                        'actions' => [],
+                        'allow' => true,
+                        'roles' => ['?'],
+                    ],
+                    [
+                        'actions' => ['help', 'contact'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -39,7 +45,7 @@ class SystemController extends Controller
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['help'],
+                'only' => ['help', 'contact'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -85,6 +91,28 @@ class SystemController extends Controller
             ->send();
 
         return $mail;
+    }
+
+
+    public function validateUser($authKey){
+        $user = User::findOne([
+                'auth_key' => $authKey,
+            ]);
+        return \Yii::$app->user->login($user);
+    }
+
+    public function actionContact()
+    {
+        if(isset($_GET['code'])){
+            if(self::validateUser(Yii::$app->request->get('code'))){
+                $contact = Webhooks::getWebHook((int)Yii::$app->request->get('contact'));
+                if(Webhooks::SetWebhookOwner(\Yii::$app->user->identity->id, $contact->id)){
+                    Yii::$app->response->redirect('/#/potential/detail/'.$contact->id);
+                }else{
+                    Yii::$app->response->redirect('/#/error/owner');
+                }
+            }
+        }
     }
 
 }

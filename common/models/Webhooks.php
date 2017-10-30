@@ -242,16 +242,22 @@ class Webhooks  extends \yii\db\ActiveRecord
             'theme'     =>  Theme::find()->asArray()->all()
         );
     }
+
     public static function SetWebhookOwner($user, $webhook)
     {
         $elem = self::findOne(['id' => $webhook, 'owner' => null]);
-        $elem->owner = $user;
-        if($elem->save(false)){
-            return 'success';
+        if($elem){
+            $elem->owner = $user;
+            if($elem->save(false)){
+                return 'success';
+            }else{
+                return 'error';
+            }
         }else{
-            return 'error';
+            return false;
         }
     }
+
     public static function getDetail()
     {
         $webhooks = Webhooks::find()->where(['id' => Yii::$app->request->post()['id'], 'owner'=> Yii::$app->user->identity->id])->one();
@@ -263,6 +269,16 @@ class Webhooks  extends \yii\db\ActiveRecord
     public static function checkWebHook($mlg_id)
     {
         $id = self::findOne(['mlg_id' => $mlg_id]);
+
+        if($id){
+            return $id;
+        }else{
+            return new Webhooks();
+        }
+    }
+    public static function getWebHook($id)
+    {
+        $id = self::findOne(['id' => $id]);
 
         if($id){
             return $id;
@@ -343,7 +359,7 @@ class Webhooks  extends \yii\db\ActiveRecord
         $elem->social = Social::checkSocial($item);
         $elem->created_at = (int)strtotime($item->created);
 
-        $elem->save();
+        //$elem->save();
 
         Additional::saveReference($item, $elem->id);
 

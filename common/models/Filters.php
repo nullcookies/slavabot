@@ -47,6 +47,7 @@ class Filters extends \yii\db\ActiveRecord
         return [
             'name',
             'search',
+            'user_id',
             'location' => function(){
                 return (string)$this->location;
             },
@@ -142,7 +143,11 @@ class Filters extends \yii\db\ActiveRecord
         }
 
         $filters = Filters::checkSearch($elem, Filters::checkFilters($elem));
-        $html = '
+
+        if($filters){
+            foreach($filters as $filter){
+                $getLink = 'http://'.$_SERVER['HTTP_HOST'].'/system/contact/?code='.User::findIdentity($filter['user_id'])->getAuthKey().'&contact='.$elem->id;
+                $html = '
         <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#e4e4e4">
     <tbody>
         <tr>
@@ -174,7 +179,7 @@ class Filters extends \yii\db\ActiveRecord
                                                                         <br>
                                                                         '.$tag.'
                                                                         <br>
-                                                                        <a href="#" style="    background-color: #8bc34a; border-color: #689f38; border: none; padding: 6px 12px; border-bottom: 2px solid; border-radius: 3px; background-clip: padding-box; margin-top: 13px; display: block; color: #fff; width: 130px; text-decoration: none;">Получить контакт</a>
+                                                                        <a href="'.$getLink.'" style="    background-color: #8bc34a; border-color: #689f38; border: none; padding: 6px 12px; border-bottom: 2px solid; border-radius: 3px; background-clip: padding-box; margin-top: 13px; display: block; color: #fff; width: 130px; text-decoration: none;">Получить контакт</a>
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
@@ -195,8 +200,7 @@ class Filters extends \yii\db\ActiveRecord
     </tbody>
 </table>
         ';
-        if($filters){
-            foreach($filters as $filter){
+
                 Yii::$app->mailer
                     ->compose('layouts/html', ['content' => $html])
                     ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
