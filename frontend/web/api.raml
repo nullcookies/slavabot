@@ -1,0 +1,55 @@
+#%RAML 1.0
+title: Интеграция SalesBot и Telegram-бота
+version: v1.0
+baseUri: 'http://app.slavabot.ru/'
+mediaType: application/json
+description: "REST-api для обмена данными c SalesBot."
+
+
+
+/rest/accounts/v1/get-user-accounts/:
+  displayName: Список аккаунтов
+  post:
+    body:
+      application/x-www-form-urlencoded:
+        properties:
+          AWSAccessKeyId:
+            description: The AWS Access Key ID of the owner of the bucket who grants an Anonymous user access for a request that satisfies the set of constraints in the Policy.
+            type: string
+          acl:
+            description: Specifies an Amazon S3 access control list. If an invalid access control list is specified, an error is generated.
+            type: string
+    responses:
+      200:
+        body:
+          application/json:
+            type: object
+            example: |
+                      {
+                          "status": true,
+                          "data": [
+                              {
+                                  "id": 1,
+                                  "user_id": 19,
+                                  "type": "instagram",
+                                  "data": {
+                                      "login": "login_string",
+                                      "password": "password_string"
+                                  },
+                                  "status": null
+                              },
+                              {
+                                  "id": 2,
+                                  "user_id": 19,
+                                  "type": "instagram",
+                                  "data": {
+                                      "login": "login_string",
+                                      "password": "password_string"
+                                  },
+                                  "status": null
+                              }
+                          ]
+                      }
+            description: "Ключ - ИНН партнёра. Значение - массив кодов карт, которые были активированны данным партнёром"
+      500:
+        description: "Возвращается в случае любой ошибки."

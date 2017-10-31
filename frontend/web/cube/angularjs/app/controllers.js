@@ -1,3 +1,19 @@
+
+function getCSRF() {
+    var metas = document.getElementsByTagName('meta');
+    for (var i=0; i<metas.length; i++) {
+        if (metas[i].getAttribute("name") ==="csrf-token") {
+            return metas[i].getAttribute("content");
+        }
+    }
+    return "";
+}
+
+function checkData($str, $len){
+    return $str.length>$len;
+}
+
+
 angular.module('cubeWebApp')
     .controller('dashboardCtrl', function ($scope, $http) {
 
@@ -757,8 +773,41 @@ angular.module('cubeWebApp')
             }
         };
     })
-    .controller('socialCtrl', function($scope){
+    .controller('socialCtrl', function($scope, $http){
         console.log('Social controller ready to work!');
+
+        $scope.InstaLogin = '';
+        $scope.InstaPassword = '';
+        $scope.accounts = [];
+
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+                'X-CSRF-Token': getCSRF()
+            }
+        };
+        $http.post('/social/accounts', [], config).then(function success(response) {
+            $scope.accounts = response.data;
+        });
+
+        $scope.InstaSave = function(){
+
+            $scope.data = {
+                type: 'instagram',
+                data: {
+                    'login': $scope.InstaLogin,
+                    'password': $scope.InstaPassword,
+                }
+            };
+
+
+            if(checkData($scope.InstaLogin, 2) && checkData($scope.InstaPassword, 2)){
+                $http.post('/social/instagram', $.param($scope.data), config).then(function success(response) {
+                    console.log(response);
+                });
+            }
+
+        }
     })
     app.filter('startFrom', function() {
         return function(input, start) {

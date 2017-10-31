@@ -9,24 +9,53 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Response;
 use frontend\models\UserConfig;
+use common\models\Accounts;
 
 
 
 
 class SocialController extends Controller
 {
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['help', 'contact'],
+                'rules' => [
+                    [
+                        'actions' => [],
+                        'allow' => true,
+                        'roles' => ['?'],
+                    ],
+                    [
+                        'actions' => ['instagram'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'logout' => ['post'],
+                ],
+            ],
+            [
+                'class' => \yii\filters\ContentNegotiator::className(),
+                'only' => ['instagram', 'accounts'],
+                'formats' => [
+                    'application/json' => Response::FORMAT_JSON,
+                ],
+            ],
+        ];
+    }
 
     const CLIENT_ID ='6234561'; // ID приложения VK
     const CLIENT_SECRET = 'gXvqte2SHQw6oGjGpKTM'; // Ключ приложения
 
     /**
      * Возвращает кнопку для авторизации пользователя через вк
-     *
-     * @param $redirect_uri - Адрес редиректа (Должен полностью дублировать параметр из StaticHelper::AjaxVK() )
-     * @param string $class - Класс, который будет подставлен в ссылку
-     * @param string $text - Текст ссылки
-     * @param string $fmu - id участника
-     * @return html
      */
 
     function getVKBtn($redirect_uri, $text='', $FMU=''){
@@ -49,8 +78,19 @@ class SocialController extends Controller
         $this->layout = '@app/views/layouts/simple.php';
 
 
-        return $this->render('social', []);
+        return $this->render('social', [
+            'accounts'=> Accounts::getAccounts()
+        ]);
 
+    }
+
+    public function actionInstagram(){
+
+        return Accounts::saveReference(\Yii::$app->request->post());
+    }
+
+    public function actionAccounts(){
+        return Accounts::getAccounts();
     }
 
     public function actionVk()
@@ -84,7 +124,7 @@ class SocialController extends Controller
 
             $current = file_get_contents($file);
 
-            $new = json_encode($token);
+            $new = json_encode(111);
             $current .= $new."\n";
             file_put_contents($file, $current);
             var_dump($token);
