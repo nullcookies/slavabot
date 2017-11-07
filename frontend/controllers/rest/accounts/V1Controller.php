@@ -11,6 +11,8 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Response;
 
+use frontend\controllers\VKController;
+use Vk;
 
 
 class V1Controller extends Controller
@@ -20,7 +22,7 @@ class V1Controller extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['get-user-accounts', 'set-account-status'],
+                'only' => ['get-user-accounts', 'set-account-status', 'get-token'],
                 'rules' => [
                     [
                         'actions' => [],
@@ -28,7 +30,7 @@ class V1Controller extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['get-user-accounts', 'set-account-status'],
+                        'actions' => ['get-user-accounts', 'set-account-status', 'get-token'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -43,7 +45,7 @@ class V1Controller extends Controller
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['get-user-accounts', 'set-account-status'],
+                'only' => ['get-user-accounts', 'set-account-status', 'get-token'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -60,7 +62,7 @@ class V1Controller extends Controller
 
     public function beforeAction($action)
     {
-        if ($action->id == 'get-user-accounts' || $action->id == 'set-account-status' ) {
+        if ($action->id == 'get-user-accounts' || $action->id == 'set-account-status' || $action->id == 'get-token') {
             $this->enableCsrfValidation = false;
         }
 
@@ -159,4 +161,5 @@ class V1Controller extends Controller
             ];
         }
     }
+    
 }

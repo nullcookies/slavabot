@@ -12,6 +12,8 @@ use frontend\models\UserConfig;
 use common\models\Accounts;
 use Vk;
 
+use frontend\controllers\VKController;
+
 
 
 class SocialController extends Controller
@@ -58,18 +60,19 @@ class SocialController extends Controller
      * Возвращает кнопку для авторизации пользователя через вк
      */
 
-    function getVKBtn($redirect_uri, $text='', $FMU=''){
+    function getVKBtn($redirect_uri, $text=''){
 
-        $url='//oauth.vk.com/authorize';
+        $v = new Vk(array(
+            'client_id' => VKController::CLIENT_ID,
+            'secret_key' => VKController::SECRET_KEY,
+            'user_id' => 12345,
+            'scope' => 'wall',
+            'v' => '5.35'
+        ));
 
-        $params = array(
-            'client_id'     => self::CLIENT_ID,
-            'redirect_uri'  => $redirect_uri,
-            'response_type' => 'code',
-            'scope'         => 'stats'
-        );
+        $url = $v->get_code_token("token", $redirect_uri);
 
-        return '<a href="' . $url . '?' . urldecode(http_build_query($params)) . '">' . $text . '</a>';
+        return '<a href="'.$url.'">' . $text . '</a>';
     }
 
     public function actionIndex()
@@ -104,60 +107,47 @@ class SocialController extends Controller
 
     public function actionVk()
     {
-        $redirect_uri = 'http://'.$_SERVER['SERVER_NAME'].'/social/vk';
-        $code = $_GET['code'];
-        $fmu = $_GET['FMU'];
+        if(!\Yii::$app->request->get('access_token')){
+            echo '<script>window.location.href = document.location.href.replace("#","?");</script>';
+            return false;
+        }
 
-        if (isset($code)) {
-            $result = false;
 
-            $params = array(
-                'client_id' => self::CLIENT_ID,
-                'client_secret' => self::CLIENT_SECRET,
-                'code' => $code,
-                'redirect_uri' => $redirect_uri,
-            );
+        $config = array(
+            'secret_key' => VKController::SECRET_KEY,
+            'client_id' => VKController::CLIENT_ID,
+            'user_id' => \Yii::$app->request->get('user_id'),
+            'access_token' => \Yii::$app->request->get('access_token'),
+            'scope' => 'stats'
+        );
 
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, 'https://oauth.vk.com/access_token' . '?' . urldecode(http_build_query($params, '', '&', PHP_QUERY_RFC3986 )));
-            curl_setopt($ch,CURLOPT_USERAGENT,"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13");
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            $result = curl_exec($ch);
-            curl_close($ch);
+        $resp = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 
-            $result = json_decode($result);
 
-            $config['secret_key'] = 'ilsUQvhc50T6nEdsjzWS';
-            $config['client_id'] = 6223471; // номер приложения
-            $config['user_id'] = $result->user_id; // id текущего пользователя (не обязательно)
-            $config['access_token'] = $result->access_token;
-            $config['scope'] = 'stats'; // права доступа к методам (для генерации токена)
+        $v = new Vk($config);
 
-            $v = new Vk($config);
+        $response = $v->api('groups.get', array(
+            'user_id' => $config['user_id'],
+            'extended' => 1,
+            'filter' => 'admin,editor'
+        ));
 
-            $response = $v->api('groups.get', array(
+        $user = $v->api('users.get', array(
+            'user_ids' => (string)$config['user_id']
+        ));
+
+        $res = array(
+            'type' => 'vkontakte',
+            'data' => array(
+                'user_name' => $user[0]['first_name'] . ' ' . $user[0]['last_name'],
                 'user_id' => $config['user_id'],
-                'extended' => 1,
-                'filter' => 'admin,editor'
-            ));
+                'access_token' => $config['access_token'],
+                'groups' => $response['items']
+            )
+        );
 
-            $user = $v->api('users.get', array(
-                'user_ids' => (string)$config['user_id']
-            ));
-
-            $res = array(
-                'type' => 'vkontakte',
-                'data' => array(
-                    'user_name' => $user[0]['first_name'] . ' ' . $user[0]['last_name'],
-                    'user_id' => $result->user_id,
-                    'access_token' => $result->access_token,
-                    'groups' => $response['items']
-                )
-            );
-
-            if(Accounts::saveReference($res, 0)){
-                Yii::$app->response->redirect('/#/pages/social');
-            }
+        if(Accounts::saveReference($res, 0)){
+            Yii::$app->response->redirect('/#/pages/social');
         }
     }
 }
