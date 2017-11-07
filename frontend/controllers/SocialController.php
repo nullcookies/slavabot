@@ -10,7 +10,7 @@ use yii\filters\AccessControl;
 use yii\web\Response;
 use frontend\models\UserConfig;
 use common\models\Accounts;
-
+use Vk;
 
 
 
@@ -29,7 +29,7 @@ class SocialController extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['instagram'],
+                        'actions' => ['instagram', 'finish-process'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -43,7 +43,7 @@ class SocialController extends Controller
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['instagram', 'accounts'],
+                'only' => ['instagram', 'accounts', 'unprocessed', 'finish-process'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -64,9 +64,9 @@ class SocialController extends Controller
 
         $params = array(
             'client_id'     => self::CLIENT_ID,
-            'redirect_uri'  => $redirect_uri.'?FMU='.$FMU,
+            'redirect_uri'  => $redirect_uri,
             'response_type' => 'code',
-            'scope'         => 'email'
+            'scope'         => 'stats'
         );
 
         return '<a href="' . $url . '?' . urldecode(http_build_query($params)) . '">' . $text . '</a>';
@@ -89,13 +89,22 @@ class SocialController extends Controller
         return Accounts::saveReference(\Yii::$app->request->post());
     }
 
+    public function actionFinishProcess(){
+        return Accounts::processAccount(\Yii::$app->request->post());
+    }
+
     public function actionAccounts(){
         return Accounts::getAccounts();
     }
 
+    public function actionUnprocessed(){
+        return Accounts::getUnprocessedAccounts();
+    }
+
+
     public function actionVk()
     {
-        $redirect_uri = 'http://'.$_SERVER['SERVER_NAME'].'/#/pages/social';
+        $redirect_uri = 'http://'.$_SERVER['SERVER_NAME'].'/social/vk';
         $code = $_GET['code'];
         $fmu = $_GET['FMU'];
 
@@ -109,29 +118,46 @@ class SocialController extends Controller
                 'redirect_uri' => $redirect_uri,
             );
 
-            $token=json_decode(file_get_contents('//oauth.vk.com/access_token' . '?' . urldecode(http_build_query($params))), true);
-            if (isset($token['access_token'])) {
-                $params['access_token']=$token['access_token'];
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, 'https://oauth.vk.com/access_token' . '?' . urldecode(http_build_query($params, '', '&', PHP_QUERY_RFC3986 )));
+            curl_setopt($ch,CURLOPT_USERAGENT,"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13");
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            curl_close($ch);
 
-                $userInfo = json_decode(file_get_contents('//api.vk.com/method/users.get' . '?' . urldecode(http_build_query($params))), true);
-                if (isset($userInfo['response'][0]['uid'])) {
-                    $userInfo = $userInfo['response'][0];
-                    $result = true;
-                }
+            $result = json_decode($result);
+
+            $config['secret_key'] = 'ilsUQvhc50T6nEdsjzWS';
+            $config['client_id'] = 6223471; // номер приложения
+            $config['user_id'] = $result->user_id; // id текущего пользователя (не обязательно)
+            $config['access_token'] = $result->access_token;
+            $config['scope'] = 'stats'; // права доступа к методам (для генерации токена)
+
+            $v = new Vk($config);
+
+            $response = $v->api('groups.get', array(
+                'user_id' => $config['user_id'],
+                'extended' => 1,
+                'filter' => 'admin,editor'
+            ));
+
+            $user = $v->api('users.get', array(
+                'user_ids' => (string)$config['user_id']
+            ));
+
+            $res = array(
+                'type' => 'vkontakte',
+                'data' => array(
+                    'user_name' => $user[0]['first_name'] . ' ' . $user[0]['last_name'],
+                    'user_id' => $result->user_id,
+                    'access_token' => $result->access_token,
+                    'groups' => $response['items']
+                )
+            );
+
+            if(Accounts::saveReference($res, 0)){
+                Yii::$app->response->redirect('/#/pages/social');
             }
-
-            $file = 'social.txt';
-
-            $current = file_get_contents($file);
-
-            $new = json_encode(111);
-            $current .= $new."\n";
-            file_put_contents($file, $current);
-            var_dump($token);
-
-
         }
     }
-
-
 }

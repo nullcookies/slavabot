@@ -23,7 +23,7 @@ class SystemController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['help', 'contact'],
+                'only' => ['help', 'contact', 'timezones'],
                 'rules' => [
                     [
                         'actions' => [],
@@ -31,7 +31,7 @@ class SystemController extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['help', 'contact'],
+                        'actions' => ['help', 'contact', 'timezones'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -45,7 +45,7 @@ class SystemController extends Controller
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['help', 'contact'],
+                'only' => ['help', 'contact', 'timezones'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -114,5 +114,4 @@ class SystemController extends Controller
             }
         }
     }
-
 }

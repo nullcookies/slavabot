@@ -26,7 +26,7 @@ class Accounts extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'status'], 'integer'],
+            [['user_id', 'status', 'processed'], 'integer'],
             [['type', 'data'], 'string']
 
         ];
@@ -42,18 +42,19 @@ class Accounts extends \yii\db\ActiveRecord
             'data' => function(){
                 return json_decode($this->data);
             },
-            'status'
+            'status',
+            'processed'
         ];
     }
 
-    public static function saveReference($item)
+    public static function saveReference($item, $processed = 1)
     {
         $model = new Accounts();
 
         $model->user_id = Yii::$app->user->id;
         $model->type = $item['type'];
         $model->data = json_encode($item['data']);
-
+        $model->processed = $processed;
         return $model->save();
     }
 
@@ -63,6 +64,21 @@ class Accounts extends \yii\db\ActiveRecord
         $acc->status = (int)$status;
 
         return $acc->save();
+    }
+
+    public static function processAccount(){
+        $post = \Yii::$app->request->post();
+
+        $acc = Accounts::find()->where(['id' => $post['id']])->one();
+
+        $acc->data = json_encode($post['data']);
+        $acc->processed = 1;
+
+        return $acc->save();
+    }
+
+    public static function getUnprocessedAccounts(){
+        return Accounts::find()->where(['user_id' => Yii::$app->user->id, 'processed' => 0])->one();
     }
 
     public static function getAccounts(){

@@ -17,6 +17,21 @@ function checkData($str, $len){
 angular.module('cubeWebApp')
     .controller('dashboardCtrl', function ($scope, $http) {
 
+        function pad(number, length){
+            var str = "" + number
+            while (str.length < length) {
+                str = '0'+str
+            }
+            return str
+        }
+
+        var offset = new Date().getTimezoneOffset()
+        offset = ((offset<0? '+':'-')+ // Note the reversed sign!
+            pad(parseInt(Math.abs(offset/60)), 2)+
+            pad(Math.abs(offset%60), 2))
+
+        console.log(offset);
+
         $scope.category = [];
         $scope.location = [];
         $scope.priority = [];
@@ -34,7 +49,7 @@ angular.module('cubeWebApp')
             $scope.norm = response.data.norm;
 
             $scope.webhooks = response.data.webhooks;
-            "2017-09-25"
+
             $scope.dateConvert = function(myDate){
                 myDate=myDate.split("-");
 
@@ -115,6 +130,8 @@ angular.module('cubeWebApp')
                 }
             });
         });
+
+
     })
     .controller('header', function ($scope, $http) {})
     .controller('menu', function ($scope, $http) {
@@ -779,16 +796,55 @@ angular.module('cubeWebApp')
         $scope.InstaLogin = '';
         $scope.InstaPassword = '';
         $scope.accounts = [];
-
+        $scope.unprocessed = [];
+        $scope.unpID = 0;
+        $scope.userSelection = {};
+        $scope.accountData = {};
+        $scope.unprocessedName;
         var config = {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
                 'X-CSRF-Token': getCSRF()
             }
         };
-        $http.post('/social/accounts', [], config).then(function success(response) {
-            $scope.accounts = response.data;
+        // /social/unprocessed
+
+        $http.post('/social/unprocessed', [], config).then(function success(response) {
+
+            if(response.data){
+                $scope.unprocessed = response.data.data.groups;
+                $scope.accountData = response.data.data;
+                $scope.unpID = response.data.id;
+                $scope.unprocessedType = response.data.type;
+                $scope.unprocessedName = response.data.data.user_name;
+                document.getElementById('getUnprocessed').click();
+            }
+
         });
+
+        $scope.getAccounts = function() {
+            $http.post('/social/accounts', [], config).then(function success(response) {
+                $scope.accounts = response.data;
+            });
+        };
+
+        $scope.accountSave = function() {
+            var data = $scope.accountData;
+            data.groups = $scope.userSelection.activeValue;
+            $scope.data = {
+                id: $scope.unpID,
+                data: data
+            };
+
+            $http.post('/social/finish-process', $.param($scope.data), config).then(function success(response) {
+                if(response.data){
+                    document.getElementById('closeModal').click();
+                    $scope.getAccounts();
+                }
+            });
+        };
+
+        $scope.getAccounts();
 
         $scope.InstaSave = function(){
 
