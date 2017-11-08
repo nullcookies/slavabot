@@ -113,6 +113,8 @@ class SocialController extends Controller
 
     public function actionVk()
     {
+        // Костыль для конвертации standalone-данных vk api в get параметры
+
         if(!\Yii::$app->request->get('access_token')){
             echo '<script>window.location.href = document.location.href.replace("#","?");</script>';
             return false;

@@ -801,6 +801,7 @@ angular.module('cubeWebApp')
         $scope.accountData = {};
         $scope.unprocessedName;
         $scope.activeID;
+        $scope.removingID = 0;
 
         var config = {
             headers: {
@@ -826,17 +827,30 @@ angular.module('cubeWebApp')
             });
         };
 
-        $scope.remove = function($id) {
-            $http.post('/social/remove', $.param({id: $id}), config).then(function success(response) {
-                if(response.data){
-                    $scope.getAccounts();
-                }
-            });
+        $scope.remove = function() {
+            if($scope.removingID>0){
+                $id = $scope.removingID;
+                $http.post('/social/remove', $.param({id: $id}), config).then(function success(response) {
+                    if(response.data){
+                        $scope.getAccounts();
+                        $scope.clearInstaForm();
+                        document.getElementById('closeConfirmModal').click();
+                    }
+                });
+            }else{
+                console.log('ID error!');
+            }
+
+        };
+
+        $scope.showConfirm = function($id){
+            $scope.removingID = $id;
+
+            document.getElementById('confirmModal').click();
         };
 
         $scope.refresh = function($id, $type) {
             $http.post('/social/update-process', $.param({id: $id}), config).then(function success(response) {
-                console.log(response);
                 document.getElementById($type).click();
             });
         };
@@ -856,6 +870,7 @@ angular.module('cubeWebApp')
             $scope.InstaLogin = '';
             $scope.InstaPassword = '';
             $scope.activeID = '';
+            $scope.removingID = 0;
         };
 
         $scope.accountSave = function() {

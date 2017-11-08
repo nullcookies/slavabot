@@ -94,7 +94,7 @@ use frontend\controllers\SocialController;
                                             </table>
                                         </td>
                                         <td>
-                                            <button type="button" class="btn btn-danger" ng-click="remove(account.id)">Удалить</button>
+                                            <button type="button" class="btn btn-danger" ng-click="showConfirm(account.id)">Удалить</button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -156,6 +156,29 @@ use frontend\controllers\SocialController;
                     <div class="modal-footer">
                         <button type="button" class="btn btn-success" ng-click="accountSave()">Сохранить</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a data-toggle="modal" id="confirmModal" style="display:none" data-target="#myModalConfirm"></a>
+
+
+        <div class="modal fade" id="myModalConfirm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" id="closeConfirmModal" class="close" ng-click="clearInstaForm()" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Подтвердите действие</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            Удалить аккаунт?
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" ng-click="remove()">Удалить</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="clearInstaForm()">Отмена</button>
                     </div>
                 </div>
             </div>
