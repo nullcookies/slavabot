@@ -141,7 +141,7 @@ class V1Controller extends Controller
             ];
         }
 
-        if(!$status) {
+        if(!isset($status)) {
             return [
                 'status' => false,
                 'error' => 'Status error!'
