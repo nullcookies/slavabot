@@ -31,7 +31,7 @@ class SocialController extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['instagram', 'finish-process'],
+                        'actions' => ['instagram', 'finish-process', 'update-process'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -45,7 +45,7 @@ class SocialController extends Controller
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['instagram', 'accounts', 'unprocessed', 'finish-process'],
+                'only' => ['instagram', 'accounts', 'unprocessed', 'finish-process', 'remove', 'update-process'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -53,26 +53,22 @@ class SocialController extends Controller
         ];
     }
 
-    const CLIENT_ID ='6234561'; // ID приложения VK
-    const CLIENT_SECRET = 'gXvqte2SHQw6oGjGpKTM'; // Ключ приложения
-
     /**
      * Возвращает кнопку для авторизации пользователя через вк
      */
 
-    function getVKBtn($redirect_uri, $text=''){
+    function getVKBtn($redirect_uri, $text='', $id){
 
         $v = new Vk(array(
             'client_id' => VKController::CLIENT_ID,
             'secret_key' => VKController::SECRET_KEY,
-            'user_id' => 12345,
             'scope' => 'wall',
             'v' => '5.35'
         ));
 
         $url = $v->get_code_token("token", $redirect_uri);
 
-        return '<a href="'.$url.'">' . $text . '</a>';
+        return '<a href="'.$url.'" id="'.$id.'">' . $text . '</a>';
     }
 
     public function actionIndex()
@@ -87,6 +83,12 @@ class SocialController extends Controller
 
     }
 
+    public function actionRemove()
+    {
+        $id = \Yii::$app->request->post('id');
+        return Accounts::remove($id);
+    }
+
     public function actionInstagram(){
 
         return Accounts::saveReference(\Yii::$app->request->post());
@@ -94,6 +96,10 @@ class SocialController extends Controller
 
     public function actionFinishProcess(){
         return Accounts::processAccount(\Yii::$app->request->post());
+    }
+
+    public function actionUpdateProcess(){
+        return Accounts::updateAccount(\Yii::$app->request->post());
     }
 
     public function actionAccounts(){
@@ -118,22 +124,20 @@ class SocialController extends Controller
             'client_id' => VKController::CLIENT_ID,
             'user_id' => \Yii::$app->request->get('user_id'),
             'access_token' => \Yii::$app->request->get('access_token'),
-            'scope' => 'stats'
+            'scope' => 'stats, photo_100'
         );
-
-        $resp = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-
 
         $v = new Vk($config);
 
         $response = $v->api('groups.get', array(
             'user_id' => $config['user_id'],
             'extended' => 1,
-            'filter' => 'admin,editor'
+            'filter' => 'admin,editor,wall_id'
         ));
 
         $user = $v->api('users.get', array(
-            'user_ids' => (string)$config['user_id']
+            'user_ids' => (string)$config['user_id'],
+            'fields' => 'photo_50, photo_100, photo_200'
         ));
 
         $res = array(
@@ -144,6 +148,13 @@ class SocialController extends Controller
                 'access_token' => $config['access_token'],
                 'groups' => $response['items']
             )
+        );
+        $res['data']['groups'][] = array(
+            'id' => $config['user_id'],
+            'name' => 'Стена пользователя ' . $res['data']['user_name'],
+            'photo_50' => $user[0]['photo_50'],
+            'photo_100' => $user[0]['photo_100'],
+            'photo_200' => $user[0]['photo_200']
         );
 
         if(Accounts::saveReference($res, 0)){

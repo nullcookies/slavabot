@@ -791,7 +791,6 @@ angular.module('cubeWebApp')
         };
     })
     .controller('socialCtrl', function($scope, $http){
-        console.log('Social controller ready to work!');
 
         $scope.InstaLogin = '';
         $scope.InstaPassword = '';
@@ -801,16 +800,16 @@ angular.module('cubeWebApp')
         $scope.userSelection = {};
         $scope.accountData = {};
         $scope.unprocessedName;
+        $scope.activeID;
+
         var config = {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
                 'X-CSRF-Token': getCSRF()
             }
         };
-        // /social/unprocessed
 
         $http.post('/social/unprocessed', [], config).then(function success(response) {
-
             if(response.data){
                 $scope.unprocessed = response.data.data.groups;
                 $scope.accountData = response.data.data;
@@ -819,13 +818,44 @@ angular.module('cubeWebApp')
                 $scope.unprocessedName = response.data.data.user_name;
                 document.getElementById('getUnprocessed').click();
             }
-
         });
 
         $scope.getAccounts = function() {
             $http.post('/social/accounts', [], config).then(function success(response) {
                 $scope.accounts = response.data;
             });
+        };
+
+        $scope.remove = function($id) {
+            $http.post('/social/remove', $.param({id: $id}), config).then(function success(response) {
+                if(response.data){
+                    $scope.getAccounts();
+                }
+            });
+        };
+
+        $scope.refresh = function($id, $type) {
+            $http.post('/social/update-process', $.param({id: $id}), config).then(function success(response) {
+                console.log(response);
+                document.getElementById($type).click();
+            });
+        };
+
+        $scope.instagramRefresh = function($account) {
+
+            $scope.activeID = $account.id;
+            $scope.InstaLogin = $account.data.login;
+            $scope.InstaPassword = $account.data.password;
+
+            document.getElementById('instagram').click();
+
+            console.log($account);
+        };
+
+        $scope.clearInstaForm = function(){
+            $scope.InstaLogin = '';
+            $scope.InstaPassword = '';
+            $scope.activeID = '';
         };
 
         $scope.accountSave = function() {
@@ -848,18 +878,30 @@ angular.module('cubeWebApp')
 
         $scope.InstaSave = function(){
 
-            $scope.data = {
-                type: 'instagram',
-                data: {
-                    'login': $scope.InstaLogin,
-                    'password': $scope.InstaPassword,
-                }
-            };
-
+            if($scope.activeID>0){
+                $scope.data = {
+                    id: $scope.activeID,
+                    type: 'instagram',
+                    data: {
+                        'login': $scope.InstaLogin,
+                        'password': $scope.InstaPassword,
+                    }
+                };
+            }else{
+                $scope.data = {
+                    type: 'instagram',
+                    data: {
+                        'login': $scope.InstaLogin,
+                        'password': $scope.InstaPassword,
+                    }
+                };
+            }
 
             if(checkData($scope.InstaLogin, 2) && checkData($scope.InstaPassword, 2)){
                 $http.post('/social/instagram', $.param($scope.data), config).then(function success(response) {
-                    console.log(response);
+                    document.getElementById('closeInstaModal').click();
+                    $scope.clearInstaForm();
+                    $scope.getAccounts();
                 });
             }
 

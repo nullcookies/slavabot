@@ -19,11 +19,12 @@ use frontend\controllers\SocialController;
                                             SocialController::getVKBtn(
                                                 'http://'.$_SERVER['SERVER_NAME'].'/social/vk',
                                                 'Вконтакте',
+                                                'vkontakte',
                                                 \Yii::$app->user->identity->id
                                             );
                                         ?>
                                     </li>
-                                    <li><a data-toggle="modal" data-target="#myModal">Instagram</a></li>
+                                    <li><a data-toggle="modal" id="instagram" data-target="#myModal">Instagram</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -69,7 +70,7 @@ use frontend\controllers\SocialController;
                                                     </td>
                                                     <td style="width: 15%;">
                                                         <div class="btn-group">
-                                                            <button type="button" class="btn btn-primary">Обновить</button>
+                                                            <button type="button" class="btn btn-primary" ng-click="instagramRefresh(account)">Обновить</button>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -85,14 +86,16 @@ use frontend\controllers\SocialController;
                                                     </td>
                                                     <td style="width: 15%;">
                                                         <div class="btn-group">
-                                                            <button type="button" class="btn btn-primary">Обновить</button>
+                                                            <button type="button" class="btn btn-primary" ng-click="refresh(account.id, account.type)">Обновить</button>
                                                         </div>
                                                     </td>
                                                 </tr>
                                                 </tbody>
                                             </table>
                                         </td>
-
+                                        <td>
+                                            <button type="button" class="btn btn-danger" ng-click="remove(account.id)">Удалить</button>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -107,7 +110,7 @@ use frontend\controllers\SocialController;
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <button type="button" id="closeInstaModal" class="close" data-dismiss="modal" ng-click="clearInstaForm()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         <h4 class="modal-title" id="myModalLabel">Добавить аккаунт Instagram</h4>
                     </div>
                     <div class="modal-body">
@@ -124,7 +127,7 @@ use frontend\controllers\SocialController;
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-success" ng-click="InstaSave()">Сохранить</button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal"  ng-click="clearInstaForm()">Отмена</button>
                     </div>
                 </div>
             </div>

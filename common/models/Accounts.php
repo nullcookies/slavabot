@@ -32,7 +32,16 @@ class Accounts extends \yii\db\ActiveRecord
         ];
     }
 
-
+    /**
+     *
+     * 'data' => json данные учетной записи
+     *
+     * 'processed' => 0 запись добавлена, но требуется пост-настройка
+     *                1 запись полностью настроена
+     *                2 запись в состоянии обновления (кнопка обновить, получаем новый токен и данные аккаунта)
+     * @return array
+     *
+     */
     public function fields()
     {
         return [
@@ -47,14 +56,31 @@ class Accounts extends \yii\db\ActiveRecord
         ];
     }
 
+    public static function checkReference()
+    {
+        $id = static::findOne(['user_id' => Yii::$app->user->id, 'processed' => 2]);
+
+        if($id){
+            return $id;
+        }else{
+            return new Accounts();
+        }
+    }
+
     public static function saveReference($item, $processed = 1)
     {
-        $model = new Accounts();
+        if($post = \Yii::$app->request->post('id')){
+            $model = static::findOne(['id' => $post]);
+        }else{
+            $model = self::checkReference();
+        }
+
 
         $model->user_id = Yii::$app->user->id;
         $model->type = $item['type'];
         $model->data = json_encode($item['data']);
         $model->processed = $processed;
+        $model->status = 1;
         return $model->save();
     }
 
@@ -76,6 +102,12 @@ class Accounts extends \yii\db\ActiveRecord
 
         return $acc->save();
     }
+    public static function updateAccount(){
+        $post = \Yii::$app->request->post();
+        $acc = Accounts::find()->where(['id' => $post['id']])->one();
+        $acc->processed = 2;
+        return $acc->save();
+    }
 
     public static function getUnprocessedAccounts(){
         return Accounts::find()->where(['user_id' => Yii::$app->user->id, 'processed' => 0])->one();
@@ -87,6 +119,10 @@ class Accounts extends \yii\db\ActiveRecord
 
     public static function getByUser($id){
         return Accounts::find()->where(['user_id' => $id])->all();
+    }
+
+    public static function remove($id){
+        return Accounts::find()->where(['id' => $id])->one()->delete();
     }
 
 }
