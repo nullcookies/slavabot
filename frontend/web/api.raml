@@ -1,4 +1,5 @@
 #%RAML 1.0
+#HTML генерируем через: raml2html generate -i frontend/web/api.raml -o frontend/web/api.html
 title: SalesBot
 version: v1.0
 baseUri: 'http://app.slavabot.ru/'
@@ -7,8 +8,8 @@ description: "REST-api для обмена данными c SalesBot."
 
 /rest/accounts/v1:
   displayName: Работа с аккаунтами соц. сетей
-  /get-user-accounts/:
-    description: Список аккаунтов пользователя
+  /user-auth/:
+    description: Запись Telegram ID по логину-паролю. Список аккаунтов пользователя.
     post:
       body:
         application/x-www-form-urlencoded:
@@ -19,6 +20,9 @@ description: "REST-api для обмена данными c SalesBot."
             password:
               description: Пароль пользователя SalesBot
               type: string
+            tig:
+              description: ID пользователя telegram.
+              type: integer
       responses:
         200:
           body:
@@ -26,30 +30,140 @@ description: "REST-api для обмена данными c SalesBot."
               type: object
               example: |
                 {
-                  "status": true,
-                  "data": [
-                    {
-                      "id": 1,
-                      "user_id": 19,
-                      "type": "instagram",
-                      "data": {
-                        "login": "login_string",
-                        "password": "password_string"
-                      },
-                      "status": null
-                    },
-                    {
-                      "id": 2,
-                      "user_id": 19,
-                      "type": "instagram",
-                      "data": {
-                        "login": "login_string",
-                        "password": "password_string"
-                      },
-                      "status": null
-                    }
-                  ]
+                    "status": true,
+                    "telegram_id": 123,
+                    "data": [
+                        {
+                            "id": 1,
+                            "user_id": 19,
+                            "type": "instagram",
+                            "data": {
+                                "login": "vedensky_lx",
+                                "password": "123123"
+                            },
+                            "status": 4,
+                            "processed": 1
+                        },
+                        {
+                            "id": 33,
+                            "user_id": 19,
+                            "type": "vkontakte",
+                            "data": {
+                                "user_name": "Александр Горбачев",
+                                "user_id": "12620990",
+                                "access_token": "ee9d69c94fed32d9ba03215ed9055032fc6fa22ce5fb889a9ac433e02393d24feeaef",
+                                "groups": {
+                                    "id": "156169448",
+                                    "name": "Test app",
+                                    "screen_name": "club156169448",
+                                    "is_closed": "0",
+                                    "type": "group",
+                                    "photo_50": "https://vk.com/images/community_50.png",
+                                    "photo_100": "https://vk.com/images/community_100.png",
+                                    "photo_200": "https://vk.com/images/community_200.png",
+                                    "$$hashKey": "00D"
+                                }
+                            },
+                            "status": 1,
+                            "processed": 1
+                        },
+                        {
+                            "id": 44,
+                            "user_id": 19,
+                            "type": "vkontakte",
+                            "data": {
+                                "user_name": "Александр Горбачев",
+                                "user_id": "12620990",
+                                "access_token": "4c2d3ffde24aa1f2985ee9187ea734cecec",
+                                "groups": {
+                                    "id": "12620990",
+                                    "name": "Стена пользователя Александр Горбачев",
+                                    "photo_50": "https://vk.com/images/camera_50.png",
+                                    "photo_100": "https://vk.com/images/camera_100.png",
+                                    "photo_200": "https://vk.com/images/camera_200.png",
+                                    "$$hashKey": "00E"
+                                }
+                            },
+                            "status": 1,
+                            "processed": 1
+                        }
+                    ]
                 }
+  /get-user-accounts/:
+      description: Список аккаунтов пользователя по telegram id.
+      post:
+        body:
+          application/x-www-form-urlencoded:
+            properties:
+              tig:
+                description: ID пользователя telegram.
+                type: integer
+        responses:
+          200:
+            body:
+              application/json:
+                type: object
+                example: |
+                  {
+                      "status": true,
+                      "telegram_id": 123,
+                      "data": [
+                          {
+                              "id": 1,
+                              "user_id": 19,
+                              "type": "instagram",
+                              "data": {
+                                  "login": "vedensky_lx",
+                                  "password": "123123"
+                              },
+                              "status": 4,
+                              "processed": 1
+                          },
+                          {
+                              "id": 33,
+                              "user_id": 19,
+                              "type": "vkontakte",
+                              "data": {
+                                  "user_name": "Александр Горбачев",
+                                  "user_id": "12620990",
+                                  "access_token": "ee9d69c94fed32d9ba03215ed9055032fc6fa22ce5fb889a9ac433e02393d24feeaef",
+                                  "groups": {
+                                      "id": "156169448",
+                                      "name": "Test app",
+                                      "screen_name": "club156169448",
+                                      "is_closed": "0",
+                                      "type": "group",
+                                      "photo_50": "https://vk.com/images/community_50.png",
+                                      "photo_100": "https://vk.com/images/community_100.png",
+                                      "photo_200": "https://vk.com/images/community_200.png",
+                                      "$$hashKey": "00D"
+                                  }
+                              },
+                              "status": 1,
+                              "processed": 1
+                          },
+                          {
+                              "id": 44,
+                              "user_id": 19,
+                              "type": "vkontakte",
+                              "data": {
+                                  "user_name": "Александр Горбачев",
+                                  "user_id": "12620990",
+                                  "access_token": "4c2d3ffde24aa1f2985ee9187ea734cecec",
+                                  "groups": {
+                                      "id": "12620990",
+                                      "name": "Стена пользователя Александр Горбачев",
+                                      "photo_50": "https://vk.com/images/camera_50.png",
+                                      "photo_100": "https://vk.com/images/camera_100.png",
+                                      "photo_200": "https://vk.com/images/camera_200.png",
+                                      "$$hashKey": "00E"
+                                  }
+                              },
+                              "status": 1,
+                              "processed": 1
+                          }
+                      ]
+                  }
   /set-account-status/:
     description: Изменение статуса аккаунта пользователя
     post:

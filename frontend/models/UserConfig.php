@@ -61,6 +61,14 @@ class UserConfig extends Model
         return $model->save();
     }
 
+    public function saveTelegramID($user_id, $tig)
+    {
+        $model = self::findModel($user_id);
+
+        $model->telegram_id = $tig;
+        return $model->save();
+    }
+
     protected function findModel($id)
     {
         if (($model = User::findOne($id)) !== null) {

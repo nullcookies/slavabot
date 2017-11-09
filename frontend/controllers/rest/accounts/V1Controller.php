@@ -10,7 +10,7 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Response;
-
+use frontend\models\UserConfig;
 use frontend\controllers\VKController;
 use Vk;
 
@@ -22,7 +22,7 @@ class V1Controller extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['get-user-accounts', 'set-account-status', 'get-token'],
+                'only' => ['get-user-accounts', 'set-account-status', 'get-token', 'user-auth'],
                 'rules' => [
                     [
                         'actions' => [],
@@ -30,7 +30,7 @@ class V1Controller extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['get-user-accounts', 'set-account-status', 'get-token'],
+                        'actions' => ['get-user-accounts', 'set-account-status', 'get-token', 'user-auth'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -45,7 +45,7 @@ class V1Controller extends Controller
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['get-user-accounts', 'set-account-status', 'get-token'],
+                'only' => ['get-user-accounts', 'set-account-status', 'get-token', 'user-auth'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -62,25 +62,58 @@ class V1Controller extends Controller
 
     public function beforeAction($action)
     {
-        if ($action->id == 'get-user-accounts' || $action->id == 'set-account-status' || $action->id == 'get-token') {
+        if ($action->id == 'get-user-accounts' ||
+            $action->id == 'set-account-status' ||
+            $action->id == 'get-token' ||
+            $action->id == 'user-auth') {
             $this->enableCsrfValidation = false;
         }
 
         return parent::beforeAction($action);
     }
 
+    public function actionGetUserAccounts(){
+
+        $telegram_id = \Yii::$app->request->post('tig');
+
+
+        if(!$telegram_id || (int)$telegram_id==0){
+            return [
+                'status' => false,
+                'error' => 'Telegram ID error!'
+            ];
+        }
+
+        $user = User::findByTIG($telegram_id);
+
+        if(!$user){
+            return [
+                'status' => false,
+                'error' => 'User not found!'
+            ];
+        }
+
+        return [
+            'status' => true,
+            'telegram_id' => $user->telegram_id,
+            'data' => Accounts::getByUser($user->id)
+        ];
+
+    }
+
     /**
      *
-     *  Отдаем аккаунты пользователя по связке логин-пароль от salesbot
+     *  Устанавливаем пользователю telegram id по логину-паролю
      *
      *  @return array
      *
      */
 
-    public function actionGetUserAccounts(){
+    public function actionUserAuth(){
 
         $login = \Yii::$app->request->post('login');
         $password = \Yii::$app->request->post('password');
+        $telegram_id = \Yii::$app->request->post('tig');
 
         if(!$login){
             return [
@@ -93,6 +126,13 @@ class V1Controller extends Controller
             return [
                 'status' => false,
                 'error' => 'Password error!'
+            ];
+        }
+
+        if(!$telegram_id || (int)$telegram_id==0){
+            return [
+                'status' => false,
+                'error' => 'Telegram ID error!'
             ];
         }
 
@@ -116,6 +156,7 @@ class V1Controller extends Controller
 
         return [
             'status' => true,
+            'telegram_id' => UserConfig::saveTelegramID($user->id, $telegram_id) ? (int)$telegram_id : 'error!',
             'data' => Accounts::getByUser($user->id)
         ];
 
@@ -141,10 +182,10 @@ class V1Controller extends Controller
             ];
         }
 
-        if(!isset($status)) {
+        if(!isset($status) || (int)$status > 1) {
             return [
                 'status' => false,
-                'error' => 'Status error!'
+                'error' => 'Status error!',
             ];
         }
 

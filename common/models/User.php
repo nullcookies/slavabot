@@ -95,6 +95,17 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Finds user by telegram_id
+     *
+     * @param string $tig
+     * @return static|null
+     */
+    public static function findByTIG($tig)
+    {
+        return static::findOne(['telegram_id' => $tig, 'status' => self::STATUS_ACTIVE]);
+    }
+
+    /**
      * Finds user by password reset token
      *
      * @param string $token password reset token

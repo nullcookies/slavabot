@@ -166,30 +166,125 @@
       .resource-modal li > ul {
         margin-bottom: 1em;
       }
-    </style></head><body data-spy="scroll" data-target="#sidebar"><div class="container"><div class="row"><div class="col-md-9" role="main"><div class="page-header"><h1>SalesBot API documentation <small>version v1.0</small></h1><p>http://app.slavabot.ru/</p><p>REST-api для обмена данными c SalesBot.</p></div><div class="panel panel-default"><div class="panel-heading"><h3 id="rest_accounts_v1" class="panel-title">Работа с аккаунтами соц. сетей</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_rest_accounts_v1_get_user_accounts_"><span class="parent">/rest/accounts/v1</span>/get-user-accounts/</a> <span class="methods"><a href="#rest_accounts_v1_get_user_accounts__post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_rest_accounts_v1_get_user_accounts_" class="panel-collapse collapse"><div class="panel-body"><div class="resource-description"><p>Список аккаунтов пользователя</p></div><div class="list-group"><div onclick="window.location.href = '#rest_accounts_v1_get_user_accounts__post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="rest_accounts_v1_get_user_accounts__post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent">/rest/accounts/v1</span>/get-user-accounts/</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#rest_accounts_v1_get_user_accounts__post_request" data-toggle="tab">Request</a></li><li><a href="#rest_accounts_v1_get_user_accounts__post_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="rest_accounts_v1_get_user_accounts__post_request"><h3>Body</h3><p><strong>Media type</strong>: application/x-www-form-urlencoded</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>login</strong>: <em>required (string)</em><p>Логин пользователя SalesBot</p></li><li><strong>password</strong>: <em>required (string)</em><p>Пароль пользователя SalesBot</p></li></ul></div><div class="tab-pane" id="rest_accounts_v1_get_user_accounts__post_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
-  "status": true,
-  "data": [
-    {
-      "id": 1,
-      "user_id": 19,
-      "type": "instagram",
-      "data": {
-        "login": "login_string",
-        "password": "password_string"
-      },
-      "status": null
-    },
-    {
-      "id": 2,
-      "user_id": 19,
-      "type": "instagram",
-      "data": {
-        "login": "login_string",
-        "password": "password_string"
-      },
-      "status": null
-    }
-  ]
+    </style></head><body data-spy="scroll" data-target="#sidebar"><div class="container"><div class="row"><div class="col-md-9" role="main"><div class="page-header"><h1>SalesBot API documentation <small>version v1.0</small></h1><p>http://app.slavabot.ru/</p><p>REST-api для обмена данными c SalesBot.</p></div><div class="panel panel-default"><div class="panel-heading"><h3 id="rest_accounts_v1" class="panel-title">Работа с аккаунтами соц. сетей</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_rest_accounts_v1_user_auth_"><span class="parent">/rest/accounts/v1</span>/user-auth/</a> <span class="methods"><a href="#rest_accounts_v1_user_auth__post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_rest_accounts_v1_user_auth_" class="panel-collapse collapse"><div class="panel-body"><div class="resource-description"><p>Запись Telegram ID по логину-паролю. Список аккаунтов пользователя.</p></div><div class="list-group"><div onclick="window.location.href = '#rest_accounts_v1_user_auth__post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="rest_accounts_v1_user_auth__post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent">/rest/accounts/v1</span>/user-auth/</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#rest_accounts_v1_user_auth__post_request" data-toggle="tab">Request</a></li><li><a href="#rest_accounts_v1_user_auth__post_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="rest_accounts_v1_user_auth__post_request"><h3>Body</h3><p><strong>Media type</strong>: application/x-www-form-urlencoded</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>login</strong>: <em>required (string)</em><p>Логин пользователя SalesBot</p></li><li><strong>password</strong>: <em>required (string)</em><p>Пароль пользователя SalesBot</p></li><li><strong>tig</strong>: <em>required (integer)</em><p>ID пользователя telegram.</p></li></ul></div><div class="tab-pane" id="rest_accounts_v1_user_auth__post_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+    "status": true,
+    "telegram_id": 123,
+    "data": [
+        {
+            "id": 1,
+            "user_id": 19,
+            "type": "instagram",
+            "data": {
+                "login": "vedensky_lx",
+                "password": "123123"
+            },
+            "status": 4,
+            "processed": 1
+        },
+        {
+            "id": 33,
+            "user_id": 19,
+            "type": "vkontakte",
+            "data": {
+                "user_name": "Александр Горбачев",
+                "user_id": "12620990",
+                "access_token": "ee9d69c94fed32d9ba03215ed9055032fc6fa22ce5fb889a9ac433e02393d24feeaef",
+                "groups": {
+                    "id": "156169448",
+                    "name": "Test app",
+                    "screen_name": "club156169448",
+                    "is_closed": "0",
+                    "type": "group",
+                    "photo_50": "https://vk.com/images/community_50.png",
+                    "photo_100": "https://vk.com/images/community_100.png",
+                    "photo_200": "https://vk.com/images/community_200.png",
+                    "$$hashKey": "00D"
+                }
+            },
+            "status": 1,
+            "processed": 1
+        },
+        {
+            "id": 44,
+            "user_id": 19,
+            "type": "vkontakte",
+            "data": {
+                "user_name": "Александр Горбачев",
+                "user_id": "12620990",
+                "access_token": "4c2d3ffde24aa1f2985ee9187ea734cecec",
+                "groups": {
+                    "id": "12620990",
+                    "name": "Стена пользователя Александр Горбачев",
+                    "photo_50": "https://vk.com/images/camera_50.png",
+                    "photo_100": "https://vk.com/images/camera_100.png",
+                    "photo_200": "https://vk.com/images/camera_200.png",
+                    "$$hashKey": "00E"
+                }
+            },
+            "status": 1,
+            "processed": 1
+        }
+    ]
+}
+</code></pre></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_rest_accounts_v1_get_user_accounts_"><span class="parent">/rest/accounts/v1</span>/get-user-accounts/</a> <span class="methods"><a href="#rest_accounts_v1_get_user_accounts__post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_rest_accounts_v1_get_user_accounts_" class="panel-collapse collapse"><div class="panel-body"><div class="resource-description"><p>Список аккаунтов пользователя по telegram id.</p></div><div class="list-group"><div onclick="window.location.href = '#rest_accounts_v1_get_user_accounts__post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="rest_accounts_v1_get_user_accounts__post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent">/rest/accounts/v1</span>/get-user-accounts/</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#rest_accounts_v1_get_user_accounts__post_request" data-toggle="tab">Request</a></li><li><a href="#rest_accounts_v1_get_user_accounts__post_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="rest_accounts_v1_get_user_accounts__post_request"><h3>Body</h3><p><strong>Media type</strong>: application/x-www-form-urlencoded</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>tig</strong>: <em>required (integer)</em><p>ID пользователя telegram.</p></li></ul></div><div class="tab-pane" id="rest_accounts_v1_get_user_accounts__post_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+    "status": true,
+    "telegram_id": 123,
+    "data": [
+        {
+            "id": 1,
+            "user_id": 19,
+            "type": "instagram",
+            "data": {
+                "login": "vedensky_lx",
+                "password": "123123"
+            },
+            "status": 4,
+            "processed": 1
+        },
+        {
+            "id": 33,
+            "user_id": 19,
+            "type": "vkontakte",
+            "data": {
+                "user_name": "Александр Горбачев",
+                "user_id": "12620990",
+                "access_token": "ee9d69c94fed32d9ba03215ed9055032fc6fa22ce5fb889a9ac433e02393d24feeaef",
+                "groups": {
+                    "id": "156169448",
+                    "name": "Test app",
+                    "screen_name": "club156169448",
+                    "is_closed": "0",
+                    "type": "group",
+                    "photo_50": "https://vk.com/images/community_50.png",
+                    "photo_100": "https://vk.com/images/community_100.png",
+                    "photo_200": "https://vk.com/images/community_200.png",
+                    "$$hashKey": "00D"
+                }
+            },
+            "status": 1,
+            "processed": 1
+        },
+        {
+            "id": 44,
+            "user_id": 19,
+            "type": "vkontakte",
+            "data": {
+                "user_name": "Александр Горбачев",
+                "user_id": "12620990",
+                "access_token": "4c2d3ffde24aa1f2985ee9187ea734cecec",
+                "groups": {
+                    "id": "12620990",
+                    "name": "Стена пользователя Александр Горбачев",
+                    "photo_50": "https://vk.com/images/camera_50.png",
+                    "photo_100": "https://vk.com/images/camera_100.png",
+                    "photo_200": "https://vk.com/images/camera_200.png",
+                    "$$hashKey": "00E"
+                }
+            },
+            "status": 1,
+            "processed": 1
+        }
+    ]
 }
 </code></pre></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_rest_accounts_v1_set_account_status_"><span class="parent">/rest/accounts/v1</span>/set-account-status/</a> <span class="methods"><a href="#rest_accounts_v1_set_account_status__post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_rest_accounts_v1_set_account_status_" class="panel-collapse collapse"><div class="panel-body"><div class="resource-description"><p>Изменение статуса аккаунта пользователя</p></div><div class="list-group"><div onclick="window.location.href = '#rest_accounts_v1_set_account_status__post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="rest_accounts_v1_set_account_status__post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent">/rest/accounts/v1</span>/set-account-status/</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#rest_accounts_v1_set_account_status__post_request" data-toggle="tab">Request</a></li><li><a href="#rest_accounts_v1_set_account_status__post_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="rest_accounts_v1_set_account_status__post_request"><h3>Body</h3><p><strong>Media type</strong>: application/x-www-form-urlencoded</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>user_id</strong>: <em>required (string)</em><p>ID пользователя SalesBot</p></li><li><strong>account_id</strong>: <em>required (string)</em><p>ID Аккаунта соц. сети пользователя SalesBot</p></li><li><strong>status</strong>: <em>required (one of 0, 1)</em><p>null Нет данных о доступе 0 Ошибка доступа 1 Доступ активен</p></li></ul></div><div class="tab-pane" id="rest_accounts_v1_set_account_status__post_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "status": true,

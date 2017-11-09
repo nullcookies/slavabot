@@ -11,7 +11,12 @@ return [
         'class' => 'yii\filters\AccessControl',
         'rules' => [
             [
-                'actions' => ['login','signup', 'error', 'request-password-reset', 'reset-password', 'getdata', 'contact', 'get-user-accounts', 'set-account-status', 'get-token'],
+                'actions' => ['login','signup', 'error', 'request-password-reset', 'reset-password',
+                    'getdata', 'contact',
+                    'get-user-accounts',
+                    'set-account-status',
+                    'get-token',
+                    'user-auth'],
                 'allow' => true,
                 'roles' => ['?'],
             ],
