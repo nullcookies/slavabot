@@ -158,8 +158,7 @@ class V1Controller extends Controller
         if(!$user->validateCode($code)){
             return [
                 'status' => false,
-                'error' => 'Incorrect code',
-                'info' => $user->validateCode($code)
+                'error' => 'Incorrect code'
             ];
         }
 
