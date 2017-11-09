@@ -100,16 +100,26 @@ class V1Controller extends Controller
                 'error' => 'User not found!'
             ];
         }
-        if(User::SendTemporaryPassword($user->id)){
+
+        $send = User::SendTemporaryPassword($user->id);
+
+        if(!$send['mail']){
             return [
-                'status' => true,
-                'info' => User::SendTemporaryPassword($user->id)
-            ];
-        }else{
-            return [
-                'status' => false
+                'status' => false,
+                'error' => 'Sanding Mail server error!'
             ];
         }
+
+        if(!$send['user']){
+            return [
+                'status' => false,
+                'error' => 'Code saving server error!'
+            ];
+        }
+
+        return [
+            'status' => true,
+        ];
     }
 
     /**
