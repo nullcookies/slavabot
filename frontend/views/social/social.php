@@ -13,7 +13,16 @@ use frontend\controllers\SocialController;
                             <div class="btn-group">
                                 <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Привязать соц.сеть <span class="caret"></span></button>
                                 <ul class="dropdown-menu accountsMenu" role="menu">
-                                    <li><a href="#">Facebook</a></li>
+                                    <li>
+                                        <?=
+                                            SocialController::getFBBtn(
+                                                'http://'.$_SERVER['SERVER_NAME'].'/social/fb',
+                                                'Facebook',
+                                                'facebook',
+                                                \Yii::$app->user->identity->id
+                                            );
+                                        ?>
+                                    </li>
                                     <li>
                                         <?=
                                             SocialController::getVKBtn(

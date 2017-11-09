@@ -13,6 +13,7 @@ use yii\web\IdentityInterface;
  * @property integer $id
  * @property string $username
  * @property string $password_hash
+ * @property string $temp_password_hash
  * @property string $password_reset_token
  * @property string $email
  * @property string $auth_key
@@ -95,14 +96,25 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Finds user by telegram_id
+ * Finds user by telegram_id
+ *
+ * @param string $tig
+ * @return static|null
+ */
+    public static function findByTIG($tid)
+    {
+        return static::findOne(['telegram_id' => $tid, 'status' => self::STATUS_ACTIVE]);
+    }
+
+    /**
+     * Finds user by id
      *
-     * @param string $tig
+     * @param string $id
      * @return static|null
      */
-    public static function findByTIG($tig)
+    public static function findByID($id)
     {
-        return static::findOne(['telegram_id' => $tig, 'status' => self::STATUS_ACTIVE]);
+        return User::findOne(['id' => $id, 'status' => self::STATUS_ACTIVE]);
     }
 
     /**
@@ -215,5 +227,107 @@ class User extends ActiveRecord implements IdentityInterface
 
         return $randomString;
 
+    }
+
+    /**
+     *  Генерируем четырехзначный код интеграции
+     */
+
+    public function generetaCode()
+    {
+        return rand(1000, 9999);
+    }
+
+
+    /**
+     * Validates code
+     *
+     * @param string $code code to validate
+     * @return bool if code provided is valid for current user
+     */
+
+    public function validateCode($code)
+    {
+        if($code && $this->temp_password_hash){
+            return Yii::$app->security->validatePassword($code, $this->temp_password_hash);
+        }else{
+            return false;
+        }
+
+    }
+
+    /**
+     * Задаем пользователю хэш сгенерированного кода интеграции
+     * @param $code
+     */
+
+    public function setCode($code)
+    {
+        $this->temp_password_hash = Yii::$app->security->generatePasswordHash($code);
+    }
+
+    public function clearTempCode()
+    {
+        return $this->temp_password_hash = '';
+    }
+
+    /**
+     * Отправляем код интеграции пользователю на почту
+     *
+     */
+
+    public function SendTemporaryPassword($id)
+    {
+
+        $user = self::findByID($id);
+
+        $code = $user->generetaCode();
+
+        $user->setCode($code);
+
+        $html = "
+            <div>
+                <div>
+                    <p>Данные для интеграции с Telegram:</p>
+                    <ul>
+                        <li>Код подтверждения: <b>" . $code . "</b></li>
+                    </ul>
+                </div>
+                <div>
+                <br>
+            </div>
+            <div>
+                С уважением,<br>
+                Команда СлаваБот<br>
+            </div>
+            <div>
+                <span class=\"wmi-callto\">+7 (495) 108-08-19</span>
+            </div>
+            <div>
+                <a href=\"mailto:support@salesbot.ru\">support@salesbot.ru</a>
+            </div>
+        ";
+
+        \Yii::$app->mailer->compose()
+            ->setFrom(['noreply@slavabot.ru' => 'SlavaBot'])
+            ->setTo($user->email)
+            ->setSubject('SlavaBot | Код подтверждения интеграции')
+            ->setHtmlBody($html)
+            ->send();
+
+        return $user->save();
+    }
+
+    /**
+     * Очистка кода интеграции
+     *
+     * @param $id
+     * @return bool
+     */
+
+    public function clearCode($id){
+        $user = self::findByID($id);
+        $user->clearTempCode();
+        return $user->save();
     }
 }

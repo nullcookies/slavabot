@@ -6,6 +6,52 @@ baseUri: 'http://app.slavabot.ru/'
 mediaType: application/json
 description: "REST-api для обмена данными c SalesBot."
 
+/rest/user/v1:
+  displayName: Работа с пользователем SlavaBot
+  /send-password/:
+    description: Отправляем на почту пользователю код интеграции
+    post:
+      body:
+        application/x-www-form-urlencoded:
+          properties:
+            login:
+              description: Логин пользователя SalesBot
+              type: string
+      responses:
+        200:
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                    "status": true
+                }
+  /auth-telegram/:
+      description: Привязка telegram ID к пользователю, по паре логин + код интеграции, сброс кода интеграции.
+      post:
+        body:
+          application/x-www-form-urlencoded:
+            properties:
+              login:
+                description: Логин пользователя SalesBot
+                type: string
+              code:
+                description: Код интеграции
+                type: string
+              tid:
+                description: Telegram ID, к которому будет осуществляться привязка
+                type: string
+        responses:
+          200:
+            body:
+              application/json:
+                type: object
+                example: |
+                  {
+                      "status": true
+                  }
+
+
 /rest/accounts/v1:
   displayName: Работа с аккаунтами соц. сетей
   /user-auth/:

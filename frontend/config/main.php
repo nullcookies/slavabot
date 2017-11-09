@@ -16,7 +16,11 @@ return [
                     'get-user-accounts',
                     'set-account-status',
                     'get-token',
-                    'user-auth'],
+                    'user-auth',
+                    'send-password',
+                    'auth-telegram'
+
+                ],
                 'allow' => true,
                 'roles' => ['?'],
             ],

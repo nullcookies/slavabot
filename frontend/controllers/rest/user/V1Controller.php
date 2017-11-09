@@ -1,5 +1,5 @@
 <?php
-namespace frontend\controllers\rest\accounts;
+namespace frontend\controllers\rest\user;
 
 use common\models\Accounts;
 use common\models\User;
@@ -11,8 +11,7 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Response;
 use frontend\models\UserConfig;
-use frontend\controllers\VKController;
-use Vk;
+
 
 
 class V1Controller extends Controller
@@ -22,7 +21,10 @@ class V1Controller extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['get-user-accounts', 'set-account-status', 'get-token', 'user-auth'],
+                'only' => [
+                    'send-password',
+                    'auth-telegram'
+                ],
                 'rules' => [
                     [
                         'actions' => [],
@@ -30,7 +32,10 @@ class V1Controller extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['get-user-accounts', 'set-account-status', 'get-token', 'user-auth'],
+                        'actions' => [
+                            'send-password',
+                            'auth-telegram'
+                        ],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -39,13 +44,16 @@ class V1Controller extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'get-user-accounts' => ['post'],
-                    'set-account-status' => ['post']
+                    'send-password' => ['post'],
+                    'auth-telegram' => ['post']
                 ],
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['get-user-accounts', 'set-account-status', 'get-token', 'user-auth'],
+                'only' => [
+                    'send-password',
+                    'auth-telegram'
+                ],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -62,52 +70,20 @@ class V1Controller extends Controller
 
     public function beforeAction($action)
     {
+        $this->enableCsrfValidation = false;
 
         return parent::beforeAction($action);
     }
 
-    public function actionGetUserAccounts(){
-
-        $telegram_id = \Yii::$app->request->post('tig');
-
-
-        if(!$telegram_id || (int)$telegram_id==0){
-            return [
-                'status' => false,
-                'error' => 'Telegram ID error!'
-            ];
-        }
-
-        $user = User::findByTIG($telegram_id);
-
-        if(!$user){
-            return [
-                'status' => false,
-                'error' => 'User not found!'
-            ];
-        }
-
-        return [
-            'status' => true,
-            'telegram_id' => $user->telegram_id,
-            'data' => Accounts::getByUser($user->id)
-        ];
-
-    }
-
     /**
+     * Отправка письма с кодом для интеграции с ботом
      *
-     *  Устанавливаем пользователю telegram id по логину-паролю
-     *
-     *  @return array
-     *
+     * @return array
      */
 
-    public function actionUserAuth(){
+    public function actionSendPassword(){
 
         $login = \Yii::$app->request->post('login');
-        $password = \Yii::$app->request->post('password');
-        $telegram_id = \Yii::$app->request->post('tig');
 
         if(!$login){
             return [
@@ -116,10 +92,54 @@ class V1Controller extends Controller
             ];
         }
 
-        if(!$password) {
+        $user = User::findByEmail($login);
+
+        if(!$user){
             return [
                 'status' => false,
-                'error' => 'Password error!'
+                'error' => 'User not found!'
+            ];
+        }
+        if(User::SendTemporaryPassword($user->id)){
+            return [
+                'status' => true
+            ];
+        }else{
+            return [
+                'status' => false
+            ];
+        }
+
+
+
+
+
+    }
+
+    /**
+     * Авторизация по паре логин + код,
+     * Привязка учетки пользователя к telegram id
+     * Удаление кода
+     *
+     * @return array
+     */
+
+    public function actionAuthTelegram(){
+        $login = \Yii::$app->request->post('login');
+        $code = \Yii::$app->request->post('code');
+        $telegram_id = \Yii::$app->request->post('tid');
+
+        if(!$login){
+            return [
+                'status' => false,
+                'error' => 'Login error!'
+            ];
+        }
+
+        if(!$code) {
+            return [
+                'status' => false,
+                'error' => 'Code error!'
             ];
         }
 
@@ -139,62 +159,20 @@ class V1Controller extends Controller
             ];
         }
 
-        if(!$user->validatePassword($password)){
+        if(!$user->validateCode($code)){
 
             return [
                 'status' => false,
-                'error' => 'Incorrect password'
+                'error' => 'Incorrect code'
             ];
-
         }
 
         return [
             'status' => true,
             'telegram_id' => UserConfig::saveTelegramID($user->id, $telegram_id) ? (int)$telegram_id : 'error!',
-            'data' => Accounts::getByUser($user->id)
+            'clear_code' => User::clearCode($user->id)
         ];
-
     }
 
-    public function actionSetAccountStatus(){
-
-        $user_id = \Yii::$app->request->post('user_id');
-        $account_id = \Yii::$app->request->post('account_id');
-        $status = \Yii::$app->request->post('status');
-
-        if(!$user_id){
-            return [
-                'status' => false,
-                'error' => 'User ID error!'
-            ];
-        }
-
-        if(!$account_id) {
-            return [
-                'status' => false,
-                'error' => 'Account ID error!'
-            ];
-        }
-
-        if(!isset($status) || (int)$status > 1) {
-            return [
-                'status' => false,
-                'error' => 'Status error!',
-            ];
-        }
-
-        $acc = Accounts::setStatus($user_id, $account_id, $status);
-
-        if($acc){
-            return [
-                'status' => true,
-            ];
-        }else{
-            return [
-                'status' => false,
-                'error' => 'Save error!'
-            ];
-        }
-    }
 
 }

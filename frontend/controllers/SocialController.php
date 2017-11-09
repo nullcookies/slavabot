@@ -11,6 +11,7 @@ use yii\web\Response;
 use frontend\models\UserConfig;
 use common\models\Accounts;
 use Vk;
+use Facebook\Facebook;
 
 use frontend\controllers\VKController;
 
@@ -69,6 +70,111 @@ class SocialController extends Controller
         $url = $v->get_code_token("token", $redirect_uri);
 
         return '<a href="'.$url.'" id="'.$id.'">' . $text . '</a>';
+    }
+
+    /**
+     * Возвращает кнопку для авторизации пользователя через вк
+     */
+
+    function getFBBtn($callback, $text='', $id){
+        session_start();
+
+        $app_id = "169360780313874";
+        $app_secret = "38e43b5ab78044815bcc51314fdb20a0";
+
+
+        $fb = new Facebook([
+            'app_id'  => $app_id,
+            'app_secret' => $app_secret,
+            'default_graph_version' => 'v2.10',
+        ]);
+
+        $helper = $fb->getRedirectLoginHelper();
+
+        $permissions = ['publish_actions','manage_pages','publish_pages'];
+
+        $loginUrl = $helper->getLoginUrl($callback, $permissions);
+
+        return '<a href="'.htmlspecialchars($loginUrl).'" id="'.$id.'">' . $text . '</a>';
+    }
+
+    public function actionFb()
+    {
+        // App ID и App Secret из настроек приложения
+        $app_id = "169360780313874";
+        $app_secret = "38e43b5ab78044815bcc51314fdb20a0";
+
+        $fb = new Facebook([
+            'app_id'  => $app_id,
+            'app_secret' => $app_secret,
+            'default_graph_version' => 'v2.10',
+        ]);
+
+        $helper = $fb->getRedirectLoginHelper();
+
+        try {
+            $accessToken = $helper->getAccessToken();
+        } catch(FacebookResponseException $e) {
+            // When Graph returns an error
+            echo 'Graph returned an error: ' . $e->getMessage();
+            exit;
+        } catch(FacebookSDKException $e) {
+            // When validation fails or other local issues
+            echo 'Facebook SDK returned an error: ' . $e->getMessage();
+            exit;
+        }
+
+        if (! isset($accessToken)) {
+            if ($helper->getError()) {
+                header('HTTP/1.0 401 Unauthorized');
+                echo "Error: " . $helper->getError() . "\n";
+                echo "Error Code: " . $helper->getErrorCode() . "\n";
+                echo "Error Reason: " . $helper->getErrorReason() . "\n";
+                echo "Error Description: " . $helper->getErrorDescription() . "\n";
+            } else {
+                header('HTTP/1.0 400 Bad Request');
+                echo 'Bad request';
+            }
+            exit;
+        }
+
+// Logged in
+        echo '<h3>Access Token</h3>';
+        var_dump($accessToken->getValue());
+
+// The OAuth 2.0 client handler helps us manage access tokens
+        $oAuth2Client = $fb->getOAuth2Client();
+
+// Get the access token metadata from /debug_token
+        $tokenMetadata = $oAuth2Client->debugToken($accessToken);
+        echo '<h3>Metadata</h3>';
+        var_dump($tokenMetadata);
+
+        $data = $tokenMetadata;
+
+        $tokenMetadata->validateAppId($app_id);
+
+        $tokenMetadata->validateExpiration();
+
+        var_dump($data);
+        /* PHP SDK v5.0.0 */
+        /* make the API call */
+//        try {
+//            // Returns a `Facebook\FacebookResponse` object
+//            $response = $fb->get(
+//                '/{user-id}/groups',
+//                '{access-token}'
+//            );
+//        } catch(FacebookResponseException $e) {
+//            echo 'Graph returned an error: ' . $e->getMessage();
+//            exit;
+//        } catch(FacebookSDKException $e) {
+//            echo 'Facebook SDK returned an error: ' . $e->getMessage();
+//            exit;
+//        }
+//        $graphNode = $response->getGraphNode();
+//
+//        var_dump($graphNode);
     }
 
     public function actionIndex()
