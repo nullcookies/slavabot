@@ -102,18 +102,14 @@ class V1Controller extends Controller
         }
         if(User::SendTemporaryPassword($user->id)){
             return [
-                'status' => true
+                'status' => true,
+                'info' => User::SendTemporaryPassword($user->id)
             ];
         }else{
             return [
                 'status' => false
             ];
         }
-
-
-
-
-
     }
 
     /**
@@ -160,10 +156,10 @@ class V1Controller extends Controller
         }
 
         if(!$user->validateCode($code)){
-
             return [
                 'status' => false,
-                'error' => 'Incorrect code'
+                'error' => 'Incorrect code',
+                'info' => $user->validateCode($code)
             ];
         }
 

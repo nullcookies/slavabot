@@ -248,12 +248,10 @@ class User extends ActiveRecord implements IdentityInterface
 
     public function validateCode($code)
     {
-        if($code && $this->temp_password_hash){
-            return Yii::$app->security->validatePassword($code, $this->temp_password_hash);
-        }else{
+        if(!$code || !$this->temp_password_hash){
             return false;
         }
-
+        return Yii::$app->security->validatePassword($code, $this->temp_password_hash);
     }
 
     /**
@@ -268,7 +266,7 @@ class User extends ActiveRecord implements IdentityInterface
 
     public function clearTempCode()
     {
-        return $this->temp_password_hash = '';
+        return $this->temp_password_hash = null;
     }
 
     /**
@@ -308,14 +306,17 @@ class User extends ActiveRecord implements IdentityInterface
             </div>
         ";
 
-        \Yii::$app->mailer->compose()
+        $mail = \Yii::$app->mailer->compose()
             ->setFrom(['noreply@slavabot.ru' => 'SlavaBot'])
             ->setTo($user->email)
             ->setSubject('SlavaBot | Код подтверждения интеграции')
             ->setHtmlBody($html)
             ->send();
 
-        return $user->save();
+        return [
+            'mail' => $mail,
+            'user' =>$user->save()
+        ];
     }
 
     /**
