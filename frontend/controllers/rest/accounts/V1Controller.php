@@ -69,7 +69,7 @@ class V1Controller extends Controller
 
     public function actionGetUserAccounts(){
 
-        $telegram_id = \Yii::$app->request->post('tig');
+        $telegram_id = \Yii::$app->request->post('tid');
 
 
         if(!$telegram_id || (int)$telegram_id==0){

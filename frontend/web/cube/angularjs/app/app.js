@@ -70,6 +70,21 @@ app.config(['$routeProvider', function ($routeProvider) {
             controller: "socialCtrl",
             title: 'Соц.сети'
         })
+        .when("/history", {
+            templateUrl: "/history",
+            controller: "historyCtrl",
+            title: 'История'
+        })
+        .when("/history/responses", {
+            templateUrl: "/responses",
+            controller: "responsesCtrl",
+            title: 'Ответы'
+        })
+        .when("/history/posts", {
+            templateUrl: "/posts",
+            controller: "postsCtrl",
+            title: 'Посты и комментарии'
+        })
 		.otherwise({
 			redirectTo:'/error-404'
 		});

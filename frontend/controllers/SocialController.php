@@ -12,9 +12,9 @@ use frontend\models\UserConfig;
 use common\models\Accounts;
 use Vk;
 use Facebook\Facebook;
-
+use VkAuth;
 use frontend\controllers\VKController;
-
+use linslin\yii2\curl;
 
 
 class SocialController extends Controller
@@ -32,7 +32,7 @@ class SocialController extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['instagram', 'finish-process', 'update-process'],
+                        'actions' => ['instagram', 'finish-process', 'update-process', 'vk-auth'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -41,12 +41,12 @@ class SocialController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'logout' => ['post'],
+                    'vk-auth' => ['post'],
                 ],
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['instagram', 'accounts', 'unprocessed', 'finish-process', 'remove', 'update-process'],
+                'only' => ['instagram', 'accounts', 'unprocessed', 'finish-process', 'remove', 'update-process', 'vk-auth'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -59,17 +59,57 @@ class SocialController extends Controller
      */
 
     function getVKBtn($redirect_uri, $text='', $id){
+        $agent = new VkAuth\VkAuthAgent('89292813613', 'zdx1000L');
+        $remixsid = $agent->getRemixsid();
 
-        $v = new Vk(array(
-            'client_id' => VKController::CLIENT_ID,
-            'secret_key' => VKController::SECRET_KEY,
-            'scope' => 'wall',
-            'v' => '5.35'
-        ));
 
-        $url = $v->get_code_token("token", $redirect_uri);
+        if($remixsid){
 
-        return '<a href="'.$url.'" id="'.$id.'">' . $text . '</a>';
+            $jar = $agent->getAuthorizedCookieJar()->toArray();
+
+            $arrConnect = [
+                'client_id'=> VKController::CLIENT_ID,
+                'display' => 'mobile',
+                'response_type'=> 'token',
+                'scope'=> 'wall,photos,friends,groups',
+                'v'=> '5.28'
+            ];
+
+            $cook = '';
+
+            foreach($jar as $i => $elem){
+                $cook.= $elem['Name'].'='.$elem['Value'].'; ';
+            }
+
+            $curl = new curl\Curl();
+
+            $response = $curl
+                ->setPostParams($arrConnect)
+                ->setHeaders([
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                    'Accept' => 'application/json',
+                    'cookie' => $cook
+                ])
+             ->post('https://oauth.vk.com/authorize');
+
+            if(preg_match('/<form.*<\/form>/sU', $response, $matches)){
+                $iframe = array_shift($matches);
+                if(preg_match('/action=["\'].*["\']/U', $iframe, $width)){
+                    $widthValue = preg_replace('/(action=["\'])(.*)(["\'])/U', '${2}', $width);
+                    $width = array_shift($width);
+                    $widthValue = array_shift($widthValue);
+                    $response1 = $curl->setOption(CURLOPT_HEADER, true)->post($widthValue);
+                    $url = $curl->responseHeaders['Location'];
+
+                    $result = substr(strstr($url, '#'), 1, strlen($url));
+                    header( 'Location:'.'http://'.$_SERVER['SERVER_NAME'].'/social/vk?'.$result, true, 301 );
+                }
+            }
+
+            return '<a href="'.$url.'" id="'.$id.'">' . $text . '</a>';
+        }else{
+            return '<p>Ошибка</p>';
+        }
     }
 
     /**
@@ -86,12 +126,12 @@ class SocialController extends Controller
         $fb = new Facebook([
             'app_id'  => $app_id,
             'app_secret' => $app_secret,
-            'default_graph_version' => 'v2.10',
+            'default_graph_version' => 'v2.11',
         ]);
 
         $helper = $fb->getRedirectLoginHelper();
 
-        $permissions = ['publish_actions','manage_pages','publish_pages'];
+        $permissions = ['public_profile', 'publish_actions','manage_pages','publish_pages', 'pages_show_list'];
 
         $loginUrl = $helper->getLoginUrl($callback, $permissions);
 
@@ -100,7 +140,6 @@ class SocialController extends Controller
 
     public function actionFb()
     {
-        // App ID и App Secret из настроек приложения
         $app_id = "169360780313874";
         $app_secret = "38e43b5ab78044815bcc51314fdb20a0";
 
@@ -115,7 +154,6 @@ class SocialController extends Controller
         try {
             $accessToken = $helper->getAccessToken();
         } catch(FacebookResponseException $e) {
-            // When Graph returns an error
             echo 'Graph returned an error: ' . $e->getMessage();
             exit;
         } catch(FacebookSDKException $e) {
@@ -138,43 +176,98 @@ class SocialController extends Controller
             exit;
         }
 
-// Logged in
-        echo '<h3>Access Token</h3>';
-        var_dump($accessToken->getValue());
 
-// The OAuth 2.0 client handler helps us manage access tokens
         $oAuth2Client = $fb->getOAuth2Client();
 
-// Get the access token metadata from /debug_token
         $tokenMetadata = $oAuth2Client->debugToken($accessToken);
-        echo '<h3>Metadata</h3>';
-        var_dump($tokenMetadata);
-
-        $data = $tokenMetadata;
 
         $tokenMetadata->validateAppId($app_id);
 
         $tokenMetadata->validateExpiration();
 
-        var_dump($data);
-        /* PHP SDK v5.0.0 */
-        /* make the API call */
+        try {
+            $response = $fb->get('/me?fields=id,name', "{$accessToken}");
+        } catch(Facebook\Exceptions\FacebookResponseException $e) {
+            echo 'Graph returned an error: ' . $e->getMessage();
+            exit;
+        } catch(Facebook\Exceptions\FacebookSDKException $e) {
+            echo 'Facebook SDK returned an error: ' . $e->getMessage();
+            exit;
+        }
+
+        $user = $response->getGraphNode();
+
+        try {
+            $response = $fb->get('/me/groups', "{$accessToken}");
+        } catch(Facebook\Exceptions\FacebookResponseException $e) {
+            echo 'Graph returned an error: ' . $e->getMessage();
+            exit;
+        } catch(Facebook\Exceptions\FacebookSDKException $e) {
+            echo 'Facebook SDK returned an error: ' . $e->getMessage();
+            exit;
+        }
+
+        $groups = $response->getGraphEdge()->asArray();
+        foreach($groups as $gr){
+                 try {
+                     $response = $fb->get('/'.$gr['id'].'?fields=id,name', "{$accessToken}");
+                 } catch(Facebook\Exceptions\FacebookResponseException $e) {
+                     echo 'Graph returned an error: ' . $e->getMessage();
+                     exit;
+                 } catch(Facebook\Exceptions\FacebookSDKException $e) {
+                     echo 'Facebook SDK returned an error: ' . $e->getMessage();
+                     exit;
+                 }
+        }
+
+        try {
+            $longToken = $fb->get('/oauth/access_token?grant_type=fb_exchange_token&client_id='.$app_id.'&client_secret='.$app_secret.'&fb_exchange_token='.$accessToken->getValue('value'), $accessToken);
+        } catch(Facebook\Exceptions\FacebookResponseException $e) {
+            echo 'Graph returned an error: ' . $e->getMessage();
+            exit;
+        } catch(Facebook\Exceptions\FacebookSDKException $e) {
+            echo 'Facebook SDK returned an error: ' . $e->getMessage();
+            exit;
+        }
+        $long_token = $longToken->getGraphNode()->asArray();
+        $date = new \DateTime();
+        $long_token['start'] = $date->getTimestamp();
+
+        $res = array(
+            'type' => 'facebook',
+            'data' => array(
+                'user_name' => $user['name'],
+                'user_id' => $user['id'],
+                'access_token' => $long_token['access_token'],
+                'groups' => $groups
+            )
+        );
+        $res['data']['groups'][] = array(
+            'id' => $user['id'],
+            'name' => 'Стена пользователя ' . $user['name'],
+        );
+
 //        try {
-//            // Returns a `Facebook\FacebookResponse` object
-//            $response = $fb->get(
-//                '/{user-id}/groups',
-//                '{access-token}'
+//            $response = $fb->post(
+//                '/'.$user['id'].'/feed',
+//                array (
+//                    'message' => 'This is a test message',
+//                ),
+//                $long_token['access_token']
 //            );
-//        } catch(FacebookResponseException $e) {
+//        } catch(Facebook\Exceptions\FacebookResponseException $e) {
 //            echo 'Graph returned an error: ' . $e->getMessage();
 //            exit;
-//        } catch(FacebookSDKException $e) {
+//        } catch(Facebook\Exceptions\FacebookSDKException $e) {
 //            echo 'Facebook SDK returned an error: ' . $e->getMessage();
 //            exit;
 //        }
 //        $graphNode = $response->getGraphNode();
-//
-//        var_dump($graphNode);
+
+
+        if(Accounts::saveReference($res, 0)){
+            Yii::$app->response->redirect('/#/pages/social');
+        }
     }
 
     public function actionIndex()
@@ -217,53 +310,62 @@ class SocialController extends Controller
     }
 
 
+    function actionVkAuth()
+    {
+        $login = Yii::$app->request->post('login');
+        $password = Yii::$app->request->post('password');
+
+        $response = VKController::authVK($login, $password);
+        if($response){
+            Yii::$app->response->redirect($response);
+        }else{
+            Yii::$app->response->redirect('/#/pages/social?error=true');
+        }
+    }
+
     public function actionVk()
     {
-        // Костыль для конвертации standalone-данных vk api в get параметры
+            $config = array(
+                'secret_key' => VKController::SECRET_KEY,
+                'client_id' => VKController::CLIENT_ID,
+                'user_id' => \Yii::$app->request->get('user_id'),
+                'access_token' => \Yii::$app->request->get('access_token'),
+                'scope' => 'stats, photo_100,wall,groups,photos,video'
+            );
 
-        if(!\Yii::$app->request->get('access_token')){
-            echo '<script>window.location.href = document.location.href.replace("#","?");</script>';
-            return false;
-        }
+            $v = new Vk($config);
 
-
-        $config = array(
-            'secret_key' => VKController::SECRET_KEY,
-            'client_id' => VKController::CLIENT_ID,
-            'user_id' => \Yii::$app->request->get('user_id'),
-            'access_token' => \Yii::$app->request->get('access_token'),
-            'scope' => 'stats, photo_100'
-        );
-
-        $v = new Vk($config);
-
-        $response = $v->api('groups.get', array(
-            'user_id' => $config['user_id'],
-            'extended' => 1,
-            'filter' => 'admin,editor,wall_id'
-        ));
-
-        $user = $v->api('users.get', array(
-            'user_ids' => (string)$config['user_id'],
-            'fields' => 'photo_50, photo_100, photo_200'
-        ));
-
-        $res = array(
-            'type' => 'vkontakte',
-            'data' => array(
-                'user_name' => $user[0]['first_name'] . ' ' . $user[0]['last_name'],
+            $response = $v->api('groups.get', array(
                 'user_id' => $config['user_id'],
-                'access_token' => $config['access_token'],
-                'groups' => $response['items']
-            )
-        );
-        $res['data']['groups'][] = array(
-            'id' => $config['user_id'],
-            'name' => 'Стена пользователя ' . $res['data']['user_name'],
-            'photo_50' => $user[0]['photo_50'],
-            'photo_100' => $user[0]['photo_100'],
-            'photo_200' => $user[0]['photo_200']
-        );
+                'extended' => 1,
+                'filter' => 'admin,editor,wall_id'
+            ));
+
+            $user = $v->api('users.get', array(
+                'user_ids' => (string)$config['user_id'],
+                'fields' => 'photo_50, photo_100, photo_200'
+            ));
+
+            $res = array(
+                'type' => 'vkontakte',
+                'data' => array(
+                    'user_name' => $user[0]['first_name'] . ' ' . $user[0]['last_name'],
+                    'user_id' => $config['user_id'],
+                    'access_token' => $config['access_token'],
+                    'groups' => $response['items']
+                )
+            );
+            $res['data']['groups'][] = array(
+                'id' => $config['user_id'],
+                'name' => 'Стена пользователя ' . $res['data']['user_name'],
+                'photo_50' => $user[0]['photo_50'],
+                'photo_100' => $user[0]['photo_100'],
+                'photo_200' => $user[0]['photo_200']
+            );
+
+//            $response = $v->wall->post(array(
+//                'message' => 'I testing API form SalesBot'
+//            ));
 
         if(Accounts::saveReference($res, 0)){
             Yii::$app->response->redirect('/#/pages/social');

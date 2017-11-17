@@ -5,7 +5,7 @@
     "homepage": "http://www.yiiframework.com/",
     "type": "project",
     "license": "BSD-3-Clause",
-    "repositories": [{ "type": "git", "url": "https://github.com/fdcore/vk.api.git" }],
+    "repositories": [{ "type": "git", "url": "https://github.com/fdcore/vk.api.git"}],
     "support": {
         "issues": "https://github.com/yiisoft/yii2/issues?state=open",
         "forum": "http://www.yiiframework.com/forum/",
@@ -19,7 +19,10 @@
         "yiisoft/yii2": "~2.0.6",
         "yiisoft/yii2-bootstrap": "~2.0.0",
         "yiisoft/yii2-swiftmailer": "~2.0.0",
-        "fdcore/vk.api": "^2.0"
+        "fdcore/vk.api": "^2.0",
+        "anfa/vk-auth": "dev-master",
+        "facebook/graph-sdk": "^5.6",
+        "linslin/yii2-curl": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

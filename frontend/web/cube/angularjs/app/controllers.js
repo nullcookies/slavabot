@@ -824,6 +824,7 @@ angular.module('cubeWebApp')
         $scope.getAccounts = function() {
             $http.post('/social/accounts', [], config).then(function success(response) {
                 $scope.accounts = response.data;
+                console.log($scope.accounts);
             });
         };
 
@@ -875,6 +876,7 @@ angular.module('cubeWebApp')
 
         $scope.accountSave = function() {
             var data = $scope.accountData;
+
             data.groups = $scope.userSelection.activeValue;
             $scope.data = {
                 id: $scope.unpID,

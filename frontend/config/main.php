@@ -18,7 +18,8 @@ return [
                     'get-token',
                     'user-auth',
                     'send-password',
-                    'auth-telegram'
+                    'auth-telegram',
+                    'new-event'
 
                 ],
                 'allow' => true,

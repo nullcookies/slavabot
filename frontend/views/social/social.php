@@ -24,14 +24,7 @@ use frontend\controllers\SocialController;
                                         ?>
                                     </li>
                                     <li>
-                                        <?=
-                                            SocialController::getVKBtn(
-                                                'http://'.$_SERVER['SERVER_NAME'].'/social/vk',
-                                                'Вконтакте',
-                                                'vkontakte',
-                                                \Yii::$app->user->identity->id
-                                            );
-                                        ?>
+                                    <li><a data-toggle="modal" id="instagram" data-target="#myModalVK">Вконтакте</a></li>
                                     </li>
                                     <li><a data-toggle="modal" id="instagram" data-target="#myModal">Instagram</a></li>
                                 </ul>
@@ -65,6 +58,9 @@ use frontend\controllers\SocialController;
                                         <td ng-show="account.type === 'vkontakte'">
                                             {{account.data.user_name}}
                                         </td>
+                                        <td ng-show="account.type === 'facebook'">
+                                            {{account.data.user_name}}
+                                        </td>
                                         <td class="text-center">
                                             <span class="label label-success" ng-show="account.status === 1">Активна</span>
                                             <span class="label label-danger" ng-show="account.status === 0">Ошибка</span>
@@ -86,7 +82,7 @@ use frontend\controllers\SocialController;
                                                 </tbody>
                                             </table>
                                         </td>
-                                        <td ng-show="account.type === 'vkontakte'">
+                                        <td ng-show="account.type === 'vkontakte' || account.type === 'facebook'">
                                             <table class="noTop">
                                                 <tbody>
                                                 <tr>
@@ -138,6 +134,38 @@ use frontend\controllers\SocialController;
                         <button type="button" class="btn btn-success" ng-click="InstaSave()">Сохранить</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal"  ng-click="clearInstaForm()">Отмена</button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="myModalVK" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" id="closemyModalVK" class="close" data-dismiss="modal" ng-click="clearInstaForm()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Добавить аккаунт Instagram</h4>
+                    </div>
+                    <form action="/social/vk-auth/"  method="post" class="ng-pristine ng-valid">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <?
+                            use yii\helpers\Html;
+
+                            echo Html :: hiddenInput(\Yii :: $app->getRequest()->csrfParam, \Yii :: $app->getRequest()->getCsrfToken(), []);
+                            ?>
+                            <label for="exampleInputEmail1">Логин</label>
+                            <input type="text" class="form-control" name="login" placeholder="Номер телефона">
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Пароль</label>
+                            <input type="password" class="form-control"  name="password"  placeholder="Пароль">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Сохранить</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal"  ng-click="clearInstaForm()">Отмена</button>
+                    </div>
+                    </form>
                 </div>
             </div>
         </div>

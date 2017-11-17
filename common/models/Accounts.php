@@ -114,7 +114,7 @@ class Accounts extends \yii\db\ActiveRecord
     }
 
     public static function getAccounts(){
-        return Accounts::find()->all();
+        return Accounts::find()->where(['user_id' => Yii::$app->user->id])->all();
     }
 
     public static function getByUser($id){

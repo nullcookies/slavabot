@@ -66,7 +66,7 @@ description: "REST-api для обмена данными c SalesBot."
             password:
               description: Пароль пользователя SalesBot
               type: string
-            tig:
+            tid:
               description: ID пользователя telegram.
               type: integer
       responses:
@@ -141,7 +141,7 @@ description: "REST-api для обмена данными c SalesBot."
         body:
           application/x-www-form-urlencoded:
             properties:
-              tig:
+              tid:
                 description: ID пользователя telegram.
                 type: integer
         responses:
@@ -239,3 +239,63 @@ description: "REST-api для обмена данными c SalesBot."
                 {
                   "status": true,
                 }
+
+/rest/history/v1/:
+  displayName: Работа с историей действий
+  /new-event/:
+    description: Добавление события нового поста в соц сеть.
+    post:
+      body:
+        application/x-www-form-urlencoded:
+          properties:
+            tid:
+              description: ID пользователя telegram.
+              type: integer
+            type:
+              description: Тип поста соц. сети
+              type: string
+              enum: ['facebook', 'vkontakte', 'instagram']
+            data:
+              description: Данные поста, в формате JSON
+              type: string
+
+      responses:
+        200:
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                    "status": true
+                },
+
+                {
+                    "status": false,
+                    "error": "Data not found in request!"
+                },
+
+                {
+                    "status": false,
+                    "error": "Data is not JSON!"
+                },
+
+                {
+                    "status": false,
+                    "error": "Type not found in request!"
+                },
+
+                {
+                    "status": false,
+                    "error": "Type error! It must be equals facebook, vkontakte or instagram!"
+                },
+
+                {
+                    "status": false,
+                    "error": "Telegram ID not found in request!"
+                },
+
+                {
+                    "status": false,
+                    "error": "User not found in database!"
+                }
+
