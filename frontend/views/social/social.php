@@ -142,30 +142,27 @@ use frontend\controllers\SocialController;
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" id="closemyModalVK" class="close" data-dismiss="modal" ng-click="clearInstaForm()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">Добавить аккаунт Instagram</h4>
+                        <button type="button" id="closemyModalVK" class="close" data-dismiss="modal" ng-click="clearVkForm()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Добавить аккаунт Vkontakte</h4>
                     </div>
-                    <form action="/social/vk-auth/"  method="post" class="ng-pristine ng-valid">
                     <div class="modal-body">
-                        <div class="form-group">
-                            <?
-                            use yii\helpers\Html;
-
-                            echo Html :: hiddenInput(\Yii :: $app->getRequest()->csrfParam, \Yii :: $app->getRequest()->getCsrfToken(), []);
-                            ?>
-                            <label for="exampleInputEmail1">Логин</label>
-                            <input type="text" class="form-control" name="login" placeholder="Номер телефона">
+                        <div class="alert alert-danger" ng-show="vkError">
+                            <i class="fa fa-times-circle fa-fw fa-lg"></i>
+                            <strong>Ошибка!</strong> {{vkErrorText}}
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" ng-class="{'has-error' : vkError || vkLoginError}">
+                            <label for="exampleInputEmail1">Логин (Номер телефона)</label>
+                            <input type="text" class="form-control" ng-model="vkLogin" ui-mask="9 (999) 999-99-99" required>
+                        </div>
+                        <div class="form-group" ng-class="{'has-error' : vkError || vkPasswordError}">
                             <label for="exampleInputPassword1">Пароль</label>
-                            <input type="password" class="form-control"  name="password"  placeholder="Пароль">
+                            <input type="password" class="form-control"  ng-model="vkPassword"  placeholder="Пароль">
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-success">Сохранить</button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal"  ng-click="clearInstaForm()">Отмена</button>
+                        <button type="button" class="btn btn-success" ng-click="VkSave()">Сохранить</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal"  ng-click="clearVkForm()">Отмена</button>
                     </div>
-                    </form>
                 </div>
             </div>
         </div>

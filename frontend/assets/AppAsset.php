@@ -35,6 +35,7 @@ class AppAsset extends AssetBundle
         '/cube/angularjs/js/angular-animate.js',
         '/cube/angularjs/js/loading-bar.js',
         '/cube/angularjs/js/angular.easypiechart.min.js',
+        '/cube/angularjs/js/ui-utils.min.js',
         '/cube/components/flot/jquery.flot.js',
         '/cube/components/flot/jquery.flot.pie.js',
         '/cube/components/flot/jquery.flot.stack.js',

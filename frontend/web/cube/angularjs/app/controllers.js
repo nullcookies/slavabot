@@ -803,6 +803,13 @@ angular.module('cubeWebApp')
         $scope.activeID;
         $scope.removingID = 0;
 
+        $scope.vkLogin = '';
+        $scope.vkPassword = '';
+        $scope.vkError = false;
+        $scope.vkLoginError = false;
+        $scope.vkPasswordError = false;
+        $scope.vkErrorText = '';
+
         var config = {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
@@ -810,16 +817,22 @@ angular.module('cubeWebApp')
             }
         };
 
-        $http.post('/social/unprocessed', [], config).then(function success(response) {
-            if(response.data){
-                $scope.unprocessed = response.data.data.groups;
-                $scope.accountData = response.data.data;
-                $scope.unpID = response.data.id;
-                $scope.unprocessedType = response.data.type;
-                $scope.unprocessedName = response.data.data.user_name;
-                document.getElementById('getUnprocessed').click();
-            }
-        });
+
+
+        $scope.checkUnprocessed = function(){
+            $http.post('/social/unprocessed', [], config).then(function success(response) {
+                if(response.data){
+                    $scope.unprocessed = response.data.data.groups;
+                    $scope.accountData = response.data.data;
+                    $scope.unpID = response.data.id;
+                    $scope.unprocessedType = response.data.type;
+                    $scope.unprocessedName = response.data.data.user_name;
+                    document.getElementById('getUnprocessed').click();
+                }
+            });
+        };
+
+        $scope.checkUnprocessed();
 
         $scope.getAccounts = function() {
             $http.post('/social/accounts', [], config).then(function success(response) {
@@ -874,6 +887,55 @@ angular.module('cubeWebApp')
             $scope.removingID = 0;
         };
 
+        $scope.clearVkForm = function(){
+            $scope.vkLogin = '';
+            $scope.vkPassword = '';
+        };
+        $scope.getAccounts();
+
+        $scope.VkSave = function(){
+
+            $scope.data = {
+                login: $scope.vkLogin,
+                password: $scope.vkPassword
+            };
+            console.log($scope.data);
+            if(checkData($scope.vkLogin, 9) && checkData($scope.vkPassword, 2)){
+                $http.post('/social/vk-auth', $.param($scope.data), config).then(function success(response) {
+
+                    console.log(response);
+
+                    if(response.data.status){
+                        $scope.vkError = false;
+                        $scope.vkLoginError = false;
+                        $scope.vkPasswordError = false;
+                        $scope.vkErrorText = '';
+                        document.getElementById('closemyModalVK').click();
+                        $scope.clearVkForm();
+                        $scope.getAccounts();
+                        $scope.checkUnprocessed();
+                    }else{
+                        if(response.data.error==='login & pass are wrong'){
+                            $scope.vkError = true;
+                            $scope.vkLoginError = false;
+                            $scope.vkPasswordError = false;
+                            $scope.vkErrorText = 'Неверный логин/пароль';
+                        }
+                    }
+
+                });
+            }else{
+                if(!checkData($scope.vkLogin, 9)){
+                    $scope.vkLoginError = true;
+                }
+
+                if(!checkData($scope.vkPassword, 4)){
+                    $scope.vkPasswordError = true;
+                }
+
+            }
+
+        }
         $scope.accountSave = function() {
             var data = $scope.accountData;
 
@@ -891,7 +953,7 @@ angular.module('cubeWebApp')
             });
         };
 
-        $scope.getAccounts();
+
 
         $scope.InstaSave = function(){
 

@@ -54,6 +54,8 @@ class SocialController extends Controller
         ];
     }
 
+
+
     /**
      * Возвращает кнопку для авторизации пользователя через вк
      */
@@ -315,60 +317,35 @@ class SocialController extends Controller
         $login = Yii::$app->request->post('login');
         $password = Yii::$app->request->post('password');
 
-        $response = VKController::authVK($login, $password);
-        if($response){
-            Yii::$app->response->redirect($response);
-        }else{
-            Yii::$app->response->redirect('/#/pages/social?error=true');
+        try {
+            $response = VKController::authVK($login, $password);
+        } catch (\Exception $ex) {
+
+            return [
+                'status' => false,
+                'error' => explode(' => ', $ex->getMessage())[1]
+                ];
         }
-    }
+        
+            parse_str($response, $params);
 
-    public function actionVk()
-    {
-            $config = array(
-                'secret_key' => VKController::SECRET_KEY,
-                'client_id' => VKController::CLIENT_ID,
-                'user_id' => \Yii::$app->request->get('user_id'),
-                'access_token' => \Yii::$app->request->get('access_token'),
-                'scope' => 'stats, photo_100,wall,groups,photos,video'
-            );
+            ob_start();
 
-            $v = new Vk($config);
+            $res = VKController::initVKApi($params);
 
-            $response = $v->api('groups.get', array(
-                'user_id' => $config['user_id'],
-                'extended' => 1,
-                'filter' => 'admin,editor,wall_id'
-            ));
+            $save = Accounts::saveReference($res, 0);
 
-            $user = $v->api('users.get', array(
-                'user_ids' => (string)$config['user_id'],
-                'fields' => 'photo_50, photo_100, photo_200'
-            ));
+            ob_end_clean();
+            if($save){
+                return [
+                    'status' => true,
+                ];
+            }else{
+                return [
+                    'status' => false,
+                    'error' => 'Get token error'
+                ];
+            }
 
-            $res = array(
-                'type' => 'vkontakte',
-                'data' => array(
-                    'user_name' => $user[0]['first_name'] . ' ' . $user[0]['last_name'],
-                    'user_id' => $config['user_id'],
-                    'access_token' => $config['access_token'],
-                    'groups' => $response['items']
-                )
-            );
-            $res['data']['groups'][] = array(
-                'id' => $config['user_id'],
-                'name' => 'Стена пользователя ' . $res['data']['user_name'],
-                'photo_50' => $user[0]['photo_50'],
-                'photo_100' => $user[0]['photo_100'],
-                'photo_200' => $user[0]['photo_200']
-            );
-
-//            $response = $v->wall->post(array(
-//                'message' => 'I testing API form SalesBot'
-//            ));
-
-        if(Accounts::saveReference($res, 0)){
-            Yii::$app->response->redirect('/#/pages/social');
-        }
     }
 }
