@@ -93,38 +93,38 @@ AppAsset::register($this);
                     <div id="col-left-inner" class="col-left-nano-content">
                         <div class="collapse navbar-collapse navbar-ex1-collapse" id="sidebar-nav" bs-navbar>
                             <ul class="nav nav-pills nav-stacked">
-                                <li data-match-route="/potential*" class="header-nav__item">
-                                    <a href="#/potential">
-                                        <i class="fa fa-list"></i>
-                                        <span style="font-size: 0.775em;">Потенциальные клиенты</span>
-                                    </a>
-                                    <ul class="submenu">
-                                        <li ng-repeat="menu in potentialSubMenu">
-                                            <a data-match-route="/potential/{{menu.id}}" href="#/potential/{{menu.id}}">
-                                                {{menu.name}}
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li class="header-nav__item" data-match-route="/pages/contacts"><a href="#/pages/contacts"><i class="fa fa-folder-open-o"></i><span>Купленные контакты</span></a></li>
+<!--                                <li data-match-route="/potential*" class="header-nav__item">-->
+<!--                                    <a href="#/potential">-->
+<!--                                        <i class="fa fa-list"></i>-->
+<!--                                        <span style="font-size: 0.775em;">Потенциальные клиенты</span>-->
+<!--                                    </a>-->
+<!--                                    <ul class="submenu">-->
+<!--                                        <li ng-repeat="menu in potentialSubMenu">-->
+<!--                                            <a data-match-route="/potential/{{menu.id}}" href="#/potential/{{menu.id}}">-->
+<!--                                                {{menu.name}}-->
+<!--                                            </a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                                <li class="header-nav__item" data-match-route="/pages/contacts"><a href="#/pages/contacts"><i class="fa fa-folder-open-o"></i><span>Купленные контакты</span></a></li>-->
                                 <li class="header-nav__item" data-match-route="/pages/social"><a href="#/pages/social"><i class="fa fa-sliders"></i><span>Соц. сети</span></a></li>
                                 <li data-match-route="/history*" class="header-nav__item">
                                     <a href="#/history">
                                         <i class="fa fa-history"></i>
                                         <span style="font-size: 0.775em;">История</span>
                                     </a>
-                                    <ul class="submenu">
-                                        <li>
-                                            <a data-match-route="#/history/responses" href="#/history/responses">
-                                                Ответы
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a data-match-route="#/history/posts" href="#/history/posts">
-                                                Посты и комментарии
-                                            </a>
-                                        </li>
-                                    </ul>
+<!--                                    <ul class="submenu">-->
+<!--                                        <li>-->
+<!--                                            <a data-match-route="#/history/responses" href="#/history/responses">-->
+<!--                                                Ответы-->
+<!--                                            </a>-->
+<!--                                        </li>-->
+<!--                                        <li>-->
+<!--                                            <a data-match-route="#/history/posts" href="#/history/posts">-->
+<!--                                                Посты и комментарии-->
+<!--                                            </a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
                                 </li>
                             </ul>
                         </div>

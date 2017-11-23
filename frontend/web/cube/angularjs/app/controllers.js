@@ -790,7 +790,7 @@ angular.module('cubeWebApp')
             }
         };
     })
-    .controller('socialCtrl', function($scope, $http){
+    .controller('socialCtrl', function($scope, $http, $sce){
 
         $scope.InstaLogin = '';
         $scope.InstaPassword = '';
@@ -809,6 +809,9 @@ angular.module('cubeWebApp')
         $scope.vkLoginError = false;
         $scope.vkPasswordError = false;
         $scope.vkErrorText = '';
+        $scope.instaError = '';
+
+        $scope.sce = $sce;
 
         var config = {
             headers: {
@@ -953,8 +956,6 @@ angular.module('cubeWebApp')
             });
         };
 
-
-
         $scope.InstaSave = function(){
 
             if($scope.activeID>0){
@@ -978,6 +979,13 @@ angular.module('cubeWebApp')
 
             if(checkData($scope.InstaLogin, 2) && checkData($scope.InstaPassword, 2)){
                 $http.post('/social/instagram', $.param($scope.data), config).then(function success(response) {
+                    console.log(response.data.error);
+                    if(response.data.error){
+                        $scope.instaError = response.data.error;
+                        return false;
+                    }else{
+                        $scope.instaError = '';
+                    }
                     document.getElementById('closeInstaModal').click();
                     $scope.clearInstaForm();
                     $scope.getAccounts();
@@ -986,6 +994,137 @@ angular.module('cubeWebApp')
 
         }
     })
+    .controller('historyCtrl', function($scope, $http, $sce, $interval){
+
+        $scope.history = []; // Массив элементов истории
+        $scope.order = 'desc'; // Сортировка по умолчанию
+
+        // Пагинация
+        $scope.numberOfPages = 0; // Количество страниц
+        $scope.currentPage = 0;   // Текущая страница
+        $scope.pageSize = 10;     // Количество элементов на странице
+
+
+        moment.locale('ru'); // Локализация для отображения даты
+
+        // Цепляем CSRF-Token для отправки post-запроса
+
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+                'X-CSRF-Token': getCSRF()
+            }
+        };
+
+        // Функция для обработки всех вариантов JSON, приходящих от бота.
+
+        $scope.parJson = function (json) {
+            var res;
+            try{
+                res = JSON.parse(JSON.parse(json));
+            }catch(e){
+                try{
+                    res = JSON.parse(json);
+                }catch(e){
+                    res = json;
+                }
+            }
+            return res;
+        }
+
+        $scope.getTime = function($time) {
+
+            var date = new Date( $time * 1000 );
+
+            var now = new Date();
+            now = now.getDate() + '.' + now.getMonth()+ '.' + now.getFullYear();
+            var day = date.getDate() + '.' + date.getMonth()+ '.' + date.getFullYear();
+            var hours = date.getHours();
+
+            hours = hours <10?'0'+hours:''+hours;
+
+            var minutes = date.getMinutes();
+
+            minutes = minutes <10?'0'+minutes:''+minutes;
+
+            var seconds = date.getSeconds();
+
+            seconds = seconds <10?'0'+seconds:''+seconds;
+
+            if(now!=day){
+                var time = day + ' ' + hours + ':' + minutes;
+            }else{
+                var time = hours + ':' + minutes;
+            }
+
+
+            return time;
+        }
+
+        // Получить элементы истории
+
+        $scope.getList = function($data){
+            $data = $data || [];
+            console.log($data);
+            $http.post('/history/get-list', $data, config).then(function success(response) {
+                $scope.history = response.data.history;
+                $scope.pages = response.data.pages;
+                $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
+            });
+        };
+
+        // Получаем при загрузке элементы истории
+
+        //$scope.getList();
+
+        $scope.paginationBlock = function(n){
+            if($scope.currentPage < 4 && n < 7){
+                return true;
+            }else{
+                if($scope.currentPage >  n + 3 || $scope.currentPage <  n - 3){
+                    return false;
+                }else{
+                    return true;
+                }
+            }
+
+        };
+        $scope.changeOrder = function(){
+
+            if($scope.order == 'desc'){
+                $scope.order = 'asc';
+            }else{
+                $scope.order = 'desc';
+            }
+            $scope.setPage($scope.currentPage);
+        };
+        $scope.disabledBack = function() {
+            if($scope.currentPage == 0){
+                return false;
+            }else{
+                $scope.currentPage = $scope.currentPage-1
+                $scope.setPage($scope.currentPage);
+            }
+        };
+
+        $scope.disabledNext = function() {
+            if($scope.currentPage >= $scope.numberOfPages - 1){
+                return false;
+            }else{
+                $scope.currentPage = $scope.currentPage+1
+                $scope.setPage($scope.currentPage);
+            }
+        };
+
+        $scope.setPage = function(n){
+
+            $scope.getList($.param({'page' : n, 'order' : $scope.order}));
+            $scope.currentPage = n;
+        };
+
+        $scope.setPage($scope.currentPage);
+
+    });
     app.filter('startFrom', function() {
         return function(input, start) {
             start = +start; //parse to int

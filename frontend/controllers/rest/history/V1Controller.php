@@ -77,26 +77,8 @@ class V1Controller extends Controller
 
     public function actionNewEvent(){
 
-        $telegram_id = \Yii::$app->request->post('tid');
         $type = \Yii::$app->request->post('type');
         $data = \Yii::$app->request->post('data');
-
-
-        if(!$telegram_id || (int)$telegram_id==0){
-            return [
-                'status' => false,
-                'error' => 'Telegram ID not found in request!'
-            ];
-        }
-
-        $user = User::findByTIG($telegram_id);
-
-        if(!$user){
-            return [
-                'status' => false,
-                'error' => 'User not found in database!'
-            ];
-        }
 
         if(!$data){
             return [
@@ -127,7 +109,7 @@ class V1Controller extends Controller
             ];
         }
 
-        if(History::saveEvent($user->id, $type, $data)){
+        if(History::saveEvent(0, $type, $data)){
             return [
                 'status' => true
             ];

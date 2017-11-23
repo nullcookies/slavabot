@@ -10,6 +10,7 @@ use yii\filters\AccessControl;
 use yii\web\Response;
 use frontend\models\UserConfig;
 use common\models\Accounts;
+use common\models\Instagram;
 use Vk;
 use Facebook\Facebook;
 use VkAuth;
@@ -46,7 +47,16 @@ class SocialController extends Controller
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['instagram', 'accounts', 'unprocessed', 'finish-process', 'remove', 'update-process', 'vk-auth'],
+                'only' => [
+                    'instagram',
+                    'accounts',
+                    'unprocessed',
+                    'finish-process',
+                    'remove',
+                    'update-process',
+                    'vk-auth',
+                    'check-instagram'
+                    ],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -54,65 +64,6 @@ class SocialController extends Controller
         ];
     }
 
-
-
-    /**
-     * Возвращает кнопку для авторизации пользователя через вк
-     */
-
-    function getVKBtn($redirect_uri, $text='', $id){
-        $agent = new VkAuth\VkAuthAgent('89292813613', 'zdx1000L');
-        $remixsid = $agent->getRemixsid();
-
-
-        if($remixsid){
-
-            $jar = $agent->getAuthorizedCookieJar()->toArray();
-
-            $arrConnect = [
-                'client_id'=> VKController::CLIENT_ID,
-                'display' => 'mobile',
-                'response_type'=> 'token',
-                'scope'=> 'wall,photos,friends,groups',
-                'v'=> '5.28'
-            ];
-
-            $cook = '';
-
-            foreach($jar as $i => $elem){
-                $cook.= $elem['Name'].'='.$elem['Value'].'; ';
-            }
-
-            $curl = new curl\Curl();
-
-            $response = $curl
-                ->setPostParams($arrConnect)
-                ->setHeaders([
-                    'Content-Type' => 'application/x-www-form-urlencoded',
-                    'Accept' => 'application/json',
-                    'cookie' => $cook
-                ])
-             ->post('https://oauth.vk.com/authorize');
-
-            if(preg_match('/<form.*<\/form>/sU', $response, $matches)){
-                $iframe = array_shift($matches);
-                if(preg_match('/action=["\'].*["\']/U', $iframe, $width)){
-                    $widthValue = preg_replace('/(action=["\'])(.*)(["\'])/U', '${2}', $width);
-                    $width = array_shift($width);
-                    $widthValue = array_shift($widthValue);
-                    $response1 = $curl->setOption(CURLOPT_HEADER, true)->post($widthValue);
-                    $url = $curl->responseHeaders['Location'];
-
-                    $result = substr(strstr($url, '#'), 1, strlen($url));
-                    header( 'Location:'.'http://'.$_SERVER['SERVER_NAME'].'/social/vk?'.$result, true, 301 );
-                }
-            }
-
-            return '<a href="'.$url.'" id="'.$id.'">' . $text . '</a>';
-        }else{
-            return '<p>Ошибка</p>';
-        }
-    }
 
     /**
      * Возвращает кнопку для авторизации пользователя через вк
@@ -290,6 +241,11 @@ class SocialController extends Controller
         return Accounts::remove($id);
     }
 
+    public function actionCheckInstagram()
+    {
+        return Instagram::login('vedensky_lx', 'zdx1991L');
+    }
+
     public function actionInstagram(){
 
         return Accounts::saveReference(\Yii::$app->request->post());
@@ -326,7 +282,7 @@ class SocialController extends Controller
                 'error' => explode(' => ', $ex->getMessage())[1]
                 ];
         }
-        
+
             parse_str($response, $params);
 
             ob_start();
@@ -347,5 +303,18 @@ class SocialController extends Controller
                 ];
             }
 
+    }
+
+    public function actionVkTest(){
+
+        $config = array(
+            'secret_key' => VKController::SECRET_KEY,
+            'client_id' => VKController::CLIENT_ID,
+            'user_id' => 12620990,
+            'access_token' => '3db2a46b71261ac2edd70a314e4f590a86f62dae684e67ffd0cf08880011ab47ba472857e0a09f1a539a5',
+            'scope' => 'stats, photo_100,wall,groups,photos,video'
+        );
+
+        $v = new Vk($config);
     }
 }

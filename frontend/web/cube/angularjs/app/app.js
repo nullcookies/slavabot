@@ -72,7 +72,7 @@ app.config(['$routeProvider', function ($routeProvider) {
             title: 'Соц.сети'
         })
         .when("/history", {
-            templateUrl: "/history",
+            templateUrl: "views/history.html",
             controller: "historyCtrl",
             title: 'История'
         })

@@ -119,6 +119,10 @@ use frontend\controllers\SocialController;
                         <h4 class="modal-title" id="myModalLabel">Добавить аккаунт Instagram</h4>
                     </div>
                     <div class="modal-body">
+                        <div class="alert alert-danger" ng-show="instaError.length>3">
+                            <i class="fa fa-times-circle fa-fw fa-lg"></i>
+                            <span ng-bind-html="sce.trustAsHtml(instaError)"></span>
+                        </div>
                         <form role="form" class="ng-pristine ng-valid">
                             <div class="form-group">
                                 <label for="exampleInputEmail1">Логин</label>

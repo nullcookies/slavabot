@@ -8,6 +8,7 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Response;
+use common\models\History;
 
 
 class HistoryController extends Controller
@@ -39,20 +40,16 @@ class HistoryController extends Controller
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['index'],
+                'only' => ['index', 'get-list'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
             ],
         ];
     }
-    public function actionIndex()
-    {
-        return 'Test';
-    }
 
-    public function actionAddEvent()
+    public function actionGetList()
     {
-
+        return History::getHistory();
     }
 }

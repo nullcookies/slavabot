@@ -6,6 +6,7 @@ use Yii;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use common\models\ExtraPropsBehaviour;
+use common\models\Instagram;
 
 
 class Accounts extends \yii\db\ActiveRecord
@@ -75,6 +76,15 @@ class Accounts extends \yii\db\ActiveRecord
             $model = self::checkReference();
         }
 
+        if($item['type']=='instagram'){
+            $acc = Instagram::login($item['data']['login'], $item['data']['password']);
+
+            if(!$acc){
+                return [
+                    'error' => '<strong>Ошибка аутентификации!</strong> Проверьте правильность логина/пароля или подтвердите вход <a target="_blank" href="https://www.instagram.com">https://www.instagram.com</a>.'
+                ];
+            }
+        }
 
         $model->user_id = Yii::$app->user->id;
         $model->type = $item['type'];

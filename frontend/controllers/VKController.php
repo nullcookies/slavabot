@@ -61,7 +61,7 @@ class VKController extends Controller
                 'client_id'=> VKController::CLIENT_ID,
                 'display' => 'mobile',
                 'response_type'=> 'token',
-                'scope'=> 'wall,photos,friends,groups',
+                'scope'=> 'offline,wall,photos,friends,groups',
                 'v'=> '5.28'
             ];
 
@@ -123,7 +123,7 @@ class VKController extends Controller
             'client_id' => VKController::CLIENT_ID,
             'user_id' => $params['user_id'],
             'access_token' => $params['access_token'],
-            'scope' => 'stats, photo_100,wall,groups,photos,video'
+            'scope' => 'offline, stats, photo_100,wall,groups,photos,video'
         );
 
         $v = new Vk($config);
@@ -145,6 +145,7 @@ class VKController extends Controller
                 'user_name' => $user[0]['first_name'] . ' ' . $user[0]['last_name'],
                 'user_id' => $config['user_id'],
                 'access_token' => $config['access_token'],
+                'expires_in' => $params['expires_in'],
                 'groups' => $groups['items']
             )
         );
