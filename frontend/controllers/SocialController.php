@@ -287,9 +287,9 @@ class SocialController extends Controller
 
             ob_start();
 
-            $res = VKController::initVKApi($params);
+            $res = VKController::initVKApi($params, $login, $password);
 
-            $save = Accounts::saveReference($res, 0);
+            $save = Accounts::saveReference($res,  0);
 
             ob_end_clean();
             if($save){

@@ -24,7 +24,7 @@ use frontend\controllers\SocialController;
                                         ?>
                                     </li>
                                     <li>
-                                    <li><a data-toggle="modal" id="instagram" data-target="#myModalVK">Вконтакте</a></li>
+                                    <li><a data-toggle="modal" id="vkontakte" data-target="#myModalVK">Вконтакте</a></li>
                                     </li>
                                     <li><a data-toggle="modal" id="instagram" data-target="#myModal">Instagram</a></li>
                                 </ul>
@@ -91,7 +91,7 @@ use frontend\controllers\SocialController;
                                                     </td>
                                                     <td style="width: 15%;">
                                                         <div class="btn-group">
-                                                            <button type="button" class="btn btn-primary" ng-click="refresh(account.id, account.type)">Обновить</button>
+                                                            <button type="button" class="btn btn-primary" ng-click="VKRefresh(account)">Обновить</button>
                                                         </div>
                                                     </td>
                                                 </tr>

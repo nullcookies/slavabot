@@ -810,7 +810,7 @@ angular.module('cubeWebApp')
         $scope.vkPasswordError = false;
         $scope.vkErrorText = '';
         $scope.instaError = '';
-
+        $scope.activeVKID;
         $scope.sce = $sce;
 
         var config = {
@@ -819,8 +819,6 @@ angular.module('cubeWebApp')
                 'X-CSRF-Token': getCSRF()
             }
         };
-
-
 
         $scope.checkUnprocessed = function(){
             $http.post('/social/unprocessed', [], config).then(function success(response) {
@@ -840,9 +838,8 @@ angular.module('cubeWebApp')
         $scope.getAccounts = function() {
             $http.post('/social/accounts', [], config).then(function success(response) {
                 $scope.accounts = response.data;
-                console.log($scope.accounts);
             });
-        };
+        }
 
         $scope.remove = function() {
             if($scope.removingID>0){
@@ -883,6 +880,17 @@ angular.module('cubeWebApp')
             console.log($account);
         };
 
+        $scope.VKRefresh = function($account) {
+
+            $scope.activeVKID = $account.id;
+            $scope.VKLogin = $account.data.login;
+            $scope.VKPassword = $account.data.password;
+
+            document.getElementById('vkontakte').click();
+
+            console.log($account);
+        };
+
         $scope.clearInstaForm = function(){
             $scope.InstaLogin = '';
             $scope.InstaPassword = '';
@@ -898,11 +906,19 @@ angular.module('cubeWebApp')
 
         $scope.VkSave = function(){
 
-            $scope.data = {
-                login: $scope.vkLogin,
-                password: $scope.vkPassword
-            };
-            console.log($scope.data);
+            if($scope.activeVKID>0){
+                $scope.data = {
+                    id: $scope.activeVKID,
+                    login: $scope.vkLogin,
+                    password: $scope.vkPassword
+                };
+            }else{
+                $scope.data = {
+                    login: $scope.vkLogin,
+                    password: $scope.vkPassword
+                };
+            }
+
             if(checkData($scope.vkLogin, 9) && checkData($scope.vkPassword, 2)){
                 $http.post('/social/vk-auth', $.param($scope.data), config).then(function success(response) {
 
@@ -939,6 +955,7 @@ angular.module('cubeWebApp')
             }
 
         }
+
         $scope.accountSave = function() {
             var data = $scope.accountData;
 
