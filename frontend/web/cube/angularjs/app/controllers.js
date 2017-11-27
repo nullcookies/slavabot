@@ -1089,6 +1089,7 @@ angular.module('cubeWebApp')
             console.log($data);
             $http.post('/history/get-list', $data, config).then(function success(response) {
                 $scope.history = response.data.history;
+                console.log($scope.history);
                 $scope.pages = response.data.pages;
                 $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
             });

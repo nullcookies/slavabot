@@ -44,14 +44,20 @@
                                     <table>
                                         <tbody>
                                         <tr ng-repeat="elem in element.elements">
-                                            <td style="text-align:left;">
+                                            <td style="text-align:left;" ng-show="elem.data.job_status=='POSTED' || elem.data.job_status=='FAIL'">
                                                 <a ng-show="elem.type=='vkontakte'" target="_blank" href="https://vk.com/club{{elem.account.data.groups.id}}?w=wall-{{elem.account.data.groups.id}}_{{parJson(elem.data.job_result).post_id}}%2Fall">{{elem.account.data.groups.name}}</a>
                                                 <a ng-show="elem.type=='facebook'" target="_blank" href="https://www.facebook.com/groups/{{parJson(elem.data.job_result).id.split('_')[0]}}/permalink/{{parJson(elem.data.job_result).id.split('_')[1]}}/">{{elem.account.data.groups.name}}</a>
+                                                <p ng-show="elem.type=='instagram' && element.data.photo" target="_blank">{{elem.data.wall_id}}</p>
+                                            </td>
+                                            <td style="text-align:left;" ng-show="elem.data.job_status=='QUEUED'">
+                                                <p ng-show="elem.type=='vkontakte'">{{elem.account.data.groups.name}}</p>
+                                                <p ng-show="elem.type=='facebook'">{{elem.account.data.groups.name}}</p>
                                                 <p ng-show="elem.type=='instagram' && element.data.photo" target="_blank">{{elem.data.wall_id}}</p>
                                             </td>
                                             <td>
                                                 <span class="label label-success" ng-show="elem.type!='instagram' && elem.data.job_status=='POSTED' || elem.type=='instagram' && element.data.photo && elem.data.job_status=='POSTED'">Опубликовано</span>
                                                 <span class="label label-danger" ng-show="elem.type!='instagram' && elem.data.job_status=='FAIL' || elem.type=='instagram' && element.data.photo && elem.data.job_status=='FAIL'">Ошибка</span>
+                                                <span class="label label-warning" ng-show="elem.type!='instagram' && elem.data.job_status=='QUEUED' || elem.type=='instagram' && element.data.photo && elem.data.job_status=='QUEUED'">В ожидании публикации</span>
                                             </td>
                                         </tr>
                                         </tbody>
