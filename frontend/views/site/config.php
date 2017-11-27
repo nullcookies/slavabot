@@ -4,6 +4,7 @@
 
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
+use common\services\StaticConfig;
 
 $this->title =  \Yii::t('main', 'Settings');
 $this->params['breadcrumbs'][] = $this->title;
@@ -58,6 +59,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ->label('Телефон')
 
                             ?>
+                            <div class="form-group">
+                                <label for="exampleInputPassword1">Часовой пояс</label>
+                                <select class="form-control" ng-model="timezone">
+                                    <? foreach(StaticConfig::timezones() as $code => $timezone): ?>
+                                        <option value="<?=$timezone['value']?>">(<?=$code?>) <?=$timezone['label']?></option>
+                                    <? endforeach; ?>
+                                </select>
+                            </div>
                             <?= Html::button(\Yii::t('main', 'Save'), ['class' => 'btn btn-success', 'ng-click' => 'saveUser()', 'name' => 'login-button_']) ?>
                             <?php ActiveForm::end(); ?>
                         </div>

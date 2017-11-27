@@ -24,7 +24,8 @@
         "facebook/graph-sdk": "^5.6",
         "linslin/yii2-curl": "*",
         "cosenary/instagram": "^2.3",
-        "mgp25/instagram-php": "^3.1"
+        "mgp25/instagram-php": "^3.1",
+        "symfony/yaml": "^3.3"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

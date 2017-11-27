@@ -11,7 +11,7 @@ class UserConfig extends Model
 {
     public $username;
     public $phone;
-
+    public $timezone;
 
     /**
      * @inheritdoc
@@ -23,6 +23,7 @@ class UserConfig extends Model
             ['username', 'trim'],
             ['username', 'required'],
             ['username', 'string', 'min' => 2, 'max' => 255],
+            ['timezone', 'string'],
             ['phone', 'required'],
             ['phone', 'match', 'pattern' => '/^\+7\s\([0-9]{3}\)\s[0-9]{3}\-[0-9]{2}\-[0-9]{2}$/'],
         ];
@@ -56,6 +57,7 @@ class UserConfig extends Model
 
         $model->username = $this->username;
         $model->phone = $this->phone;
+        $model->timezone = $this->timezone;
 
 
         return $model->save();

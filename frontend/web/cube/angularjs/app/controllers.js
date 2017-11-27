@@ -675,6 +675,7 @@ angular.module('cubeWebApp')
         }
 
         $scope.username = '';
+        $scope.timezone = '';
         $scope.phone = '';
         $scope.userSuccess = false;
         $scope.userError = false;
@@ -705,6 +706,8 @@ angular.module('cubeWebApp')
 
         $http.post('/site/user/', [], config).then(function success(response) {
             if (response) {
+                console.log(response);
+                $scope.timezone = response.data.timezone;
                 $scope.username = response.data.username;
                 $scope.phone = response.data.phone;
             } else {
@@ -716,6 +719,7 @@ angular.module('cubeWebApp')
             $scope.data = {
                 'UserConfig[username]': $scope.username,
                 'UserConfig[phone]': $scope.phone,
+                'UserConfig[timezone]': $scope.timezone,
             };
 
             var data = $.param($scope.data);

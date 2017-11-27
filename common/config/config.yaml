@@ -1,0 +1,28 @@
+timezones:
+  UTC+2:
+    value: Europe/Kaliningrad
+    label: Калининград
+  UTC+3:
+    value: Europe/Moscow
+    label: Москва
+  UTC+4:
+    value: Europe/Astrakhan
+    label: Астрахань
+  UTC+5:
+    value: Asia/Yekaterinburg
+    label: Екатеринбург
+  UTC+6:
+    value: Asia/Novosibirsk
+    label: Новосибирск
+  UTC+7:
+    value: Asia/Barnaul
+    label: Барнаул
+  UTC+8:
+    value: Asia/Irkutsk
+    label: Иркутск
+  UTC+9:
+    value: Asia/Chita
+    label: Чита
+  UTC+10:
+    value: Asia/Vladivostok
+    label: Владивосток
