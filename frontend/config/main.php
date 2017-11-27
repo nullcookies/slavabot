@@ -20,7 +20,8 @@ return [
                     'send-password',
                     'auth-telegram',
                     'new-event',
-                    'set-time-zone'
+                    'set-time-zone',
+                    'get-time-zone'
                 ],
                 'allow' => true,
                 'roles' => ['?'],

@@ -90,6 +90,33 @@ description: "REST-api для обмена данными c SalesBot."
                         "old_timezone": "test/test",
                         "new_timezone": "Europe/Moscow"
                     }
+  /get-time-zone/:
+          description: Получить часовой пояс пользователя ЛК
+          post:
+            body:
+              application/x-www-form-urlencoded:
+                properties:
+                  tid:
+                    description: Telegram ID пользователя
+                    type: integer
+            responses:
+              200:
+                body:
+                  application/json:
+                    type: object
+                    example: |
+                      {
+                          "status": false,
+                          "error": "Telegram ID error!"
+                      },
+                      {
+                          "status": false,
+                          "error": "User not found!"
+                      },
+                      {
+                          "status": true,
+                          "timezone": "Asia/Yekaterinburg"
+                      }
 
 
 /rest/accounts/v1:

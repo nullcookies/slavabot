@@ -53,7 +53,8 @@ class V1Controller extends Controller
                 'only' => [
                     'send-password',
                     'auth-telegram',
-                    'set-time-zone'
+                    'set-time-zone',
+                    'get-time-zone'
                 ],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
@@ -226,6 +227,37 @@ class V1Controller extends Controller
                 'error' => 'Server error!'
             ];
         }
+
+    }
+
+    /**
+     * Получение пользователю часового пояса
+     */
+
+    public function actionGetTimeZone(){
+
+        $telegram_id = \Yii::$app->request->post('tid');
+
+        if(!$telegram_id || (int)$telegram_id==0){
+            return [
+                'status' => false,
+                'error' => 'Telegram ID error!'
+            ];
+        }
+
+        $user = User::findByTIG($telegram_id);
+
+        if(!$user){
+            return [
+                'status' => false,
+                'error' => 'User not found!'
+            ];
+        }
+
+        return [
+            'status' => true,
+            'timezone' => $user->timezone,
+        ];
 
     }
 
