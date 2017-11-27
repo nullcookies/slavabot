@@ -82,7 +82,7 @@ class History extends \yii\db\ActiveRecord
 
     public static function getHistory()
     {
-        $user_id = 19;//\Yii::$app->user->identity->id;
+        $user_id = \Yii::$app->user->identity->id;
 
         $arOrder = [
             'asc' =>  SORT_ASC,

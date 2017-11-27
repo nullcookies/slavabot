@@ -94,18 +94,18 @@ class Accounts extends \yii\db\ActiveRecord
         return $model->save();
     }
 
-    public static function setStatus($user_id, $account_id, $status){
-        $acc = Accounts::find()->where(['user_id' => $user_id, 'id' => $account_id])->one();
+    public static function setStatus($id, $status){
+        $model = static::findOne(['id' => $id]);
 
-        $acc->status = (int)$status;
-
-        return $acc->save();
+        $model->status = $status;
+        return $model->save();
     }
 
     public static function processAccount(){
         $post = \Yii::$app->request->post();
 
         $acc = Accounts::find()->where(['id' => $post['id']])->one();
+
 
         $acc->data = json_encode($post['data']);
         $acc->processed = 1;

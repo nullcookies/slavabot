@@ -19,8 +19,8 @@ return [
                     'user-auth',
                     'send-password',
                     'auth-telegram',
-                    'new-event'
-
+                    'new-event',
+                    'set-time-zone'
                 ],
                 'allow' => true,
                 'roles' => ['?'],

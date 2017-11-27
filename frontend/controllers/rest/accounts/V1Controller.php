@@ -159,18 +159,10 @@ class V1Controller extends Controller
 
     public function actionSetAccountStatus(){
 
-        $user_id = \Yii::$app->request->post('user_id');
-        $account_id = \Yii::$app->request->post('account_id');
+        $wall_id = \Yii::$app->request->post('wall_id');
         $status = \Yii::$app->request->post('status');
 
-        if(!$user_id){
-            return [
-                'status' => false,
-                'error' => 'User ID error!'
-            ];
-        }
-
-        if(!$account_id) {
+        if(!$wall_id) {
             return [
                 'status' => false,
                 'error' => 'Account ID error!'
@@ -183,9 +175,14 @@ class V1Controller extends Controller
                 'error' => 'Status error!',
             ];
         }
-
-        $acc = Accounts::setStatus($user_id, $account_id, $status);
-
+        $acc = Accounts::find()->where(['LIKE', 'data', preg_replace("/[^0-9]/", '', $wall_id)])->one();
+        if(!$acc){
+            return [
+                'status' => false,
+                'error' => 'Account not found!'
+            ];
+        }
+        $acc = Accounts::setStatus($acc->id, $status);
         if($acc){
             return [
                 'status' => true,

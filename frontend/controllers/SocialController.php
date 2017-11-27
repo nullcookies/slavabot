@@ -243,7 +243,7 @@ class SocialController extends Controller
 
     public function actionCheckInstagram()
     {
-        return Instagram::login('vedensky_lx', 'zdx1991L');
+        return Instagram::login();
     }
 
     public function actionInstagram(){

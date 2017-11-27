@@ -69,6 +69,14 @@ class UserConfig extends Model
         return $model->save();
     }
 
+    public function saveTimezone($user_id, $timezone)
+    {
+        $model = self::findModel($user_id);
+        $model->timezone = $timezone;
+
+        return $model->save();
+    }
+
     protected function findModel($id)
     {
         if (($model = User::findOne($id)) !== null) {

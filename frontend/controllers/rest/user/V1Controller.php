@@ -52,7 +52,8 @@ class V1Controller extends Controller
                 'class' => \yii\filters\ContentNegotiator::className(),
                 'only' => [
                     'send-password',
-                    'auth-telegram'
+                    'auth-telegram',
+                    'set-time-zone'
                 ],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
@@ -177,6 +178,55 @@ class V1Controller extends Controller
             'telegram_id' => UserConfig::saveTelegramID($user->id, $telegram_id) ? (int)$telegram_id : 'error!',
             'clear_code' => User::clearCode($user->id)
         ];
+    }
+
+    /**
+     * Установка пользователю часового пояса
+     */
+
+    public function actionSetTimeZone(){
+
+        $telegram_id = \Yii::$app->request->post('tid');
+        $timezone = \Yii::$app->request->post('timezone');
+
+        if(!$timezone){
+            return [
+                'status' => false,
+                'error' => 'Timezone error!'
+            ];
+        }
+
+        if(!$telegram_id || (int)$telegram_id==0){
+            return [
+                'status' => false,
+                'error' => 'Telegram ID error!'
+            ];
+        }
+
+        $user = User::findByTIG($telegram_id);
+
+        if(!$user){
+            return [
+                'status' => false,
+                'error' => 'User not found!'
+            ];
+        }
+
+        $result = UserConfig::saveTimezone($user->id, $timezone);
+
+        if($result){
+            return [
+                'status' => $result,
+                'old_timezone' => $user->timezone,
+                'new_timezone' => $timezone,
+            ];
+        }else{
+            return [
+                'status' => $result,
+                'error' => 'Server error!'
+            ];
+        }
+
     }
 
 

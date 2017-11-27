@@ -26,6 +26,7 @@ description: "REST-api для обмена данными c SalesBot."
                 {
                     "status": true
                 }
+
   /auth-telegram/:
       description: Привязка telegram ID к пользователю, по паре логин + код интеграции, сброс кода интеграции.
       post:
@@ -50,6 +51,45 @@ description: "REST-api для обмена данными c SalesBot."
                   {
                       "status": true
                   }
+
+  /set-time-zone/:
+        description: Установить пользователю часовой пояс
+        post:
+          body:
+            application/x-www-form-urlencoded:
+              properties:
+                tid:
+                  description: Telegram ID пользователя
+                  type: integer
+                timezone:
+                  description: Часовой пояс пользователя в формате Europe/Moscow
+                  type: string
+          responses:
+            200:
+              body:
+                application/json:
+                  type: object
+                  example: |
+                    {
+                        "status": false,
+                        "error": "Timezone error!"
+                    },
+
+                    {
+                        "status": false,
+                        "error": "Telegram ID error!"
+                    },
+
+                    {
+                        "status": false,
+                        "error": "User not found!"
+                    },
+
+                    {
+                        "status": true,
+                        "old_timezone": "test/test",
+                        "new_timezone": "Europe/Moscow"
+                    }
 
 
 /rest/accounts/v1:
@@ -216,11 +256,8 @@ description: "REST-api для обмена данными c SalesBot."
       body:
         application/x-www-form-urlencoded:
           properties:
-            user_id:
-              description: ID пользователя SalesBot
-              type: string
-            account_id:
-              description: ID Аккаунта соц. сети пользователя SalesBot
+            wall_id:
+              description: ID стены пользователя, к которой относится статус
               type: string
             status:
               description: "
@@ -240,7 +277,7 @@ description: "REST-api для обмена данными c SalesBot."
                   "status": true,
                 }
 
-/rest/history/v1/:
+/rest/history/v1:
   displayName: Работа с историей действий
   /new-event/:
     description: Добавление события нового поста в соц сеть.
