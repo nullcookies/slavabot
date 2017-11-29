@@ -40,7 +40,7 @@ class HistoryController extends Controller
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['index', 'get-list'],
+                'only' => ['index', 'get-list', 'get-planned'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -51,5 +51,9 @@ class HistoryController extends Controller
     public function actionGetList()
     {
         return History::getHistory();
+    }
+    public function actionGetPlanned()
+    {
+        return History::getPlanned();
     }
 }

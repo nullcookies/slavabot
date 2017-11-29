@@ -91,7 +91,9 @@ use frontend\controllers\SocialController;
                                                     </td>
                                                     <td style="width: 15%;">
                                                         <div class="btn-group">
-                                                            <button type="button" class="btn btn-primary" ng-click="VKRefresh(account)">Обновить</button>
+                                                            <button ng-show="account.type === 'vkontakte'" type="button" class="btn btn-primary" ng-click="VKRefresh(account)">Обновить</button>
+                                                            <button ng-show="account.type === 'facebook'" type="button" class="btn btn-primary" ng-click="refresh(account.id, account.type)">Обновить</button>
+
                                                         </div>
                                                     </td>
                                                 </tr>

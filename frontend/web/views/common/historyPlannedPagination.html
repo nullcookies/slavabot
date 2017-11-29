@@ -1,0 +1,15 @@
+<div class="row">
+    <div class="col-lg-6 col-lg-offset-3">
+        <ul class="pagination pull-left" ng-show="plannedNumberOfPages>1">
+            <li>
+                <a href="" scroll-on-click ng-click="disabledPlaneBack()" ><i class="fa fa-chevron-left"></i></a>
+            </li>
+            <li ng-repeat="n in [] | range : plannedNumberOfPages"  ng-class="{active : n==plannedCurrentPage}">
+                <a href="" scroll-on-click class="active" ng-click="setPlannedPage(n)" ng-show="paginationBlock(n)">{{n+1}}</a>
+            </li>
+            <li>
+                <a href="" scroll-on-click  ng-click="disabledPlaneNext()"><i class="fa fa-chevron-right"></i></a>
+            </li>
+        </ul>
+    </div>
+</div>

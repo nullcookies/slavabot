@@ -807,8 +807,8 @@ angular.module('cubeWebApp')
         $scope.activeID;
         $scope.removingID = 0;
 
-        $scope.vkLogin = '';
-        $scope.vkPassword = '';
+        $scope.vkLogin;
+        $scope.vkPassword;
         $scope.vkError = false;
         $scope.vkLoginError = false;
         $scope.vkPasswordError = false;
@@ -887,12 +887,10 @@ angular.module('cubeWebApp')
         $scope.VKRefresh = function($account) {
 
             $scope.activeVKID = $account.id;
-            $scope.VKLogin = $account.data.login;
-            $scope.VKPassword = $account.data.password;
+            $scope.vkLogin = $account.data.login;
+            $scope.vkPassword = $account.data.password;
 
             document.getElementById('vkontakte').click();
-
-            console.log($account);
         };
 
         $scope.clearInstaForm = function(){
@@ -1019,12 +1017,27 @@ angular.module('cubeWebApp')
 
         $scope.history = []; // Массив элементов истории
         $scope.order = 'desc'; // Сортировка по умолчанию
+        $scope.planned = [];
 
         // Пагинация
         $scope.numberOfPages = 0; // Количество страниц
         $scope.currentPage = 0;   // Текущая страница
         $scope.pageSize = 10;     // Количество элементов на странице
 
+        $scope.plannedCurrentPage = 0;   // Текущая страница
+
+        //Вкладки
+        $scope.allPlane = true;
+        $scope.plannedPlane = false;
+
+        $scope.setAll = function(){
+            $scope.allPlane = true;
+            $scope.plannedPlane = false;
+        };
+        $scope.setPlanned = function(){
+            $scope.allPlane = false;
+            $scope.plannedPlane = true;
+        };
 
         moment.locale('ru'); // Локализация для отображения даты
 
@@ -1052,14 +1065,16 @@ angular.module('cubeWebApp')
             }
             return res;
         }
-
+        $scope.fixMonth = function($mon){
+            return $mon + 1;
+        }
         $scope.getTime = function($time) {
 
             var date = new Date( $time * 1000 );
 
             var now = new Date();
-            now = now.getDate() + '.' + now.getMonth()+ '.' + now.getFullYear();
-            var day = date.getDate() + '.' + date.getMonth()+ '.' + date.getFullYear();
+            now = now.getDate() + '.' + $scope.fixMonth(now.getMonth()) + '.' + now.getFullYear();
+            var day = date.getDate() + '.' + $scope.fixMonth(date.getMonth()) + '.' + date.getFullYear();
             var hours = date.getHours();
 
             hours = hours <10?'0'+hours:''+hours;
@@ -1089,9 +1104,19 @@ angular.module('cubeWebApp')
             console.log($data);
             $http.post('/history/get-list', $data, config).then(function success(response) {
                 $scope.history = response.data.history;
-                console.log($scope.history);
                 $scope.pages = response.data.pages;
                 $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
+            });
+        };
+
+        // Получить запланированные
+        $scope.getPlanned = function($data){
+            $data = $data || [];
+            $http.post('/history/get-planned', $data, config).then(function success(response) {
+                $scope.planned = response.data.history;
+                console.log($scope.planned);
+                $scope.plannedPages = response.data.pages;
+                $scope.plannedNumberOfPages = $scope.plannedPages.totalCount / $scope.pageSize;
             });
         };
 
@@ -1109,7 +1134,6 @@ angular.module('cubeWebApp')
                     return true;
                 }
             }
-
         };
         $scope.changeOrder = function(){
 
@@ -1118,6 +1142,7 @@ angular.module('cubeWebApp')
             }else{
                 $scope.order = 'desc';
             }
+            $scope.setPlannedPage($scope.currentPage);
             $scope.setPage($scope.currentPage);
         };
         $scope.disabledBack = function() {
@@ -1138,13 +1163,42 @@ angular.module('cubeWebApp')
             }
         };
 
+        $scope.disabledPlaneBack = function() {
+            if($scope.plannedCurrentPage == 0){
+                return false;
+            }else{
+                $scope.plannedCurrentPage = $scope.plannedCurrentPage-1
+                $scope.setPlannedPage($scope.plannedCurrentPage);
+            }
+        };
+
+        $scope.disabledPlaneNext = function() {
+            if($scope.plannedCurrentPage >= $scope.plannedNumberOfPages - 1){
+                return false;
+            }else{
+                $scope.plannedCurrentPage = $scope.plannedCurrentPage+1
+                $scope.setPlannedPage($scope.plannedCurrentPage);
+            }
+        };
+
         $scope.setPage = function(n){
 
             $scope.getList($.param({'page' : n, 'order' : $scope.order}));
             $scope.currentPage = n;
         };
+        $scope.setPlannedPage = function(n){
 
+            $scope.getPlanned($.param({'page' : n, 'order' : $scope.order}));
+            $scope.plannedCurrentPage = n;
+        };
+
+        $scope.setPlannedPage($scope.currentPage);
         $scope.setPage($scope.currentPage);
+
+        // $scope.Timer = $interval(function () {
+        //     $scope.setPlannedPage($scope.currentPage);
+        //     $scope.setPage($scope.currentPage);
+        // }, 5000);
 
     });
     app.filter('startFrom', function() {
