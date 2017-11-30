@@ -160,6 +160,16 @@ class SocialController extends Controller
             exit;
         }
 
+        try {
+            $responseAccounts = $fb->get('/me/accounts', "{$accessToken}");
+        } catch(Facebook\Exceptions\FacebookResponseException $e) {
+            echo 'Graph returned an error: ' . $e->getMessage();
+            exit;
+        } catch(Facebook\Exceptions\FacebookSDKException $e) {
+            echo 'Facebook SDK returned an error: ' . $e->getMessage();
+            exit;
+        }
+        $accounts = $responseAccounts->getGraphEdge()->asArray();
         $groups = $response->getGraphEdge()->asArray();
         foreach($groups as $gr){
                  try {
@@ -192,9 +202,11 @@ class SocialController extends Controller
                 'user_name' => $user['name'],
                 'user_id' => $user['id'],
                 'access_token' => $long_token['access_token'],
-                'groups' => $groups
+                'groups' => array_merge($accounts, $groups),
             )
         );
+
+
         $res['data']['groups'][] = array(
             'id' => $user['id'],
             'name' => 'Стена пользователя ' . $user['name'],
@@ -202,11 +214,11 @@ class SocialController extends Controller
 
 //        try {
 //            $response = $fb->post(
-//                '/'.$user['id'].'/feed',
+//                '/'.$res['data']['groups'][0]['id'].'/feed',
 //                array (
 //                    'message' => 'This is a test message',
 //                ),
-//                $long_token['access_token']
+//                $res['data']['groups'][0]['access_token']
 //            );
 //        } catch(Facebook\Exceptions\FacebookResponseException $e) {
 //            echo 'Graph returned an error: ' . $e->getMessage();
@@ -216,8 +228,8 @@ class SocialController extends Controller
 //            exit;
 //        }
 //        $graphNode = $response->getGraphNode();
-
-
+//        var_dump($res['data']);
+//        return false;
         if(Accounts::saveReference($res, 0)){
             Yii::$app->response->redirect('/#/pages/social');
         }
