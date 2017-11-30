@@ -817,6 +817,12 @@ angular.module('cubeWebApp')
         $scope.activeVKID;
         $scope.sce = $sce;
 
+        $scope.available = {
+            'instagram' : true,
+            'facebook' : true,
+            'vkontakte' : true
+        };
+
         var config = {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
@@ -842,6 +848,17 @@ angular.module('cubeWebApp')
         $scope.getAccounts = function() {
             $http.post('/social/accounts', [], config).then(function success(response) {
                 $scope.accounts = response.data;
+                console.log($scope.accounts);
+                $scope.available = {
+                    'instagram' : true,
+                    'facebook' : true,
+                    'vkontakte' : true
+                };
+                for (key in $scope.accounts) {
+                    $scope.available[$scope.accounts[key].type] = false;
+                }
+                console.log();
+                console.log($scope.available);
             });
         }
 

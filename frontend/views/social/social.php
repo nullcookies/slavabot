@@ -8,12 +8,12 @@ use frontend\controllers\SocialController;
             <div class="row">
                 <div class="col-md-12">
                     <div style="margin-top:25px;"></div>
-                    <div class="row">
+                    <div class="row" ng-show="available.facebook || available.vkontakte || available.instagram">
                         <div class="col-md-12">
                             <div class="btn-group">
                                 <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Привязать соц.сеть <span class="caret"></span></button>
-                                <ul class="dropdown-menu accountsMenu" role="menu">
-                                    <li>
+                                <ul class="dropdown-menu accountsMenu" role="menu" >
+                                    <li ng-show="available.facebook">
                                         <?=
                                             SocialController::getFBBtn(
                                                 'http://'.$_SERVER['SERVER_NAME'].'/social/fb',
@@ -23,10 +23,8 @@ use frontend\controllers\SocialController;
                                             );
                                         ?>
                                     </li>
-                                    <li>
-                                    <li><a data-toggle="modal" id="vkontakte" data-target="#myModalVK">Вконтакте</a></li>
-                                    </li>
-                                    <li><a data-toggle="modal" id="instagram" data-target="#myModal">Instagram</a></li>
+                                    <li ng-show="available.vkontakte"><a data-toggle="modal" id="vkontakte" data-target="#myModalVK">Вконтакте</a></li>
+                                    <li ng-show="available.instagram"><a data-toggle="modal" id="instagram" data-target="#myModal">Instagram</a></li>
                                 </ul>
                             </div>
                         </div>

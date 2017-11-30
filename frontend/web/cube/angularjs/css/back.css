@@ -255,3 +255,15 @@ table.noTop tbody > tr:first-child > td {
 .accountsMenu li a{
     cursor:pointer;
 }
+div.minTable{
+    width: 360px;
+    margin: 0 auto;
+}
+div.minTable table {
+    table-layout: fixed;
+    width: 100%;
+}
+div.minTable table tbody tr td, div.minTable table tbody tr td th {
+    width: 2%;
+    border-top: 1px solid #fff;
+}
