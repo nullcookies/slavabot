@@ -61,7 +61,7 @@ class VKController extends Controller
                 'client_id'=> VKController::CLIENT_ID,
                 'display' => 'mobile',
                 'response_type'=> 'token',
-                'scope'=> 'offline,wall,photos,friends,groups',
+                'scope'=> 'offline,wall,photos,friends,groups,messages',
                 'v'=> '5.28'
             ];
 
