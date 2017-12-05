@@ -101,6 +101,11 @@ class Accounts extends \yii\db\ActiveRecord
         return $model->save();
     }
 
+    public static function getVk(){
+        $model = static::find()->where(['type' => 'vkontakte'])->all();
+        return $model;
+    }
+
     public static function processAccount(){
         $post = \Yii::$app->request->post();
 

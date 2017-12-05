@@ -21,7 +21,8 @@ return [
                     'auth-telegram',
                     'new-event',
                     'set-time-zone',
-                    'get-time-zone'
+                    'get-time-zone',
+                    'get-vk-accounts'
                 ],
                 'allow' => true,
                 'roles' => ['?'],

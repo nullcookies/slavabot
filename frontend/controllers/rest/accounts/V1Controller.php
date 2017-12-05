@@ -2,6 +2,7 @@
 namespace frontend\controllers\rest\accounts;
 
 use common\models\Accounts;
+use common\models\rest\Accounts as RESTAccounts;
 use common\models\User;
 use Yii;
 use yii\base\InvalidParamException;
@@ -22,7 +23,7 @@ class V1Controller extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['get-user-accounts', 'set-account-status', 'get-token', 'user-auth'],
+                'only' => ['get-user-accounts', 'set-account-status', 'get-token', 'user-auth', 'get-vk-accounts'],
                 'rules' => [
                     [
                         'actions' => [],
@@ -45,7 +46,13 @@ class V1Controller extends Controller
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['get-user-accounts', 'set-account-status', 'get-token', 'user-auth'],
+                'only' => [
+                    'get-user-accounts',
+                    'set-account-status',
+                    'get-token',
+                    'user-auth',
+                    'get-vk-accounts'
+                ],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -193,6 +200,10 @@ class V1Controller extends Controller
                 'error' => 'Save error!'
             ];
         }
+    }
+
+    public function actionGetVkAccounts(){
+        return RESTAccounts::getVk();
     }
 
 }
