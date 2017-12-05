@@ -5,6 +5,7 @@ use yii\base\Object;
 
 class StaticConfig
 {
+    
     public function config($param)
     {
         return Yaml::parse(file_get_contents(__DIR__ . '/../config/config.yaml'))[$param];
@@ -16,5 +17,9 @@ class StaticConfig
 
     public function facebook(){
         return self::config('social')['facebook'];
+    }
+
+    public function vk(){
+        return self::config('social')['vk'];
     }
 }

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Class FacebookService
+ * Работа с Fb
+ * @package common\services\social
+ */
+
 namespace common\services\social;
 use \Facebook\Facebook as FB;
 use common\services\StaticConfig;
@@ -10,7 +16,10 @@ class FacebookService
     protected $app_secret;
     protected $version;
 
-
+    /**
+     * FacebookService constructor.
+     * Подгружаем настройки приложения fb
+     */
     public function __construct()
     {
         $this->app_id = StaticConfig::facebook()['app_id'];
@@ -18,6 +27,9 @@ class FacebookService
         $this->version = StaticConfig::facebook()['version'];
     }
 
+    /**
+     * @return FB
+     */
     public function init(){
         return new FB([
             'app_id'  => $this->app_id,
@@ -26,6 +38,11 @@ class FacebookService
         ]);
     }
 
+    /**
+     * Получаем необходимые данные от апи
+     *
+     * @return array
+     */
     public function process(){
 
         $fb = self::init();
@@ -61,6 +78,12 @@ class FacebookService
         return $res;
     }
 
+    /**
+     * Генерируем ссылку для авторизации через fb
+     *
+     * @param $callback
+     * @return string
+     */
     public function link($callback){
         session_start();
 
@@ -73,6 +96,12 @@ class FacebookService
         return $helper->getLoginUrl($callback, $permissions);
     }
 
+    /**
+     * Получаем кратковременный access_token
+     *
+     * @param $helper
+     * @return mixed
+     */
     public function accessToken($helper){
         try {
             $accessToken = $helper->getAccessToken();
@@ -102,6 +131,12 @@ class FacebookService
         }
     }
 
+    /**
+     * Получаем данные о пользователе
+     * @param $fb
+     * @param $accessToken
+     * @return mixed
+     */
     public function getUser($fb, $accessToken){
         try {
             $response = $fb->get('/me?fields=id,name', "{$accessToken}");
@@ -115,6 +150,12 @@ class FacebookService
         }
     }
 
+    /**
+     * Получаем данные о группах пользователя
+     * @param $fb
+     * @param $accessToken
+     * @return mixed
+     */
     public function getGroups($fb, $accessToken){
         try {
             $response = $fb->get('/me/groups', "{$accessToken}");
@@ -128,6 +169,16 @@ class FacebookService
         }
     }
 
+    /**
+     * Получаем данные о страницах пренадлежащих пользователю
+     * Это как группы, только не группы =)
+     *
+     * У страниц есть свой access_token, причем он краткосрочный.
+     *
+     * @param $fb
+     * @param $accessToken
+     * @return mixed
+     */
     public function getAccounts($fb, $accessToken){
         try {
             $responseAccounts = $fb->get('/me/accounts', "{$accessToken}");
@@ -141,6 +192,12 @@ class FacebookService
         }
     }
 
+    /**
+     * Получение долгосрочного токена
+     * @param $fb
+     * @param $accessToken
+     * @return mixed
+     */
     public function getLongToken($fb, $accessToken){
         try {
             $longToken = $fb->get('/oauth/access_token?grant_type=fb_exchange_token&client_id='.$this->app_id.'&client_secret='.$this->app_secret.'&fb_exchange_token='.$accessToken->getValue('value'), $accessToken);

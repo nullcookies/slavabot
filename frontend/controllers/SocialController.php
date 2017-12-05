@@ -2,21 +2,14 @@
 namespace frontend\controllers;
 
 use Yii;
-use yii\base\InvalidParamException;
-use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Response;
-use frontend\models\UserConfig;
 use common\models\Accounts;
 use common\models\Instagram;
-use Vk;
-use Facebook\Facebook;
-use VkAuth;
-use frontend\controllers\VKController;
-use linslin\yii2\curl;
 use common\services\social\FacebookService;
+use common\services\social\VkService;
 
 class SocialController extends Controller
 {
@@ -64,7 +57,15 @@ class SocialController extends Controller
         ];
     }
 
-
+    /**
+     * Генерируем по шаблону ссылку для авторизации FB
+     *
+     * @param $callback
+     * @param string $text
+     * @param $id
+     * @param string $template
+     * @return mixed
+     */
     function getFBBtn($callback, $text='', $id, $template='<a href="LINK" id="ID">TEXT</a>'){
 
         $fb = new FacebookService;
@@ -84,9 +85,23 @@ class SocialController extends Controller
         );
     }
 
+    /**
+     * Шаблонизация для конопки FB
+     *
+     * @param $string
+     * @param $patterns
+     * @param $replacements
+     * @return mixed
+     */
+
     function useTemplate($string, $patterns, $replacements){
         return preg_replace($patterns, $replacements, $string);
     }
+
+    /**
+     * Обработка и сохранение данных возвращаемых FB
+     * Страница социальные сети. После обработки данных нас редиректит на нее же и открывается окно выбора группы FB.
+     */
 
     public function actionFb()
     {
@@ -96,6 +111,11 @@ class SocialController extends Controller
             Yii::$app->response->redirect('/#/pages/social');
         }
     }
+
+    /**
+     * Обработка и сохранение данных возвращаемых FB.
+     * Мастер настройки, отличие в том, что тут авторизация FB откроется в новой вкладке и после успешной обработки вкладка закроется.
+     */
 
     public function actionWizardFb()
     {
@@ -108,6 +128,11 @@ class SocialController extends Controller
         }
     }
 
+    /**
+     * Возвращаем страницу с аккаунтами пользователя
+     *
+     * @return string
+     */
     public function actionIndex()
     {
 
@@ -120,66 +145,21 @@ class SocialController extends Controller
 
     }
 
-    public function actionRemove()
-    {
-        $id = \Yii::$app->request->post('id');
-        return Accounts::remove($id);
-    }
-
-    public function actionCheckInstagram()
-    {
-        return Instagram::login();
-    }
-
-    public function actionInstagram(){
-
-        return Accounts::saveReference(\Yii::$app->request->post());
-    }
-
-    public function actionFinishProcess(){
-        return Accounts::processAccount(\Yii::$app->request->post());
-    }
-
-    public function actionUpdateProcess(){
-        return Accounts::updateAccount(\Yii::$app->request->post());
-    }
-
-    public function actionAccounts(){
-        return Accounts::getAccounts();
-    }
-
-    public function actionUnprocessed($type = ''){
-        if(\Yii::$app->request->post()['type']){
-            $type = \Yii::$app->request->post()['type'];
-        }
-        return Accounts::getUnprocessedAccounts($type);
-    }
-
-
+    /**
+     * Авторизаця ВК
+     * @return array
+     */
     function actionVkAuth()
     {
         $login = Yii::$app->request->post('login');
         $password = Yii::$app->request->post('password');
 
-        try {
-            $response = VKController::authVK($login, $password);
-        } catch (\Exception $ex) {
+        $auth = new VkService;
+        $res = $auth->init($login, $password);
 
-            return [
-                'status' => false,
-                'error' => explode(' => ', $ex->getMessage())[1]
-                ];
-        }
+        if($res['data']){
+            $save = Accounts::saveReference($auth->init($login, $password),  0);
 
-            parse_str($response, $params);
-
-            ob_start();
-
-            $res = VKController::initVKApi($params, $login, $password);
-
-            $save = Accounts::saveReference($res,  0);
-
-            ob_end_clean();
             if($save){
                 return [
                     'status' => true,
@@ -190,6 +170,82 @@ class SocialController extends Controller
                     'error' => 'Get token error'
                 ];
             }
-
+        }else{
+            return $res;
+        }
     }
+
+    /**
+     * Удаление аккаунта
+     *
+     * @return false|int
+     */
+    public function actionRemove()
+    {
+        $id = \Yii::$app->request->post('id');
+        return Accounts::remove($id);
+    }
+
+    /**
+     * Проверка актуальности логина/пароля Instagram перед сохранением
+     * @return bool
+     */
+
+    public function actionCheckInstagram()
+    {
+        return Instagram::login();
+    }
+
+    /**
+     * Сохраняем аккаунт instagram
+     *
+     * @return array|bool
+     */
+    public function actionInstagram(){
+
+        return Accounts::saveReference(\Yii::$app->request->post());
+    }
+
+    /**
+     * Устанавливаем активную группу для аккаунта vk/fb
+     *
+     * @return bool
+     */
+    public function actionFinishProcess(){
+        return Accounts::processAccount(\Yii::$app->request->post());
+    }
+
+    /**
+     * Обновление аккаунта
+     *
+     * @return bool
+     */
+    public function actionUpdateProcess(){
+        return Accounts::updateAccount(\Yii::$app->request->post());
+    }
+
+    /**
+     * Получить аккаунты текущего пользователя
+     *
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public function actionAccounts(){
+        return Accounts::getAccounts();
+    }
+
+    /**
+     * Получить аккаунты с невыбранной группой
+     *
+     * @param string $type
+     * @return array|null|\yii\db\ActiveRecord
+     */
+
+    public function actionUnprocessed($type = ''){
+        if(\Yii::$app->request->post()['type']){
+            $type = \Yii::$app->request->post()['type'];
+        }
+        return Accounts::getUnprocessedAccounts($type);
+    }
+
+
 }
