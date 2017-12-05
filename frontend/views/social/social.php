@@ -8,10 +8,10 @@ use frontend\controllers\SocialController;
             <div class="row">
                 <div class="col-md-12">
                     <div style="margin-top:25px;"></div>
-                    <div class="row" ng-show="available.facebook || available.vkontakte || available.instagram">
+                    <div class="row" >
                         <div class="col-md-12">
                             <div class="btn-group">
-                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Привязать соц.сеть <span class="caret"></span></button>
+                                <button type="button" ng-class="{'disabled' : !available.facebook && !available.vkontakte && !available.instagram}" class="btn btn-primary dropdown-toggle " data-toggle="dropdown" aria-expanded="false">Привязать соц.сеть <span class="caret"></span></button>
                                 <ul class="dropdown-menu accountsMenu" role="menu" >
                                     <li ng-show="available.facebook">
                                         <?=
