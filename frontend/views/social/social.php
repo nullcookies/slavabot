@@ -18,8 +18,7 @@ use frontend\controllers\SocialController;
                                             SocialController::getFBBtn(
                                                 'http://'.$_SERVER['SERVER_NAME'].'/social/fb',
                                                 'Facebook',
-                                                'facebook',
-                                                \Yii::$app->user->identity->id
+                                                'facebook'
                                             );
                                         ?>
                                     </li>

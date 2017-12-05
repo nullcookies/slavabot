@@ -26,3 +26,14 @@ timezones:
   UTC+10:
     value: Asia/Vladivostok
     label: Владивосток
+social:
+  facebook:
+    app_id: '169360780313874'
+    app_secret: '38e43b5ab78044815bcc51314fdb20a0'
+    version: 'v2.10'
+    permissions:
+      0: 'public_profile'
+      1: 'publish_actions'
+      2: 'manage_pages'
+      3: 'publish_pages'
+      4: 'pages_show_list'

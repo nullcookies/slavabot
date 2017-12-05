@@ -48,7 +48,7 @@ app.config(['$routeProvider', function ($routeProvider) {
             title: 'Купленные контакты',
         })
 		.when("/dasboard", {
-			templateUrl: "views/dashboard.html",
+			templateUrl: "/dashboard/",
 			controller: "dashboardCtrl",
 			title: 'Главная'
 		})

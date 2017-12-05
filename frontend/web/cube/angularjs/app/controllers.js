@@ -15,7 +15,7 @@ function checkData($str, $len){
 
 
 angular.module('cubeWebApp')
-    .controller('dashboardCtrl', function ($scope, $http) {
+    .controller('dashboardCtrl', function ($scope, $http, $sce, $interval) {
 
         function pad(number, length){
             var str = "" + number
@@ -30,13 +30,168 @@ angular.module('cubeWebApp')
             pad(parseInt(Math.abs(offset/60)), 2)+
             pad(Math.abs(offset%60), 2))
 
-        console.log(offset);
 
         $scope.category = [];
         $scope.location = [];
         $scope.priority = [];
         $scope.theme = [];
         $scope.webhooks = 0;
+
+        // Сохранение аккаунтов начало
+
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+                'X-CSRF-Token': getCSRF()
+            }
+        };
+
+        $scope.vkLogin = '';
+        $scope.vkPassword = '';
+        $scope.vkError = false;
+        $scope.vkLoginError = false;
+        $scope.vkPasswordError = false;
+        $scope.vkErrorText = '';
+        $scope.vkAuthBox = true;
+        $scope.vkGroupBox = false;
+        $scope.vkfinish = false;
+        $scope.userSelection = {};
+        $scope.InstaLogin = '';
+        $scope.InstaPassword = '';
+        $scope.instaError = '';
+        $scope.instaAuthBox = true;
+        $scope.instafinish = false;
+        $scope.sce = $sce;
+        $scope.fbGroupBox = false;
+        $scope.fbAuthBox = true;
+        $scope.fbFinish = false;
+
+        $scope.InstaSave = function(){
+            $scope.data = {
+                type: 'instagram',
+                data: {
+                    'login': $scope.InstaLogin,
+                    'password': $scope.InstaPassword,
+                }
+            };
+
+            if(checkData($scope.InstaLogin, 2) && checkData($scope.InstaPassword, 2)){
+                $http.post('/social/instagram', $.param($scope.data), config).then(function success(response) {
+                    if(response.data.error){
+                        $scope.instaError = response.data.error;
+                        return false;
+                    }else{
+                        $scope.instaError = '';
+                        $scope.instaAuthBox = false;
+                        $scope.instafinish = true;
+                    }
+
+                });
+            }
+
+        }
+
+        $scope.checkUnprocessed = function(){
+            $http.post('/social/unprocessed', [], config).then(function success(response) {
+                if(response.data){
+                    $scope.unprocessed = response.data.data.groups;
+                    $scope.accountData = response.data.data;
+                    $scope.unpID = response.data.id;
+                    $scope.unprocessedType = response.data.type;
+                    $scope.unprocessedName = response.data.data.user_name;
+                }
+            });
+        };
+
+        $scope.checkUnprocessedFacebook = function(){
+            $http.post('/social/unprocessed', { type : 'facebook'}, config).then(function success(response) {
+                if(response.data.type=='facebook'){
+                    $scope.unprocessed = response.data.data.groups;
+                    $scope.accountData = response.data.data;
+                    $scope.unpID = response.data.id;
+                    $scope.unprocessedType = response.data.type;
+                    $scope.unprocessedName = response.data.data.user_name;
+                    $scope.fbGroupBox = true;
+                    $scope.fbAuthBox = false;
+                    console.log('Facebook found');
+                }
+            });
+        };
+
+        $scope.Timer = $interval(function () {
+            if($scope.fbAuthBox){
+                $scope.checkUnprocessedFacebook()
+            }
+        }, 1000);
+
+        $scope.accountSave = function($type) {
+            var data = $scope.accountData;
+
+            data.groups = $scope.userSelection.activeValue;
+            $scope.data = {
+                id: $scope.unpID,
+                data: data
+            };
+
+            $http.post('/social/finish-process', $.param($scope.data), config).then(function success(response) {
+                if(response.data){
+                    if($type=='vk'){
+                        $scope.vkAuthBox = false;
+                        $scope.vkGroupBox = false;
+                        $scope.vkfinish = true;
+                    }
+                    if($type=='fb'){
+                        $scope.fbGroupBox = false;
+                        $scope.fbAuthBox = false;
+                        $scope.fbFinish = true;
+                    }
+                }
+            });
+        };
+
+        $scope.VkSave = function(){
+            $scope.data = {
+                login: $scope.vkLogin,
+                password: $scope.vkPassword
+            };
+
+            if(checkData($scope.vkLogin, 9) && checkData($scope.vkPassword, 2)){
+                $http.post('/social/vk-auth', $.param($scope.data), config).then(function success(response) {
+                    console.log(response);
+
+                    if(response.data.status){
+
+                        $scope.vkError = false;
+                        $scope.vkLoginError = false;
+                        $scope.vkPasswordError = false;
+                        $scope.vkErrorText = '';
+                        $scope.checkUnprocessed();
+                        $scope.vkAuthBox = false;
+                        $scope.vkGroupBox = true;
+
+                    }else{
+                        if(response.data.error==='login & pass are wrong'){
+                            $scope.vkError = true;
+                            $scope.vkLoginError = false;
+                            $scope.vkPasswordError = false;
+                            $scope.vkErrorText = 'Неверный логин/пароль';
+                        }
+                    }
+
+                });
+            }else{
+                if(!checkData($scope.vkLogin, 9)){
+                    $scope.vkLoginError = true;
+                }
+
+                if(!checkData($scope.vkPassword, 4)){
+                    $scope.vkPasswordError = true;
+                }
+
+            }
+        }
+
+        // Сохранение аккаунтов конец
 
         $http({method: 'GET', url: '/site/main'}).
         then(function success(response) {
@@ -60,7 +215,6 @@ angular.module('cubeWebApp')
 
             var array = [];
 
-            console.log(response.data.data);
 
             for (var i = 0; i < response.data.data.length; i++) {
                 array[i]=[$scope.dateConvert(response.data.data[i]['dateNorm']), parseInt(response.data.data[i]['cnt'])];

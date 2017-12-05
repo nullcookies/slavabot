@@ -117,6 +117,13 @@ class User extends ActiveRecord implements IdentityInterface
         return User::findOne(['id' => $id, 'status' => self::STATUS_ACTIVE]);
     }
 
+    public static function setAuth($id)
+    {
+        $model = User::findOne(['id' => $id, 'status' => self::STATUS_ACTIVE]);
+        $model->authorized = 1;
+        $model->save(false);
+    }
+
     /**
      * Finds user by password reset token
      *

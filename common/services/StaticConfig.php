@@ -13,4 +13,8 @@ class StaticConfig
     public function timezones(){
         return self::config('timezones');
     }
+
+    public function facebook(){
+        return self::config('social')['facebook'];
+    }
 }

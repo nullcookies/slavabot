@@ -119,8 +119,16 @@ class Accounts extends \yii\db\ActiveRecord
         return $acc->save();
     }
 
-    public static function getUnprocessedAccounts(){
-        return Accounts::find()->where(['user_id' => Yii::$app->user->id, 'processed' => 0])->one();
+    public static function getUnprocessedAccounts($type=''){
+        $filter = [
+            'user_id' => Yii::$app->user->id,
+            'processed' => 0
+        ];
+
+        if($type!=''){
+            $filter['type'] =  $type;
+        }
+        return Accounts::find()->where($filter)->one();
     }
 
     public static function getAccounts(){

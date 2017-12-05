@@ -59,6 +59,7 @@ class SignupForm extends Model
         $user->email = $this->email;
         $user->phone = $this->phone;
         $user->timezone = 'Europe/Moscow';
+        $user->authorized = 0;
         $user->setPassword($password);
         $user->generateAuthKey();
         $html = "

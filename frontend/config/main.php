@@ -44,6 +44,16 @@ return [
             'baseUrl' => '/',
             'csrfParam' => '_csrf-frontend',
         ],
+        'assetManager' => [
+            'bundles' => [
+                'yii\web\JqueryAsset' => [
+                    'sourcePath' => null,   // do not publish the bundle
+                    'js' => [
+                        '/cube/components/jquery/dist/jquery.min.js',
+                    ]
+                ],
+            ],
+        ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             'viewPath' => '@app/views/mail',

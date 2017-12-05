@@ -11,18 +11,28 @@ class AppAsset extends AssetBundle
 {
     public $basePath = '@webroot';
     public $baseUrl = '@web';
+//<link rel="stylesheet" type="text/css" href="../css/compiled/wizard.css" />
+//<link rel="stylesheet" type="text/css" href="../components/bootstrap-application-wizard-ocsp/dist/bootstrap-wizard.css" />
 
+//<script src="../components-custom/wizard/wizard.js"></script>
+//<script src="../components/bootstrap-application-wizard-ocsp/demo/js/prettify.js"></script>
+//<script src="../components/bootstrap-application-wizard-ocsp/dist/bootstrap-wizard.min.js"></script>
     public $css = [
         '/cube/components/bootstrap/dist/css/bootstrap.min.css',
         '/cube/components/font-awesome/css/font-awesome.css',
         '/cube/css/libs/nanoscroller.css',
         '/cube/css/compiled/theme_styles.css',
         '/cube/angularjs/css/back.css',
+        '/cube/css/compiled/wizard.css',
+        '/cube//components/bootstrap-application-wizard-ocsp/dist/bootstrap-wizard.css'
     ];
     public $js = [
         '/cube/js/demo-skin-changer.js',
-        //'/cube/components/jquery/dist/jquery.min.js',
+        '/cube/components/jquery/dist/jquery.min.js',
         '/cube/components/bootstrap/dist/js/bootstrap.js',
+        //'/cube/components-custom/wizard/wizard.js',
+        '/cube/components/bootstrap-application-wizard-ocsp/demo/js/prettify.js',
+        '/cube/components/bootstrap-application-wizard-ocsp/dist/bootstrap-wizard.min.js',
         '/cube/components/nanoscroller/bin/javascripts/jquery.nanoscroller.min.js',
         '/cube/js/demo.js',
         '/cube/js/scripts.js',
