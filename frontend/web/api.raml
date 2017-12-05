@@ -303,7 +303,40 @@ description: "REST-api для обмена данными c SalesBot."
                 {
                   "status": true,
                 }
-
+  /get-vk-accounts/:
+      description: Получить telegram_id и access_token всех пользователей
+      post:
+        responses:
+          200:
+            body:
+              application/json:
+                type: object
+                example: |
+                  {
+                      "status": true,
+                      "accounts": [
+                          {
+                              "telegram_id": 162433937,
+                              "access_token": "8d8eeed414536a7d0ed5e53f1fb9a777ef8fb17e9cf895ddbd46b952e96931470088d07a9ca254bf1ed03"
+                          },
+                          {
+                              "telegram_id": 134330020,
+                              "access_token": "ba6f2254af8fa31ff0d38cf25e17acdf18dd774f5ce95d9248ab2c571b80ac7972fd052d59c32109b8e7c"
+                          },
+                          {
+                              "telegram_id": 45757136,
+                              "access_token": "01943361e57014a1a5a6dad2a3775c6dd740fb2a84c7a4b1033f24b78da21be4c27ca68d3ce774a161b4f"
+                          },
+                          {
+                              "telegram_id": 55302661,
+                              "access_token": "51da91e1ff3addb2e1a94e1d7707d9675aa346367a4e8c8c6d2acefb8952229995835c7347c602b88a6c1"
+                          }
+                      ]
+                  },
+                  {
+                      "status": false,
+                      "error": "Server error!"
+                  }
 /rest/history/v1:
   displayName: Работа с историей действий
   /new-event/:

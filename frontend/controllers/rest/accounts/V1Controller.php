@@ -203,7 +203,20 @@ class V1Controller extends Controller
     }
 
     public function actionGetVkAccounts(){
-        return RESTAccounts::getVk();
+        $accounts = RESTAccounts::getVk();
+
+        if($accounts){
+            return [
+                'status' => true,
+                'accounts' => $accounts
+            ];
+        }else{
+            return [
+                'status' => false,
+                'error' => 'Server error!'
+            ];
+        }
+
     }
 
 }
