@@ -122,7 +122,7 @@ angular.module('cubeWebApp')
             if($scope.fbAuthBox){
                 $scope.checkUnprocessedFacebook()
             }
-        }, 1000);
+        }, 10000);
 
         $scope.accountSave = function($type) {
             var data = $scope.accountData;
@@ -1150,26 +1150,30 @@ angular.module('cubeWebApp')
 
             if($scope.activeID>0){
                 $scope.data = {
-                    id: $scope.activeID,
-                    type: 'instagram',
-                    data: {
-                        'login': $scope.InstaLogin,
-                        'password': $scope.InstaPassword,
+                    Instagram :{
+                        id: $scope.activeID,
+                        type: 'instagram',
+                        data: {
+                            'login': $scope.InstaLogin,
+                            'password': $scope.InstaPassword,
+                        }
                     }
                 };
             }else{
                 $scope.data = {
-                    type: 'instagram',
-                    data: {
-                        'login': $scope.InstaLogin,
-                        'password': $scope.InstaPassword,
-                    }
+                    Instagram :
+                        {
+                            type: 'instagram',
+                            data: {
+                                'login': $scope.InstaLogin,
+                                'password': $scope.InstaPassword,
+                            }
+                        }
                 };
             }
 
             if(checkData($scope.InstaLogin, 2) && checkData($scope.InstaPassword, 2)){
                 $http.post('/social/instagram', $.param($scope.data), config).then(function success(response) {
-                    console.log(response.data.error);
                     if(response.data.error){
                         $scope.instaError = response.data.error;
                         return false;

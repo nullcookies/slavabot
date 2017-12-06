@@ -11,6 +11,9 @@ use common\models\Instagram;
 use common\services\social\FacebookService;
 use common\services\social\VkService;
 
+use common\commands\command\AddToAccountsCommand;
+
+
 class SocialController extends Controller
 {
     public function behaviors()
@@ -203,7 +206,18 @@ class SocialController extends Controller
      */
     public function actionInstagram(){
 
-        return Accounts::saveReference(\Yii::$app->request->post());
+        $model = new Instagram();
+        $model->load(Yii::$app->request->post());
+
+        $res = Yii::$app->commandBus->handle(
+            new AddToAccountsCommand(
+                [
+                    'data' => $model
+                ]
+            )
+        );
+
+        return $res;
     }
 
     /**

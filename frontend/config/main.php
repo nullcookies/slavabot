@@ -41,6 +41,16 @@ return [
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
+        'commandBus' => [
+            'class' => 'trntv\bus\CommandBus',
+            'middlewares' => [
+                [
+                    'class' => '\trntv\bus\middlewares\BackgroundCommandMiddleware',
+                    'backgroundHandlerPath' => '@console/yii',
+                    'backgroundHandlerRoute' => 'command-bus/handle',
+                ]
+            ]
+        ],
         'request' => [
             'baseUrl' => '/',
             'csrfParam' => '_csrf-frontend',
