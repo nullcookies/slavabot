@@ -101,7 +101,7 @@ angular.module('cubeWebApp')
             if($scope.fbAuthBox){
                 $scope.checkUnprocessedFacebook()
             }
-        }, 10000);
+        }, 1000);
 
         $scope.accountSave = function($type) {
             var data = $scope.accountData;
