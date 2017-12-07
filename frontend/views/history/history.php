@@ -3,133 +3,74 @@ use frontend\controllers\SocialController;
 use common\models\User;
 ?>
 
-<div class="row">
-    <!--<div class="col-lg-3 col-sm-6 col-xs-12">-->
-    <!--<div class="main-box infographic-box colored emerald-bg">-->
-    <!--<i class="fa fa-file-code-o"></i>-->
-    <!--<span class="headline">В файле</span>-->
-    <!--<span ng-bind="webhooks" class="value"></span>-->
-    <!--</div>-->
-    <!--</div>-->
-
-    <div class="col-lg-3 col-sm-6 col-xs-12">
-        <div class="main-box infographic-box colored green-bg">
-            <i class="fa fa-database "></i>
-            <span class="headline">В базе</span>
-            <span class="value" ng-bind="indb"></span>
+    <div class="row">
+        <div class="col-lg-12">
+            <ol class="breadcrumb">
+                <li><a href="">Главная</a></li>
+                <li class="active"><span>История</span></li>
+            </ol>
+            <br>
         </div>
     </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="main-box clearfix">
+                <header class="main-box-header clearfix">
 
-    <div class="col-lg-3 col-sm-6 col-xs-12">
-        <div class="main-box infographic-box colored red-bg">
-            <i class="fa fa-user"></i>
-            <span class="headline">Ссылок на профили</span>
-            <span class="value" ng-bind="norm"></span>
-        </div>
-    </div>
-
-</div>
-<div class="row">
-    <div class="col-md-12">
-        <div class="main-box">
-            <header class="main-box-header clearfix">
-                <h2 class="pull-left">Потенциальные клиенты</h2>
-            </header>
-            <div class="main-box-body clearfix">
-                <div class="row">
-                    <div class="col-md-9">
-                        <div id="graph-bar" style="height: 240px; padding: 0px; position: relative;"></div>
-                    </div>
-                    <div class="col-md-3">
-                        <ul class="graph-stats">
-                            <li>
-                                <div class="clearfix">
-                                    <div class="title pull-left">
-                                        Вконтакте
-                                    </div>
-                                    <div class="value pull-right" title="{{( vk/indb )*100}}%" data-toggle="tooltip">
-                                        {{vk}}
-                                    </div>
-                                </div>
-                                <div class="progress">
-                                    <div style="width: {{( vk/indb )*100}}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="{{( vk/indb )*100}}" role="progressbar" class="progress-bar">
-                                        <span class="sr-only">{{( vk/indb )*100}}%</span>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="clearfix">
-                                    <div class="title pull-left">
-                                        Facebook
-                                    </div>
-                                    <div class="value pull-right" title="{{( fb/indb )*100}}%" data-toggle="tooltip">
-                                        {{fb}}
-                                    </div>
-                                </div>
-                                <div class="progress">
-                                    <div style="width: {{( fb/indb )*100}}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="{{( fb/indb )*100}}" role="progressbar" class="progress-bar">
-                                        <span class="sr-only">{{( fb/indb )*100}}%</span>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="clearfix">
-                                    <div class="title pull-left">
-                                        Одноклассники
-                                    </div>
-                                    <div class="value pull-right" title="{{( ok/indb )*100}}%" data-toggle="tooltip">
-                                        {{ok}}
-                                    </div>
-                                </div>
-                                <div class="progress">
-                                    <div style="width: {{( ok/indb )*100}}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="{{( ok/indb )*100}}" role="progressbar" class="progress-bar">
-                                        <span class="sr-only">{{( ok/indb )*100}}%</span>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="clearfix">
-                                    <div class="title pull-left">
-                                        Twitter
-                                    </div>
-                                    <div class="value pull-right" title="{{( twitter/indb )*100}}%" data-toggle="tooltip">
-                                        {{twitter}}
-                                    </div>
-                                </div>
-                                <div class="progress">
-                                    <div style="width: {{( twitter/indb )*100}}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="{{( twitter/indb )*100}}" role="progressbar" class="progress-bar">
-                                        <span class="sr-only">{{( twitter/indb )*100}}%</span>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="clearfix">
-                                    <div class="title pull-left">
-                                        Instagram
-                                    </div>
-                                    <div class="value pull-right" title="{{( inst/indb )*100}}%" data-toggle="tooltip">
-                                        {{inst}}
-                                    </div>
-                                </div>
-                                <div class="progress">
-                                    <div style="width: {{( inst/indb )*100}}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="{{( inst/indb )*100}}" role="progressbar" class="progress-bar">
-                                        <span class="sr-only">{{( inst/indb )*100}}%</span>
-                                    </div>
-                                </div>
-                            </li>
+                </header>
+                <div class="main-box-body clearfix">
+                    <div class="tabs-wrapper">
+                        <ul class="nav nav-tabs">
+                            <li ng-class="{'active' : allPlane}"><a ng-click="setAll()">Все посты</a></li>
+                            <li ng-class="{'active' : plannedPlane}"><a ng-click="setPlanned()">Запланированные посты</a></li>
                         </ul>
+                        <div class="tab-content">
+                            <div ng-class="{'active in' : allPlane}" class="tab-pane fade" id="tab-all">
+                                <div class="table-responsive" id="top">
+                                    <table class="table">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center"><a href="" ng-click="changeOrder()" class="{{order}}"><span>Дата публикации</span></a></th>
+                                            <th class="text-center"><span>Содержимое поста</span></th>
+                                            <th class="text-center"><span>Превью</span></th>
+                                            <th class="text-center"><span>Аккаунты</span></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="element in history" ng-include='"views/common/historyTable.html"'></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div ng-include='"views/common/historyPagination.html"'></div>
+                            </div>
+                            <div ng-class="{'active in' : plannedPlane}" class="tab-pane fade" id="tab-planned">
+                                <div class="table-responsive" id="topPlanned">
+                                    <table class="table">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center"><a href="" ng-click="changeOrder()" class="{{order}}"><span>Дата публикации</span></a></th>
+                                            <th class="text-center"><span>Содержимое поста</span></th>
+                                            <th class="text-center"><span>Превью</span></th>
+                                            <th class="text-center"><span>Аккаунты</span></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr ng-repeat="element in planned" ng-include='"views/common/historyTable.html"'></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div ng-include='"views/common/historyPlannedPagination.html"'></div>
+                            </div>
+                        </div>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </div>
-</div>
+
 
 <?if(Yii::$app->user->identity['authorized']==0){?>
-
-    <div class="wizard" id="satellite-wizard" data-title="Мастер настройки">
+    <div class="wizard" id="satellite-wizard" ng-controller='dashboardCtrl' data-title="Мастер настройки">
 
         <!-- Step 1 Name & FQDN -->
         <div class="wizard-card" data-cardname="name">
@@ -155,7 +96,7 @@ use common\models\User;
                     <input type="password" class="form-control"  ng-model="vkPassword"  placeholder="Пароль">
                 </div>
                 <div class="form-group">
-                    <button type="button" class="btn btn-success" ng-click="VkSave()">Добавить аккаунт</button>
+                    <button type="button" class="btn btn-success" ng-click="VkSave()">Подключить аккаунт</button>
                 </div>
             </div>
             <div class="vkcard__content" ng-show="vkGroupBox">
@@ -199,7 +140,7 @@ use common\models\User;
                 </div>
 
                 <div class="form-group">
-                    <button type="button" class="btn btn-success" ng-click="InstaSave()">Сохранить</button>
+                    <button type="button" class="btn btn-success" ng-click="InstaSave()">Подключить аккаунт</button>
                 </div>
             </div>
             <div class="vkcard__content" ng-show="instafinish">
@@ -213,12 +154,12 @@ use common\models\User;
             <h3>Facebook</h3>
             <div class="fbcard__auth" ng-show="fbAuthBox">
                 <?=
-                    SocialController::getFBBtn(
-                        'http://'.$_SERVER['SERVER_NAME'].'/social/wizard-fb',
-                        'Привязать аккаунт Facebook',
-                        'facebook',
-                        '<a class="btn btn-success" href="LINK" target="_blank" id="ID">TEXT</a>'
-                    );
+                SocialController::getFBBtn(
+                    'http://'.$_SERVER['SERVER_NAME'].'/social/wizard-fb',
+                    'Подключить аккаунт Facebook',
+                    'facebook',
+                    '<a class="btn btn-success" href="LINK" target="_blank" id="ID">TEXT</a>'
+                );
                 ?>
             </div>
             <div class="fbcard__content" ng-show="fbGroupBox">
@@ -265,10 +206,9 @@ use common\models\User;
         $(document).ready(function() {
 
             var options = {
-                contentHeight : 600,
-                contentWidth : 1000,
+                contentHeight : 450,
+                contentWidth : 750,
                 backdrop: 'static',
-                //show: true,
                 buttons: {
                     cancelText: "Отмена",
                     nextText: "Далее",
@@ -290,7 +230,7 @@ use common\models\User;
             wizard.show();
         });
     </script>
-<?
+    <?
     User::setAuth(Yii::$app->user->identity['id']);
 }
 ?>

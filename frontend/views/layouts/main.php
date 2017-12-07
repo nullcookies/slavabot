@@ -107,25 +107,26 @@ AppAsset::register($this);
 <!--                                    </ul>-->
 <!--                                </li>-->
 <!--                                <li class="header-nav__item" data-match-route="/pages/contacts"><a href="#/pages/contacts"><i class="fa fa-folder-open-o"></i><span>Купленные контакты</span></a></li>-->
-                                <li class="header-nav__item" data-match-route="/pages/social"><a href="#/pages/social"><i class="fa fa-sliders"></i><span>Соц. сети</span></a></li>
                                 <li data-match-route="/history*" class="header-nav__item">
                                     <a href="#/history">
                                         <i class="fa fa-history"></i>
                                         <span style="font-size: 0.775em;">История</span>
                                     </a>
-<!--                                    <ul class="submenu">-->
-<!--                                        <li>-->
-<!--                                            <a data-match-route="#/history/responses" href="#/history/responses">-->
-<!--                                                Ответы-->
-<!--                                            </a>-->
-<!--                                        </li>-->
-<!--                                        <li>-->
-<!--                                            <a data-match-route="#/history/posts" href="#/history/posts">-->
-<!--                                                Посты и комментарии-->
-<!--                                            </a>-->
-<!--                                        </li>-->
-<!--                                    </ul>-->
+                                    <!--                                    <ul class="submenu">-->
+                                    <!--                                        <li>-->
+                                    <!--                                            <a data-match-route="#/history/responses" href="#/history/responses">-->
+                                    <!--                                                Ответы-->
+                                    <!--                                            </a>-->
+                                    <!--                                        </li>-->
+                                    <!--                                        <li>-->
+                                    <!--                                            <a data-match-route="#/history/posts" href="#/history/posts">-->
+                                    <!--                                                Посты и комментарии-->
+                                    <!--                                            </a>-->
+                                    <!--                                        </li>-->
+                                    <!--                                    </ul>-->
                                 </li>
+                                <li class="header-nav__item" data-match-route="/pages/social"><a href="#/pages/social"><i class="fa fa-sliders"></i><span>Соц. сети</span></a></li>
+
                             </ul>
                         </div>
                     </div>

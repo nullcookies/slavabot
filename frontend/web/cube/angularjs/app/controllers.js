@@ -16,29 +16,6 @@ function checkData($str, $len){
 
 angular.module('cubeWebApp')
     .controller('dashboardCtrl', function ($scope, $http, $sce, $interval) {
-
-        function pad(number, length){
-            var str = "" + number
-            while (str.length < length) {
-                str = '0'+str
-            }
-            return str
-        }
-
-        var offset = new Date().getTimezoneOffset()
-        offset = ((offset<0? '+':'-')+ // Note the reversed sign!
-            pad(parseInt(Math.abs(offset/60)), 2)+
-            pad(Math.abs(offset%60), 2))
-
-
-        $scope.category = [];
-        $scope.location = [];
-        $scope.priority = [];
-        $scope.theme = [];
-        $scope.webhooks = 0;
-
-        // Сохранение аккаунтов начало
-
         var config = {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
@@ -68,10 +45,12 @@ angular.module('cubeWebApp')
 
         $scope.InstaSave = function(){
             $scope.data = {
-                type: 'instagram',
-                data: {
-                    'login': $scope.InstaLogin,
-                    'password': $scope.InstaPassword,
+                Instagram:{
+                    type: 'instagram',
+                    data: {
+                        'login': $scope.InstaLogin,
+                        'password': $scope.InstaPassword,
+                    }
                 }
             };
 
@@ -192,98 +171,6 @@ angular.module('cubeWebApp')
         }
 
         // Сохранение аккаунтов конец
-
-        $http({method: 'GET', url: '/site/main'}).
-        then(function success(response) {
-            $scope.indb = response.data.indb;
-            $scope.vk = response.data.vk;
-            $scope.ok = response.data.ok;
-            $scope.fb = response.data.fb;
-            $scope.twitter = response.data.twitter;
-            $scope.inst = response.data.inst;
-            $scope.norm = response.data.norm;
-
-            $scope.webhooks = response.data.webhooks;
-
-            $scope.dateConvert = function(myDate){
-                myDate=myDate.split("-");
-
-                var newDate=myDate[1]+"/"+myDate[0]+"/"+myDate[2];
-
-                return new Date(newDate).getTime();
-            }
-
-            var array = [];
-
-
-            for (var i = 0; i < response.data.data.length; i++) {
-                array[i]=[$scope.dateConvert(response.data.data[i]['dateNorm']), parseInt(response.data.data[i]['cnt'])];
-            }
-
-            var series = new Array();
-
-            series.push({
-                data: array,
-                color: '#e84e40',
-                lines: {
-                    show : true,
-                    lineWidth: 3,
-                },
-                points: {
-                    fillColor: "#e84e40",
-                    fillColor: '#ffffff',
-                    pointWidth: 1,
-                    show: true
-                },
-                label: 'Клиенты'
-            });
-
-            $.plot("#graph-bar", series, {
-                colors: ['#03a9f4', '#f1c40f', '#2ecc71', '#3498db', '#9b59b6', '#95a5a6'],
-                grid: {
-                    tickColor: "#f2f2f2",
-                    borderWidth: 0,
-                    hoverable: true,
-                    clickable: true
-                },
-                legend: {
-                    noColumns: 1,
-                    labelBoxBorderColor: "#000000",
-                    position: "ne"
-                },
-                shadowSize: 0,
-                xaxis: {
-                    mode: "time",
-                    tickSize: [1, "day"],
-                    tickLength: 0,
-                    // axisLabel: "Date",
-                    axisLabelUseCanvas: true,
-                    axisLabelFontSizePixels: 12,
-                    axisLabelFontFamily: 'Open Sans, sans-serif',
-                    axisLabelPadding: 10
-                }
-            });
-
-            var previousPoint = null;
-            $("#graph-bar").bind("plothover", function (event, pos, item) {
-                if (item) {
-                    if (previousPoint != item.dataIndex) {
-
-                        previousPoint = item.dataIndex;
-
-                        $("#flot-tooltip").remove();
-                        var x = item.datapoint[0],
-                            y = item.datapoint[1];
-
-                        showTooltip(item.pageX, item.pageY, item.series.label, y );
-                    }
-                }
-                else {
-                    $("#flot-tooltip").remove();
-                    previousPoint = [0,0,0];
-                }
-            });
-        });
 
 
     })

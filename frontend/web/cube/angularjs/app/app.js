@@ -25,7 +25,8 @@ app.config(['cfpLoadingBarProvider', function(cfpLoadingBarProvider) {
 app.config(['$routeProvider', function ($routeProvider) {
 	$routeProvider
 		.when("/", {
-			redirectTo:'/dasboard'
+            title: 'Главная',
+			redirectTo:'/history'
 		})
         .when("/potential", {
             templateUrl: "views/users.html",
@@ -47,11 +48,6 @@ app.config(['$routeProvider', function ($routeProvider) {
             controller: "contactsCtrl",
             title: 'Купленные контакты',
         })
-		.when("/dasboard", {
-			templateUrl: "/dashboard/",
-			controller: "dashboardCtrl",
-			title: 'Главная'
-		})
         .when("/pages/config", {
             templateUrl: "/site/config/",
             controller: "configCtrl",
@@ -72,7 +68,7 @@ app.config(['$routeProvider', function ($routeProvider) {
             title: 'Соц.сети'
         })
         .when("/history", {
-            templateUrl: "views/history.html",
+            templateUrl: "/history",
             controller: "historyCtrl",
             title: 'История'
         })
@@ -87,7 +83,8 @@ app.config(['$routeProvider', function ($routeProvider) {
             title: 'Посты и комментарии'
         })
 		.otherwise({
-			redirectTo:'/error-404'
+			redirectTo:'/',
+            title: ''
 		});
 }]);
 
