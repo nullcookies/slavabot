@@ -160,8 +160,8 @@ class SocialController extends Controller
         $auth = new VkService;
         $res = $auth->init($login, $password);
 
-        if($res['data']){
-            $save = Accounts::saveReference($auth->init($login, $password),  0);
+        if($res){
+            $save = Accounts::saveReference($res,  0);
 
             if($save){
                 return [
@@ -248,7 +248,7 @@ class SocialController extends Controller
      */
 
     public function actionUnprocessed($type = ''){
-        if(\Yii::$app->request->post()['type']){
+        if(isset(\Yii::$app->request->post()['type'])){
             $type = \Yii::$app->request->post()['type'];
         }
         return Accounts::getUnprocessedAccounts($type);

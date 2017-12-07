@@ -5,8 +5,7 @@ use Yii;
 use common\models\Accounts;
 use common\models\Instagram;
 use trntv\bus\interfaces\SelfHandlingCommand;
-use yii\base\BaseObject;
-
+use yii\base\Object as BaseObject;
 
 class AddToAccountsCommand extends BaseObject implements SelfHandlingCommand
 {

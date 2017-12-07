@@ -154,12 +154,12 @@ use common\models\User;
             <h3>Facebook</h3>
             <div class="fbcard__auth" ng-show="fbAuthBox">
                 <?=
-                SocialController::getFBBtn(
-                    'http://'.$_SERVER['SERVER_NAME'].'/social/wizard-fb',
-                    'Подключить аккаунт Facebook',
-                    'facebook',
-                    '<a class="btn btn-success" href="LINK" target="_blank" id="ID">TEXT</a>'
-                );
+                    SocialController::getFBBtn(
+                        'http://'.$_SERVER['HTTP_HOST'].'/social/wizard-fb',
+                        'Подключить аккаунт Facebook',
+                        'facebook',
+                        '<a class="btn btn-success" href="LINK" target="_blank" id="ID">TEXT</a>'
+                    );
                 ?>
             </div>
             <div class="fbcard__content" ng-show="fbGroupBox">

@@ -10,7 +10,7 @@ class m171030_083616_socialTable extends Migration
             'id' => $this->primaryKey(),
             'user_id' => $this->integer()->notNull(),
             'type' => $this->string()->notNull(),
-            'data' => $this->string()->notNull(),
+            'data' => $this->string(10000)->notNull(),
             'status' => $this->integer(),
         ]);
     }

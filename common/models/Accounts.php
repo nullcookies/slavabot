@@ -85,11 +85,9 @@ class Accounts extends \yii\db\ActiveRecord
             $model = self::checkReference();
         }
 
-        $res = $item['data'];
-
         $model->user_id = \Yii::$app->user->id;
         $model->type = $item['type'];
-        $model->data = json_encode($res);
+        $model->data = json_encode($item['data']);
         $model->processed = $processed;
         $model->status = 1;
         return $model->save();

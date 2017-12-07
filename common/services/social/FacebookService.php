@@ -85,7 +85,7 @@ class FacebookService
      * @return string
      */
     public function link($callback){
-        session_start();
+        //session_start();
 
         $fb = self::init();
 

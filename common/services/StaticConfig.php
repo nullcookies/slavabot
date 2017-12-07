@@ -6,20 +6,20 @@ use yii\base\Object;
 class StaticConfig
 {
     
-    public function config($param)
+    static function config($param)
     {
         return Yaml::parse(file_get_contents(__DIR__ . '/../config/config.yaml'))[$param];
     }
 
-    public function timezones(){
+    static function timezones(){
         return self::config('timezones');
     }
 
-    public function facebook(){
+    static function facebook(){
         return self::config('social')['facebook'];
     }
 
-    public function vk(){
+    static function vk(){
         return self::config('social')['vk'];
     }
 }
