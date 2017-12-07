@@ -189,15 +189,6 @@ class SocialController extends Controller
         return Accounts::remove($id);
     }
 
-    /**
-     * Проверка актуальности логина/пароля Instagram перед сохранением
-     * @return bool
-     */
-
-    public function actionCheckInstagram()
-    {
-        return Instagram::login();
-    }
 
     /**
      * Сохраняем аккаунт instagram
@@ -207,11 +198,13 @@ class SocialController extends Controller
     public function actionInstagram(){
 
         $model = new Instagram();
+
         $model->load(Yii::$app->request->post());
 
         $res = Yii::$app->commandBus->handle(
             new AddToAccountsCommand(
                 [
+                    'processed' => 1,
                     'data' => $model
                 ]
             )

@@ -51,6 +51,13 @@ return [
                 ]
             ]
         ],
+        'encrypter' => [
+            'class'=>'\nickcv\encrypter\components\Encrypter',
+            'globalPassword'=>'slavabotglobal',
+            'iv'=>'slavabotIdVector',
+            'useBase64Encoding'=>true,
+            'use256BitesEncoding'=>false,
+        ],
         'request' => [
             'baseUrl' => '/',
             'csrfParam' => '_csrf-frontend',

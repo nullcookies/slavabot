@@ -26,7 +26,10 @@
         "cosenary/instagram": "^2.3",
         "mgp25/instagram-php": "^3.1",
         "symfony/yaml": "^3.3",
-        "nesbot/carbon": "^1.22"
+        "nesbot/carbon": "^1.22",
+        "trntv/yii2-tactician": "^1.0",
+        "trntv/yii2-command-bus": "^3.0",
+        "nickcv/yii2-encrypter": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

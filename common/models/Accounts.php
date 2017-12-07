@@ -50,7 +50,16 @@ class Accounts extends \yii\db\ActiveRecord
             'user_id',
             'type',
             'data' => function(){
-                return json_decode($this->data);
+                $data = json_decode($this->data);
+
+                if(isset($data->password)){
+                    $decrypt = \Yii::$app->encrypter->decrypt($data->password);
+                    if($decrypt){
+                        $data->password = $decrypt;
+                    }
+                }
+
+                return $data;
             },
             'status',
             'processed'
@@ -76,19 +85,11 @@ class Accounts extends \yii\db\ActiveRecord
             $model = self::checkReference();
         }
 
-        if($item['type']=='instagram'){
-            $acc = Instagram::login($item['data']['login'], $item['data']['password']);
+        $res = $item['data'];
 
-            if(!$acc){
-                return [
-                    'error' => '<strong>Ошибка аутентификации!</strong> Проверьте правильность логина/пароля или подтвердите вход <a target="_blank" href="https://www.instagram.com">https://www.instagram.com</a>.'
-                ];
-            }
-        }
-
-        $model->user_id = Yii::$app->user->id;
+        $model->user_id = \Yii::$app->user->id;
         $model->type = $item['type'];
-        $model->data = json_encode($item['data']);
+        $model->data = json_encode($res);
         $model->processed = $processed;
         $model->status = 1;
         return $model->save();
@@ -107,10 +108,18 @@ class Accounts extends \yii\db\ActiveRecord
     }
 
     public static function processAccount(){
+
         $post = \Yii::$app->request->post();
 
         $acc = Accounts::find()->where(['id' => $post['id']])->one();
 
+        if(isset($post['data']['password'])){
+            $decrypt = \Yii::$app->encrypter->encrypt($post['data']['password']);
+
+            if($decrypt){
+                $post['data']['password'] = $decrypt;
+            }
+        }
 
         $acc->data = json_encode($post['data']);
         $acc->processed = 1;

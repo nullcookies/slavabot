@@ -171,7 +171,7 @@ class VkService
             'type' => 'vkontakte',
             'data' => array(
                 'login' => $login,
-                'password' => $password,
+                'password' => \Yii::$app->encrypter->encrypt($password),
                 'user_name' => $user[0]['first_name'] . ' ' . $user[0]['last_name'],
                 'user_id' => $config['user_id'],
                 'access_token' => $config['access_token'],

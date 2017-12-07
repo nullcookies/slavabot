@@ -16,6 +16,12 @@ class AddToAccountsCommand extends BaseObject implements SelfHandlingCommand
     public $data;
 
     /**
+     * @var int
+     */
+
+    public $processed;
+
+    /**
      * @param AddToAccountsCommand $command
      * @return bool
      */
@@ -39,10 +45,15 @@ class AddToAccountsCommand extends BaseObject implements SelfHandlingCommand
             }
         }
 
+        $res = $account['data'];
+
+        $res['password'] = \Yii::$app->encrypter->encrypt($res['password']);
+
+
         $model->user_id = Yii::$app->user->id;
         $model->type = $account['type'];
-        $model->data = json_encode($account['data']);
-        $model->processed = 1;
+        $model->data = json_encode($res);
+        $model->processed = $command->processed;
         $model->status = 1;
 
         return $model->save();
