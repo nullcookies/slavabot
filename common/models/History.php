@@ -71,7 +71,7 @@ class History extends \yii\db\ActiveRecord
 
                 $redate = \Yii::$app->formatter->asDatetime($this->updated_at, $format);
 
-                if(Json::decode($this->data)['schedule_dt']){
+                if(isset(Json::decode($this->data)['schedule_dt'])){
                     $postDate = Json::decode($this->data)['schedule_dt'];
                     $date = $postDate['date'];
                     $timezone = $postDate['timezone'];
@@ -98,7 +98,7 @@ class History extends \yii\db\ActiveRecord
 
                 $redate = \Yii::$app->formatter->asDatetime($this->updated_at, $format);
 
-                if(Json::decode($this->data)['schedule_dt']){
+                if(isset(Json::decode($this->data)['schedule_dt'])){
                     $postDate = Json::decode($this->data)['schedule_dt'];
                     $date = $postDate['date'];
                     $timezone = $postDate['timezone'];
@@ -124,7 +124,16 @@ class History extends \yii\db\ActiveRecord
 
         $format = "dd.M.y HH:mm";
 
-        if(json_decode($data, true)['post_id']){
+        $file = 'webhooks.txt';
+        $current = file_get_contents($file);
+        $new = Yii::$app->request->post();
+
+        if(\Yii::$app->request->isPost){
+            $current .= json_encode($new)."\n";
+            file_put_contents($file, $current);
+        }
+
+        if(isset(json_decode($data, true)['post_id'])){
             $model = History::findOne(['post_id' => json_decode($data, true)['post_id']]);
             $old_data = json_decode($model->data, true);
             $old_data['schedule_dt'] = json_decode($data, true)['schedule_dt'];
