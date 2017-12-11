@@ -23,6 +23,7 @@ use common\models\Priority;
 use common\models\Theme;
 use common\models\Additional;
 use yii\web\Response;
+use yii\helpers\Url;
 
 
 /**
@@ -228,18 +229,19 @@ class SiteController extends Controller
         return $this->render('about');
     }
 
-    public function actionSignup()
+    public function actionSignup($success = false)
     {
         $this->layout = 'login';
         $model = new SignupForm();
         if ($model->load(Yii::$app->request->post())) {
             if ($user = $model->signup()) {
-                return Yii::$app->response->redirect(['site/login']);
+
+                return Yii::$app->response->redirect(Url::to(['site/signup', 'success' => true]));
             }
         }
 
         return $this->render('signup', [
-            'model' => $model,
+            'model' => $model
         ]);
     }
 

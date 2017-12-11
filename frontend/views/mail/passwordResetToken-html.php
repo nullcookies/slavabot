@@ -22,4 +22,4 @@ $resetLink = Yii::$app->urlManager->createAbsoluteUrl(['site/reset-password', 't
 <div><br></div>
 <div>С уважением,<br>Команда СлаваБот<br></div>
 <div><span class="wmi-callto">+7 (495) 108-08-19</span></div>
-<div><a href="mailto:support@salesbot.ru" target="_blank">support@salesbot.ru</a></div>
+<div><a href="mailto:support@slavabot.ru" target="_blank">support@slavabot.ru</a></div>

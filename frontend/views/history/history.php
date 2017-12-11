@@ -103,7 +103,7 @@ use common\models\User;
                 <h4 class="modal-title" id="myModalLabel">
                     Укажите активное сообщество для аккаунта: {{unprocessedName}}
                 </h4>
-                <div class="form-group">
+                <div class="form-group scroll-block">
                     <div class="radio" style="margin-top: 25px;" ng-repeat="groupe in unprocessed">
                         <input type="radio" name="optionsRadios" ng-model="userSelection.activeValue" id="optionsRadios{{groupe.id}}" ng-value="groupe">
                         <label for="optionsRadios{{groupe.id}}">
@@ -166,7 +166,7 @@ use common\models\User;
                 <h4 class="modal-title" id="myModalLabel">
                     Укажите активное сообщество для аккаунта: {{unprocessedName}}
                 </h4>
-                <div class="form-group">
+                <div class="form-group scroll-block">
                     <div class="radio" style="margin-top: 25px;" ng-repeat="groupe in unprocessed">
                         <input type="radio" name="optionsRadios" ng-model="userSelection.activeValue" id="optionsRadios{{groupe.id}}" ng-value="groupe">
                         <label for="optionsRadios{{groupe.id}}">

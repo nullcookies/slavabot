@@ -297,3 +297,9 @@ div.minTable table tbody tr td, div.minTable table tbody tr td th {
 li.wizard-nav-item {
     width: 100%;
 }
+.scroll-block{
+    overflow: scroll;
+    width: 100%;
+    height: 220px;
+    padding-left: 15px;
+}

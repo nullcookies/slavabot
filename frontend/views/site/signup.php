@@ -9,6 +9,7 @@ use yii\bootstrap\ActiveForm;
 
 $this->title = \Yii::t('main', 'Signup');
 $this->params['breadcrumbs'][] = $this->title;
+$success = Yii::$app->request->get('success');
 ?>
 
 <div id="login-box">
@@ -20,7 +21,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     <span>Slavabot</span>
                 </div>
             </header>
-            <div id="login-box-inner">
+            <? if(!$success){?>
+            <div id="login-box-inner" >
                 <?php $form = ActiveForm::begin(['id' => 'form-signup']); ?>
 
                     <?= $form->field($model, 'username',
@@ -63,6 +65,15 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
                 <?php ActiveForm::end(); ?>
             </div>
+            <? } elseif($success){?>
+                <div id="login-box-inner" style="height: 190px;">
+                    <p>Данные для входа отправлены на почту!</p>
+                    <p>Теперь вы можете авторизоваться.</p>
+
+                    <a href="/site/login" class="btn btn-success col-xs-12">Авторизоваться</a>
+                </div>
+            <? }?>
+
         </div>
     </div>
 </div>
