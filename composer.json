@@ -29,7 +29,8 @@
         "nesbot/carbon": "^1.22",
         "trntv/yii2-tactician": "^1.0",
         "trntv/yii2-command-bus": "^3.0",
-        "nickcv/yii2-encrypter": "*"
+        "nickcv/yii2-encrypter": "*",
+        "longman/telegram-bot": "^0.51.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

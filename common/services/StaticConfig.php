@@ -11,6 +11,11 @@ class StaticConfig
         return Yaml::parse(file_get_contents(__DIR__ . '/../config/config.yaml'))[$param];
     }
 
+    static function configBot($name)
+    {
+        return Yaml::parse(file_get_contents(__DIR__ . '/../config/bot/'.$name.'.yaml'));
+    }
+
     static function timezones(){
         return self::config('timezones');
     }
