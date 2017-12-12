@@ -309,7 +309,7 @@ class User extends ActiveRecord implements IdentityInterface
                 <span class=\"wmi-callto\">+7 (495) 108-08-19</span>
             </div>
             <div>
-                <a href=\"mailto:support@salesbot.ru\">support@salesbot.ru</a>
+                <a href=\"mailto:support@slavabot.ru\">support@slavabot.ru</a>
             </div>
         ";
 
