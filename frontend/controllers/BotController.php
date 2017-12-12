@@ -12,6 +12,13 @@ use frontend\controllers\bot\BotHook;
 
 /**
  * Bot main controller
+ *
+ * Соотношение папок из бота:
+ *
+ * /config           => /common/config/bot
+ * /commands         => /frontend/controllers/bot/commands
+ * /tlg_rbot/app     => /frontend/controllers/bot/
+ *
  */
 
 class BotController extends Controller
