@@ -29,14 +29,18 @@ class BotController extends Controller
             'access' => [
                 'class' => AccessControl::className(),
                 'only' => [
-                    'index'
+                    'index',
+                    'set',
+                    'unset',
+                    'hook'
                 ],
                 'rules' => [
                     [
                         'actions' => [
                             'index',
                             'set',
-                            'unset'
+                            'unset',
+                            'hook'
                         ],
                         'allow' => true,
                         'roles' => ['?'],
@@ -54,7 +58,6 @@ class BotController extends Controller
                     'index' => ['get'],
                     'set' => ['get'],
                     'unset' => ['get'],
-
                     'hook' => ['post'],
                     //'getdata' => ['post']
                 ],

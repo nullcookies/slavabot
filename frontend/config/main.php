@@ -12,7 +12,8 @@ return [
         'rules' => [
             [
                 'actions' => ['login','signup', 'error', 'request-password-reset', 'reset-password',
-                    'getdata', 'contact',
+                    'getdata',
+                    'contact',
                     'get-user-accounts',
                     'set-account-status',
                     'get-token',
@@ -22,7 +23,10 @@ return [
                     'new-event',
                     'set-time-zone',
                     'get-time-zone',
-                    'get-vk-accounts'
+                    'get-vk-accounts',
+                    'set',
+                    'unset',
+                    'hook'
                 ],
                 'allow' => true,
                 'roles' => ['?'],
