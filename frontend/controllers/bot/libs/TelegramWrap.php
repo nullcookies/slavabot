@@ -1,0 +1,295 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Admin
+ * Date: 10.11.2017
+ * Time: 10:10
+ */
+
+namespace frontend\controllers\bot\libs;
+
+use common\services\StaticConfig;
+use Longman\TelegramBot\Entities\Keyboard;
+
+/**
+ * Class TelegramWrap
+ * @package Libs
+ * Дублирующийся код для выдачи в телеграм
+ */
+class TelegramWrap
+{
+
+    public $config;
+
+    /**
+     * TelegramWrap constructor.
+     */
+    public function __construct()
+    {
+        //заполняем массив
+        $this->config = StaticConfig::configBot('telegram');
+
+        //убираем обратные слеши для вывода emoji
+        $this->config['buttons']['email']['label']      = stripcslashes($this->config['buttons']['email']['label']);
+        $this->config['buttons']['menu']['label']       = stripcslashes($this->config['buttons']['menu']['label']);
+        $this->config['buttons']['repeatcode']['label'] = stripcslashes($this->config['buttons']['repeatcode']['label']);
+        $this->config['buttons']['post']['label']       = stripcslashes($this->config['buttons']['post']['label']);
+        $this->config['buttons']['settings']['label']       = stripcslashes($this->config['buttons']['settings']['label']);
+        $this->config['buttons']['time']['label']       = stripcslashes($this->config['buttons']['time']['label']);
+        $this->config['timezones']['active']       = stripcslashes($this->config['timezones']['active']);
+
+    }
+
+    /**
+     * Вывод стартового окна
+     * @return string
+     */
+    public function getStartWindow(array $arDate)
+    {
+
+        //текст приветствия
+        $str = "Добро пожаловать!\n";
+        $str .= "Команды:\n";
+        //описание для email
+        $str            .= sprintf("%s - %s.",
+            $this->config['buttons']['email']['command'],
+            $this->config['buttons']['email']['description']
+        );
+        $arDate['text'] = $str;
+
+        //кнопки
+        $keyboard = new Keyboard(
+            [
+                ['text' => $this->config['buttons']['email']['label']],
+            ]
+        );
+
+        $arDate['reply_markup'] = $keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
+
+        return $arDate;
+    }
+
+
+    /**Вывод окна запроса email
+     *
+     * @param array $arDate
+     *
+     * @return array
+     */
+    public function getEmailWindow(array $arDate)
+    {
+
+        //текст приглашения
+        $str            = "Введите email аккаунта SlavaBot:\n";
+        $arDate['text'] = $str;
+
+        //кнопки
+        $keyboard = new Keyboard(
+            [
+                ['text' => $this->config['buttons']['menu']['label']],
+            ]
+        );
+
+        $arDate['reply_markup'] = $keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
+
+        return $arDate;
+    }
+
+    public function getWrongEmailWindow(array $arDate, $text = '<email>')
+    {
+        //текст приглашения
+        $str            = "Пользователь {$text} не найден.\n";
+        $str            .= "Введите email аккаунта SlavaBot:\n";
+        $arDate['text'] = $str;
+
+        //кнопки
+        $keyboard = new Keyboard(
+            [
+                ['text' => $this->config['buttons']['email']['label']],
+                ['text' => $this->config['buttons']['menu']['label']],
+            ]
+        );
+
+        $arDate['reply_markup'] = $keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
+
+        return $arDate;
+    }
+
+
+    /**Окно ввода кода
+     *
+     * @param array $arDate
+     *
+     * @return array
+     */
+    public function getCodeWindow(array $arDate, $notes = [])
+    {
+
+        //текст приглашения
+        $str            = "На {$notes['email']} отправлен код активации. Введите его:\n";
+        $arDate['text'] = $str;
+
+        //кнопки
+        $keyboard               = new Keyboard(
+            [
+                ['text' => $this->config['buttons']['repeatcode']['label']],
+                ['text' => $this->config['buttons']['email']['label']],
+                ['text' => $this->config['buttons']['menu']['label']],
+            ]
+        );
+        $arDate['reply_markup'] = $keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
+
+        return $arDate;
+    }
+
+    /**Успешная активация пользователя
+     * @param array $arDate
+     *
+     * @return array
+     */
+    public function getCodeSuccessWindow(array $arDate)
+    {
+
+        //текст приглашения
+        $str = "Аккаунт успешно подключен.";
+        $arDate['text'] = $str;
+
+//        //кнопки
+        $keyboard = new Keyboard(
+            [
+                ['text' => $this->config['buttons']['menu']['label'] ],
+            ]
+        );
+        $arDate['reply_markup'] = $keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
+
+        return $arDate;
+    }
+
+    public function getCodeWrongWindow(array $arDate)
+    {
+
+        //текст приглашения
+        $str = "Неправильный код или email.\n";
+        $str .= "Введите снова:.\n";
+        $arDate['text'] = $str;
+
+//        //кнопки
+        $keyboard = new Keyboard(
+            [
+                ['text' => $this->config['buttons']['repeatcode']['label'] ],
+                ['text' => $this->config['buttons']['email']['label'] ],
+                ['text' => $this->config['buttons']['menu']['label'] ],
+            ]
+        );
+        $arDate['reply_markup'] = $keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
+
+        return $arDate;
+    }
+
+
+    /**Выводим главное меню
+     *
+     * @param array $arDate
+     *
+     * @return array
+     */
+    public function getMainWindow(array $arDate)
+    {
+        //текст приглашения
+        $str = "Добро пожаловать. Выберите ваше действие:\n";
+        $str .= sprintf("%s - %s.",
+                $this->config['buttons']['post']['command'],
+                $this->config['buttons']['post']['description']
+                ) . "\n";
+        $str .= sprintf("%s - %s.",
+            $this->config['buttons']['menu']['command'],
+            $this->config['buttons']['menu']['description']
+        ) . "\n";
+        $str .= sprintf("%s - %s.",
+            $this->config['buttons']['settings']['command'],
+            $this->config['buttons']['settings']['description']
+        );
+
+        $arDate['text'] = $str;
+
+        //кнопки
+        $keyboard               = new Keyboard(
+            [
+                ['text' => $this->config['buttons']['post']['label']],
+                ['text' => $this->config['buttons']['menu']['label']],
+                ['text' => $this->config['buttons']['settings']['label']],
+
+            ]
+        );
+        $arDate['reply_markup'] = $keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
+
+
+        return $arDate;
+    }
+
+    /**Окно отмены поста
+     * @param array $arDate
+     *
+     * @return array
+     */
+    public function getPostCancelWindow(array $arDate){
+
+         //текст
+        $str = "Отмена создания сообщения.\n";
+        $arDate['text'] = $str;
+
+        //кнопки
+        $keyboard               = new Keyboard(
+            [
+                ['text' => $this->config['buttons']['menu']['label']],
+            ]
+        );
+        $arDate['reply_markup'] = $keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
+
+
+        return $arDate;
+
+    }
+
+
+
+    /*
+     * Окно настроек
+     */
+    public function getSettingsWindow(array $arDate){
+
+         //текст
+        $str = "Настройки публикации:\n";
+        $str .= sprintf("%s - %s.",
+        $this->config['buttons']['time']['command'],
+        $this->config['buttons']['time']['description']
+        ) . "\n";
+        $arDate['text'] = $str;
+
+        //кнопки
+        $arDate = $this->getSettingsKeyboard($arDate);
+
+        return $arDate;
+    }
+
+
+    /*
+     * Клавиатура для настроек
+     */
+    public function getSettingsKeyboard(array $arDate){
+
+        //кнопки
+        $keyboard               = new Keyboard(
+            [
+                ['text' => $this->config['buttons']['time']['label']],
+                ['text' => $this->config['buttons']['menu']['label']],
+            ]
+        );
+        $arDate['reply_markup'] = $keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
+
+
+        return $arDate;
+    }
+
+
+}

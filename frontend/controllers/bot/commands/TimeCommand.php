@@ -2,15 +2,11 @@
 
 namespace Longman\TelegramBot\Commands\UserCommands;
 
+use common\models\User;
+use frontend\controllers\bot\libs\TelegramWrap;
 use Longman\TelegramBot\Commands\UserCommand;
-use Longman\TelegramBot\Conversation;
-use Longman\TelegramBot\Entities\Keyboard;
-use Longman\TelegramBot\Entities\MessageEntity;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Request;
-use Symfony\Component\Yaml\Yaml;
-use Libs\SalesBotApi;
-use Libs\TelegramWrap;
 
 
 class TimeCommand extends UserCommand
@@ -24,10 +20,8 @@ class TimeCommand extends UserCommand
 
     public function execute()
     {
-
         //подключаем обертку с настройками
         $telConfig = new TelegramWrap();
-
 
         try {
 
@@ -44,19 +38,16 @@ class TimeCommand extends UserCommand
 
             if ($text === '' || $text === $telConfig->config['buttons']['time']['label']) {
 
-
-                $db            = new \Libs\Db();
-                $entityManager = $db->GetManager();
-
-                $user = $entityManager->getRepository('Models\Users')->findOneBy([
-                    'telegram_id' => $user_id,
+                $user = User::findOne([
+                    'telegram_id' => $user_id
                 ]);
 
-                $user_timezone = '';
                 if ($user) {
-                    $user_timezone = $user->getTimezone();
+                    $user_timezone = $user->timezone;
                 }
-
+                else {
+                    $user_timezone = '';
+                }
 
                 $inline_keyboard = new InlineKeyboard();
                 foreach ($telConfig->config['timezones']['buttons'] as $zone =>$arButton) {

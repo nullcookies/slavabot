@@ -1,5 +1,0 @@
-bot:
-  api_key: 475149120:AAEApdOiByJzqvnm0C9FnVdw3Juq6GGVfv0
-  username: mlgbottest
-  hook_url: https://tlgbot.mlg.ddemo.ru/hook.php
-  cert: /etc/nginx/ssl/

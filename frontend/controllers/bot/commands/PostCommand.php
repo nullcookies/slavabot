@@ -11,8 +11,8 @@ use Longman\TelegramBot\Entities\Keyboard;
 use Longman\TelegramBot\Entities\MessageEntity;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
-use Libs\TelegramWrap;
-use Libs\SalesBotApi;
+use frontend\controllers\bot\libs\TelegramWrap;
+use frontend\controllers\bot\libs\SalesBotApi;
 
 class PostCommand extends UserCommand
 {
@@ -220,29 +220,29 @@ class PostCommand extends UserCommand
 
                     $notes['MsgId'] = $message->getMessageId();
 
-                     //часовой пояс пользователя
-                    $db            = new \Libs\Db();
-                    $entityManager = $db->GetManager();
-
-                    $user = $entityManager->getRepository('Models\Users')->findOneBy([
-                        'telegram_id' => $user_id,
-                    ]);
-
-                   //по умолчанию ставим
+//                     //часовой пояс пользователя
+//                    $db            = new \Libs\Db();
+//                    $entityManager = $db->GetManager();
+//
+//                    $user = $entityManager->getRepository('Models\Users')->findOneBy([
+//                        'telegram_id' => $user_id,
+//                    ]);
+//
+//                   //по умолчанию ставим
                     $timeZone = 'Europe/Moscow';
-                    if ($user) {
-                        $timeZone = $user->GetTimezone();
-
+//                    if ($user) {
+//                        $timeZone = $user->GetTimezone();
+//
                         //проверяем часовой пояс из ЛК
                         $SalesBot = new SalesBotApi();
                         $tz = $SalesBot->getTimezone(['tid'=>$user_id]);
-                        if ($tz != $timeZone) {
-                            $timeZone = $tz;
-                            $user->SetTimezone( $timeZone );
-                            $entityManager->persist($user);
-                            $entityManager->flush();
-                        }
-                    }
+//                        if ($tz != $timeZone) {
+//                            $timeZone = $tz;
+//                            $user->SetTimezone( $timeZone );
+//                            $entityManager->persist($user);
+//                            $entityManager->flush();
+//                        }
+//                    }
 
                     $data['text'] = "Введите время публикации.\nНапример: ".Carbon::now()->timezone($timeZone)->addHour()->format('d.m.Y H:i');
 
@@ -268,28 +268,28 @@ class PostCommand extends UserCommand
                     } else {
 
                         //часовой пояс пользователя
-                        $db            = new \Libs\Db();
-                        $entityManager = $db->GetManager();
+//                        $db            = new \Libs\Db();
+//                        $entityManager = $db->GetManager();
 
-                        $user = $entityManager->getRepository('Models\Users')->findOneBy([
-                            'telegram_id' => $user_id,
-                        ]);
+//                        $user = $entityManager->getRepository('Models\Users')->findOneBy([
+//                            'telegram_id' => $user_id,
+//                        ]);
 
                         //по умолчанию ставим
                         $timeZone = 'Europe/Moscow';
-                        if ($user) {
-                            $timeZone = $user->GetTimezone();
+//                        if ($user) {
+//                            $timeZone = $user->GetTimezone();
 
                             //проверяем часовой пояс из ЛК
-                            $SalesBot = new SalesBotApi();
-                            $tz = $SalesBot->getTimezone(['tid'=>$user_id]);
-                            if ($tz != $timeZone) {
-                                $timeZone = $tz;
-                                $user->SetTimezone( $timeZone );
-                                $entityManager->persist($user);
-                                $entityManager->flush();
-                            }
-                        }
+//                            $SalesBot = new SalesBotApi();
+//                            $tz = $SalesBot->getTimezone(['tid'=>$user_id]);
+//                            if ($tz != $timeZone) {
+//                                $timeZone = $tz;
+//                                $user->SetTimezone( $timeZone );
+//                                $entityManager->persist($user);
+//                                $entityManager->flush();
+//                            }
+//                        }
 
                         $notes['state'] = 5;
                         $notes['schedule_dt'] = Carbon::parse($text)->timezone($timeZone)->timezone('Europe/London')->toDateTimeString();

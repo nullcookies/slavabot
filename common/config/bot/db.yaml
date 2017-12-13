@@ -1,6 +1,6 @@
 db:
     driver: pdo_mysql
     host: localhost
-    user: tlgbot
-    password: tlgbot
-    dbname: tlgbot_mlg
+    user: medialogic
+    password: 69yvOr8Q9aHJ
+    dbname: salesbot_medialogic

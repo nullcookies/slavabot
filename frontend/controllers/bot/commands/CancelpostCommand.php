@@ -5,7 +5,7 @@ namespace Longman\TelegramBot\Commands\UserCommands;
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Conversation;
 use Longman\TelegramBot\Request;
-use Libs\TelegramWrap;
+use frontend\controllers\bot\libs\TelegramWrap;
 
 class CancelpostCommand extends UserCommand
 {

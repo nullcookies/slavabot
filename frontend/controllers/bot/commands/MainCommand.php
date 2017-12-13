@@ -2,14 +2,11 @@
 
 namespace Longman\TelegramBot\Commands\UserCommands;
 
+use frontend\controllers\bot\libs\TelegramWrap;
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Conversation;
 use Longman\TelegramBot\Entities\Keyboard;
-use Longman\TelegramBot\Entities\MessageEntity;
 use Longman\TelegramBot\Request;
-use Symfony\Component\Yaml\Yaml;
-use Libs\SalesBotApi;
-use Libs\TelegramWrap;
 
 
 class MainCommand extends UserCommand

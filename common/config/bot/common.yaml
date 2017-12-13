@@ -1,7 +1,9 @@
 bot:
-  api_key: 494827287:AAF-HEVOxrPxndlA_MRBoVwRQPFPV3Zo6TI
-  username: slavarubot
-  hook_url: https://salesbot.medialogic.ddemo.ru/bot/hook/
+#  api_key: 494827287:AAF-HEVOxrPxndlA_MRBoVwRQPFPV3Zo6TI
+#  username: slavarubot
+  api_key: 466074967:AAHAEaiBAHz5im_pdzNmW1gR1NGOAAR5JB8
+  username: MltTempBot
+  hook_url: https://salesbot.medialogic.ddemo.ru/bot/hook
   cert: /etc/ssl/mycerts/salesbot.medialogic.ddemo.ru/cert.pem
 apps:
   vkontakte:

@@ -8,17 +8,15 @@
 
 namespace frontend\controllers\bot;
 
-use Longman\TelegramBot\Telegram;
-use Symfony\Component\Yaml\Yaml;
 use common\services\StaticConfig;
+use Longman\TelegramBot\Exception\TelegramException;
+use Longman\TelegramBot\Telegram;
 
 
 class BotHook extends Bot
 {
     public function Run()
     {
-
-
         $settings = StaticConfig::configBot('db');
 
         $mysql_credentials = [
@@ -39,15 +37,16 @@ class BotHook extends Bot
             $telegram->setUploadPath($this->upload_dir);
 
             // Logging (Error, Debug and Raw Updates)
-            \Longman\TelegramBot\TelegramLog::initErrorLog(__DIR__ . "/../logs/{$this->bot_username}_error.log");
-            \Longman\TelegramBot\TelegramLog::initDebugLog(__DIR__ . "/../logs/{$this->bot_username}_debug.log");
-            \Longman\TelegramBot\TelegramLog::initUpdateLog(__DIR__ . "/../logs/{$this->bot_username}_update.log");
+            \Longman\TelegramBot\TelegramLog::initErrorLog(\Yii::getAlias('@frontend') . "/runtime/logs/{$this->bot_username}_error.log");
+            \Longman\TelegramBot\TelegramLog::initDebugLog(\Yii::getAlias('@frontend') . "/runtime/logs/{$this->bot_username}_debug.log");
+            \Longman\TelegramBot\TelegramLog::initUpdateLog(\Yii::getAlias('@frontend') . "/runtime/logs/{$this->bot_username}_update.log");
 
 
             // Handle telegram webhook request
             $telegram->handle();
-        } catch (Longman\TelegramBot\Exception\TelegramException $e) {
-            echo "";
+
+        }  catch (TelegramException $e) {
+            echo $e->getMessage();
         }
     }
 }

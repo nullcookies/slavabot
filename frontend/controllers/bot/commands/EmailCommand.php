@@ -2,14 +2,13 @@
 
 namespace Longman\TelegramBot\Commands\UserCommands;
 
+use common\models\User;
+use frontend\controllers\bot\libs\SalesBotApi;
+use frontend\controllers\bot\libs\TelegramWrap;
+
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Conversation;
-use Longman\TelegramBot\Entities\Keyboard;
-use Longman\TelegramBot\Entities\MessageEntity;
 use Longman\TelegramBot\Request;
-use Symfony\Component\Yaml\Yaml;
-use Libs\SalesBotApi;
-use Libs\TelegramWrap;
 
 class EmailCommand extends UserCommand
 {
@@ -79,28 +78,9 @@ class EmailCommand extends UserCommand
                     break;
                 }
 
-              //отправляем запрос на отправку проверочного кода
+                //отправляем запрос на отправку проверочного кода
                 $SalesBot = new SalesBotApi();
-                if ( $SalesBot->sendPassword(['login' => $text]) ) {
-                    //письмо с кодом успешно отправленно
-                    //сохраняем себе связку id_telegramm - email
-                    $db            = new \Libs\Db();
-                    $entityManager = $db->GetManager();
-
-                    $user = $entityManager->getRepository('Models\Users')->findOneBy([
-                        'telegram_id' => $user_id,
-                        'email'       => $text
-                    ]);
-
-                    if ( ! $user) {
-                        $user = new \Models\Users();
-                        $user->SetTelegramId($user_id);
-                        $user->SetEmail($text);
-                        $user->SetTimezone( $SalesBot->getTimezone(['tid'=>$user_id]) );
-                        $entityManager->persist($user);
-                        $entityManager->flush();
-                    }
-
+                if ($SalesBot->sendPassword(['login' => $text])) {
                     $notes['email'] = $text;
                 } else {
                     //письмо не отправленно,пользователь не найден
@@ -111,21 +91,18 @@ class EmailCommand extends UserCommand
 
                 }
                 $text = '';
-                // no break
+            // no break
             // no break
             case 1:
                 if ($text === '') {
                     $notes['state'] = 1;
 
-                    $db            = new \Libs\Db();
-                    $entityManager = $db->GetManager();
-
-                    $user = $entityManager->getRepository('Models\Users')->findOneBy([
+                    $user = User::findOne([
                         'telegram_id' => $user_id
                     ]);
 
                     if ($user) {
-                        $notes['email'] = $user->GetEmail();
+                        $notes['email'] = $user->email;
                     }
                     $this->conversation->update();
 
@@ -135,25 +112,20 @@ class EmailCommand extends UserCommand
                     break;
                 }
 
-                 //отправляем запрос на отправку проверочного кода
+                //отправляем запрос на отправку проверочного кода
                 $SalesBot = new SalesBotApi();
 
-                //достаем связку id_telegramm - email
-                //сохраняли при отправки письма скодом
-                $db = new \Libs\Db();
-                $entityManager = $db->GetManager();
-
-                $user = $entityManager->getRepository('Models\Users')->findOneBy([
-                    'telegram_id'=>$user_id
+                $user = User::findOne([
+                    'telegram_id' => $user_id
                 ]);
 
-                if ( $user ) {
+                if ($user) {
 
-                    if ( $SalesBot->authTelegram(
+                    if ($SalesBot->authTelegram(
                         [
-                        'login' => $user->getEmail(),
-                        'code' => $text,
-                        'tid' => $user_id
+                            'login' => $user->email,
+                            'code' => $text,
+                            'tid' => $user_id
                         ]
                     )) {
                         $notes['state'] = 2;
@@ -170,7 +142,7 @@ class EmailCommand extends UserCommand
                 }
 
                 $text = '';
-                // no break
+            // no break
             // no break
             case 2:
                 $this->conversation->update();

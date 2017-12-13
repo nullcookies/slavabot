@@ -12,7 +12,6 @@ namespace Longman\TelegramBot\Commands\SystemCommands;
 
 use Longman\TelegramBot\Commands\SystemCommand;
 use Longman\TelegramBot\Commands\UserCommands\CancelpostCommand;
-use Longman\TelegramBot\Commands\UserCommands\CodeCommand;
 use Longman\TelegramBot\Commands\UserCommands\PostCommand;
 use Longman\TelegramBot\Commands\UserCommands\SendpostCommand;
 use Longman\TelegramBot\Commands\UserCommands\SettimeCommand;

@@ -2,14 +2,12 @@
 
 namespace Longman\TelegramBot\Commands\UserCommands;
 
+use frontend\controllers\bot\libs\TelegramWrap;
+use Libs\SalesBotApi;
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Conversation;
 use Longman\TelegramBot\Entities\Keyboard;
-use Longman\TelegramBot\Entities\MessageEntity;
 use Longman\TelegramBot\Request;
-use Symfony\Component\Yaml\Yaml;
-use Libs\SalesBotApi;
-use Libs\TelegramWrap;
 
 
 class SettingsCommand extends UserCommand
@@ -23,7 +21,6 @@ class SettingsCommand extends UserCommand
 
     public function execute()
     {
-
         //подключаем обертку с настройками
         $telConfig = new TelegramWrap();
 
@@ -31,10 +28,8 @@ class SettingsCommand extends UserCommand
 
         $text = trim($message->getText(true));
 
-
         $chat = $message->getChat();
         $user = $message->getFrom();
-
 
         $chat_id = $chat->getId();
         $user_id = $user->getId();

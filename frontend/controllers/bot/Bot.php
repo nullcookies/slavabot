@@ -19,12 +19,10 @@ class Bot
 {
     protected static $telegram;
 
-    // TODO: Вынести переменные в YAML конфиг
-
-    public $bot_api_key = '475149120:AAEApdOiByJzqvnm0C9FnVdw3Juq6GGVfv0';
-    public $bot_username = 'mlgbottest';
+    public $bot_api_key;
+    public $bot_username;
     public $commands_paths = [__DIR__ . '/commands'];
-    public $hook_url = 'https://tlgbot.mlg.ddemo.ru/hook.php';
+    public $hook_url;
     public $cert;
     public $download_dir = __DIR__ . '/storage/download';
     public $upload_dir = __DIR__ . '/storage/upload';

@@ -2,11 +2,10 @@
 
 namespace Longman\TelegramBot\Commands\UserCommands;
 
-use Longman\TelegramBot\Commands\UserCommand;
-use Longman\TelegramBot\Conversation;
-use Longman\TelegramBot\Request;
-use Libs\TelegramWrap;
+use frontend\controllers\bot\libs\TelegramWrap;
 use Libs\SalesBotApi;
+use Longman\TelegramBot\Commands\UserCommand;
+use Longman\TelegramBot\Request;
 
 class SettimeCommand extends UserCommand
 {
