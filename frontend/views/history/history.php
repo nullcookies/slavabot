@@ -188,7 +188,7 @@ use common\models\User;
         </div>
         <div class="wizard-card" data-cardname="tlgcard">
             <h3>Подключение Telegram</h3>
-            <p>Подключитесь к <a href="http://t.me/MltTempBot" target="_blank">Славаботу</a> в Telegram.
+            <p>Подключитесь к <a href="http://t.me/slavarubot" target="_blank">Славаботу</a> в Telegram.
 
             </p>
         </div>
@@ -231,6 +231,6 @@ use common\models\User;
         });
     </script>
     <?
-    User::setAuth(Yii::$app->user->identity['id']);
+    //User::setAuth(Yii::$app->user->identity['id']);
 }
 ?>
