@@ -43,7 +43,7 @@ class Post extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'table_job_posts';
+        return 'table_posts';
     }
 
     /**

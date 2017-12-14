@@ -3,9 +3,11 @@
 namespace Longman\TelegramBot\Commands\SystemCommands;
 
 
+use frontend\controllers\bot\libs\Logger;
+use frontend\controllers\bot\libs\SalesBotApi;
 use frontend\controllers\bot\libs\TelegramWrap;
-use Libs\SalesBotApi;
 use Longman\TelegramBot\Commands\SystemCommand;
+use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 
 class StartCommand extends SystemCommand
@@ -42,7 +44,13 @@ class StartCommand extends SystemCommand
             $data = $telConfig->getMainWindow($data);
         }
 
-        return Request::sendMessage($data);        // Send message!
+        try {
+            return Request::sendMessage($data);
+        } catch (TelegramException $e) {
+            Logger::error('StartCommand', [
+                'message' => $e->getMessage()
+            ]);
+        }        // Send message!
 
     }
 }

@@ -78,8 +78,7 @@ class SendpostCommand extends UserCommand
             }
 
             $post = new Post();
-            $post->external_uid = "";
-            $post->internal_uid = $user;
+            $post->internal_uid = $user_id;
             $post->wall_id = $user['wall_id'];
             $post->callback_tlg_message_status = $notes["MsgId"];
             $post->message = $notes['Text'] ?: "";
@@ -101,7 +100,7 @@ class SendpostCommand extends UserCommand
             $arr['post_model_id'] = $post->id;
             $arr['Text'] = $notes['Text'] ?: "";
 
-            file_put_contents(__DIR__ . '/../logs/photos.log', $notes['Photo']);
+            file_put_contents(\Yii::getAlias('@frontend') . '/runtime/logs/photos.log', $notes['Photo']);
 
             if (isset($notes['Photo']) && !empty($notes['Photo'])) {
                 $p = json_decode($notes['Photo'], true);
@@ -110,7 +109,7 @@ class SendpostCommand extends UserCommand
                 } else {
                     $photo = end($p);
                 }
-                $photos[] = __DIR__ . "/../storage/download/" . $photo['file_path'];
+                $photos[] = \Yii::getAlias('@frontend') . "/storage/download/" . $photo['file_path'];
                 $arr['Photos'] = $photos;
             }
             if (isset($notes['Video']) && !empty($notes['Video'])) {
@@ -118,12 +117,12 @@ class SendpostCommand extends UserCommand
                 if (isset($v['file_path'])) {
                     $video = $v;
                 }
-                $videos[] = __DIR__ . "/../storage/download/" . $video['file_path'];
+                $videos[] = \Yii::getAlias('@frontend') . "/storage/download/" . $video['file_path'];
                 $arr['Videos'] = $videos;
             }
             if (isset($notes['Audio']) && !empty($notes['Audio'])) {
                 $audio = end(json_decode($notes['Audio'], true));
-                $audios[] = __DIR__ . "/../storage/download/" . $audio['file_path'];
+                $audios[] = \Yii::getAlias('@frontend') . "/storage/download/" . $audio['file_path'];
                 $arr['Audios'] = $audios;
             }
 
@@ -151,7 +150,7 @@ class SendpostCommand extends UserCommand
             }
 
             $client = new \Kicken\Gearman\Client('127.0.0.1:4730');
-            $job = $client->submitBackgroundJob('post_vk', json_encode($arr));
+            $job = $client->submitBackgroundJob('sales_post_vk', json_encode($arr));
 
             return $job;
         }
@@ -175,7 +174,6 @@ class SendpostCommand extends UserCommand
             }
 
             $post = new Post();
-            $post->external_uid = "";
             $post->internal_uid = $user_id;
             $post->wall_id = $user['page_id'];
             $post->callback_tlg_message_status = $notes["MsgId"];
@@ -211,12 +209,12 @@ class SendpostCommand extends UserCommand
                 if (isset($v['file_path'])) {
                     $video = $v;
                 }
-                $videos[] = __DIR__ . "/../storage/download/" . $video['file_path'];
+                $videos[] = \Yii::getAlias('@frontend') . "/storage/download/" . $video['file_path'];
                 $arr['Videos'] = $videos;
             }
             if (isset($notes['Audio']) && !empty($notes['Audio'])) {
                 $audio = end(json_decode($notes['Audio'], true));
-                $audios[] = __DIR__ . "/../storage/download/" . $audio['file_path'];
+                $audios[] = \Yii::getAlias('@frontend') . "/storage/download/" . $audio['file_path'];
                 $arr['Audios'] = $audios;
             }
 
@@ -244,7 +242,7 @@ class SendpostCommand extends UserCommand
             }
 
             $client = new \Kicken\Gearman\Client('127.0.0.1:4730');
-            $job = $client->submitBackgroundJob('post_fb', json_encode($arr));
+            $job = $client->submitBackgroundJob('sales_post_fb', json_encode($arr));
 
             return $job;
         }
@@ -267,7 +265,6 @@ class SendpostCommand extends UserCommand
         }
 
         $post = new Post();
-        $post->external_uid = "";
         $post->internal_uid = $user_id;
         $post->wall_id = $user['username'];
         $post->callback_tlg_message_status = $notes["MsgId"];
@@ -299,12 +296,12 @@ class SendpostCommand extends UserCommand
             if (isset($v['file_path'])) {
                 $video = $v;
             }
-            $videos[] = __DIR__ . "/../storage/download/" . $video['file_path'];
+            $videos[] = \Yii::getAlias('@frontend') . "/storage/download/" . $video['file_path'];
             $arr['Videos'] = $videos;
         }
         if (isset($notes['Audio']) && !empty($notes['Audio'])) {
             $audio = end(json_decode($notes['Audio'], true));
-            $audios[] = __DIR__ . "/../storage/download/" . $audio['file_path'];
+            $audios[] = \Yii::getAlias('@frontend') . "/storage/download/" . $audio['file_path'];
             $arr['Audios'] = $audios;
         }
 
@@ -333,7 +330,7 @@ class SendpostCommand extends UserCommand
 
 
         $client = new \Kicken\Gearman\Client('127.0.0.1:4730');
-        $job = $client->submitBackgroundJob('post_ig', json_encode($arr));
+        $job = $client->submitBackgroundJob('sales_post_ig', json_encode($arr));
 
         return $job;
 

@@ -24,11 +24,14 @@ class Bot
     public $commands_paths = [__DIR__ . '/commands'];
     public $hook_url;
     public $cert;
-    public $download_dir = __DIR__ . '/storage/download';
-    public $upload_dir = __DIR__ . '/storage/upload';
+    public $download_dir;
+    public $upload_dir;
 
     public function __construct()
     {
+        $this->download_dir = \Yii::getAlias('@frontend') . '/storage/download';
+        $this->upload_dir = \Yii::getAlias('@frontend') . '/storage/upload';
+
         $settings = StaticConfig::configBot('common');
 
         $this->bot_api_key = $settings['bot']['api_key'];

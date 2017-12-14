@@ -2,13 +2,13 @@
 
 namespace Longman\TelegramBot\Commands\UserCommands;
 
+use common\models\User;
+use frontend\controllers\bot\libs\SalesBotApi;
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Conversation;
 use Longman\TelegramBot\Entities\Keyboard;
-use Longman\TelegramBot\Entities\MessageEntity;
 use Longman\TelegramBot\Request;
-use Symfony\Component\Yaml\Yaml;
-use Libs\SalesBotApi;
+
 
 class CodeCommand extends UserCommand
 {
@@ -66,20 +66,17 @@ class CodeCommand extends UserCommand
 
                 //достаем связку id_telegramm - email
                 //сохраняли при отправки письма скодом
-                $db = new \Libs\Db();
-                $entityManager = $db->GetManager();
-
-                $user = $entityManager->getRepository('Models\Users')->findOneBy([
-                    'telegram_id'=>$user_id
+                $user = User::findOne([
+                    'telegram_id' => $user_id
                 ]);
 
-                if ( $user ) {
+                if ($user) {
 
-                    if ( $SalesBot->authTelegram(
+                    if ($SalesBot->authTelegram(
                         [
-                        'login' => $user->getEmail(),
-                        'code' => $text,
-                        'tid' => $user_id
+                            'login' => $user->email,
+                            'code' => $text,
+                            'tid' => $user_id
                         ]
                     )) {
                         //письмо с кодом успешно отправленно
@@ -92,8 +89,8 @@ class CodeCommand extends UserCommand
 
 
                 } else {
-                     //пользователь не найден
-                    $data['text'] = "Пользователь с таким кодом активации не найден.".$user_id;
+                    //пользователь не найден
+                    $data['text'] = "Пользователь с таким кодом активации не найден." . $user_id;
                 }
 
 

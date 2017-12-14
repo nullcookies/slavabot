@@ -30,19 +30,19 @@ class TelegramWrap
         $this->config = StaticConfig::configBot('telegram');
 
         //убираем обратные слеши для вывода emoji
-        $this->config['buttons']['email']['label']      = stripcslashes($this->config['buttons']['email']['label']);
-        $this->config['buttons']['menu']['label']       = stripcslashes($this->config['buttons']['menu']['label']);
+        $this->config['buttons']['email']['label'] = stripcslashes($this->config['buttons']['email']['label']);
+        $this->config['buttons']['menu']['label'] = stripcslashes($this->config['buttons']['menu']['label']);
         $this->config['buttons']['repeatcode']['label'] = stripcslashes($this->config['buttons']['repeatcode']['label']);
-        $this->config['buttons']['post']['label']       = stripcslashes($this->config['buttons']['post']['label']);
-        $this->config['buttons']['settings']['label']       = stripcslashes($this->config['buttons']['settings']['label']);
-        $this->config['buttons']['time']['label']       = stripcslashes($this->config['buttons']['time']['label']);
-        $this->config['timezones']['active']       = stripcslashes($this->config['timezones']['active']);
+        $this->config['buttons']['post']['label'] = stripcslashes($this->config['buttons']['post']['label']);
+        $this->config['buttons']['settings']['label'] = stripcslashes($this->config['buttons']['settings']['label']);
+        $this->config['buttons']['time']['label'] = stripcslashes($this->config['buttons']['time']['label']);
+        $this->config['timezones']['active'] = stripcslashes($this->config['timezones']['active']);
 
     }
 
     /**
      * Вывод стартового окна
-     * @return string
+     * @return array
      */
     public function getStartWindow(array $arDate)
     {
@@ -51,7 +51,7 @@ class TelegramWrap
         $str = "Добро пожаловать!\n";
         $str .= "Команды:\n";
         //описание для email
-        $str            .= sprintf("%s - %s.",
+        $str .= sprintf("%s - %s.",
             $this->config['buttons']['email']['command'],
             $this->config['buttons']['email']['description']
         );
@@ -80,7 +80,7 @@ class TelegramWrap
     {
 
         //текст приглашения
-        $str            = "Введите email аккаунта SlavaBot:\n";
+        $str = "Введите email аккаунта SlavaBot:\n";
         $arDate['text'] = $str;
 
         //кнопки
@@ -98,8 +98,8 @@ class TelegramWrap
     public function getWrongEmailWindow(array $arDate, $text = '<email>')
     {
         //текст приглашения
-        $str            = "Пользователь {$text} не найден.\n";
-        $str            .= "Введите email аккаунта SlavaBot:\n";
+        $str = "Пользователь {$text} не найден.\n";
+        $str .= "Введите email аккаунта SlavaBot:\n";
         $arDate['text'] = $str;
 
         //кнопки
@@ -126,11 +126,11 @@ class TelegramWrap
     {
 
         //текст приглашения
-        $str            = "На {$notes['email']} отправлен код активации. Введите его:\n";
+        $str = "На {$notes['email']} отправлен код активации. Введите его:\n";
         $arDate['text'] = $str;
 
         //кнопки
-        $keyboard               = new Keyboard(
+        $keyboard = new Keyboard(
             [
                 ['text' => $this->config['buttons']['repeatcode']['label']],
                 ['text' => $this->config['buttons']['email']['label']],
@@ -157,7 +157,7 @@ class TelegramWrap
 //        //кнопки
         $keyboard = new Keyboard(
             [
-                ['text' => $this->config['buttons']['menu']['label'] ],
+                ['text' => $this->config['buttons']['menu']['label']],
             ]
         );
         $arDate['reply_markup'] = $keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
@@ -176,9 +176,9 @@ class TelegramWrap
 //        //кнопки
         $keyboard = new Keyboard(
             [
-                ['text' => $this->config['buttons']['repeatcode']['label'] ],
-                ['text' => $this->config['buttons']['email']['label'] ],
-                ['text' => $this->config['buttons']['menu']['label'] ],
+                ['text' => $this->config['buttons']['repeatcode']['label']],
+                ['text' => $this->config['buttons']['email']['label']],
+                ['text' => $this->config['buttons']['menu']['label']],
             ]
         );
         $arDate['reply_markup'] = $keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
@@ -200,11 +200,11 @@ class TelegramWrap
         $str .= sprintf("%s - %s.",
                 $this->config['buttons']['post']['command'],
                 $this->config['buttons']['post']['description']
-                ) . "\n";
+            ) . "\n";
         $str .= sprintf("%s - %s.",
-            $this->config['buttons']['menu']['command'],
-            $this->config['buttons']['menu']['description']
-        ) . "\n";
+                $this->config['buttons']['menu']['command'],
+                $this->config['buttons']['menu']['description']
+            ) . "\n";
         $str .= sprintf("%s - %s.",
             $this->config['buttons']['settings']['command'],
             $this->config['buttons']['settings']['description']
@@ -213,7 +213,7 @@ class TelegramWrap
         $arDate['text'] = $str;
 
         //кнопки
-        $keyboard               = new Keyboard(
+        $keyboard = new Keyboard(
             [
                 ['text' => $this->config['buttons']['post']['label']],
                 ['text' => $this->config['buttons']['menu']['label']],
@@ -232,14 +232,15 @@ class TelegramWrap
      *
      * @return array
      */
-    public function getPostCancelWindow(array $arDate){
+    public function getPostCancelWindow(array $arDate)
+    {
 
-         //текст
+        //текст
         $str = "Отмена создания сообщения.\n";
         $arDate['text'] = $str;
 
         //кнопки
-        $keyboard               = new Keyboard(
+        $keyboard = new Keyboard(
             [
                 ['text' => $this->config['buttons']['menu']['label']],
             ]
@@ -252,18 +253,18 @@ class TelegramWrap
     }
 
 
-
     /*
      * Окно настроек
      */
-    public function getSettingsWindow(array $arDate){
+    public function getSettingsWindow(array $arDate)
+    {
 
-         //текст
+        //текст
         $str = "Настройки публикации:\n";
         $str .= sprintf("%s - %s.",
-        $this->config['buttons']['time']['command'],
-        $this->config['buttons']['time']['description']
-        ) . "\n";
+                $this->config['buttons']['time']['command'],
+                $this->config['buttons']['time']['description']
+            ) . "\n";
         $arDate['text'] = $str;
 
         //кнопки
@@ -276,10 +277,11 @@ class TelegramWrap
     /*
      * Клавиатура для настроек
      */
-    public function getSettingsKeyboard(array $arDate){
+    public function getSettingsKeyboard(array $arDate)
+    {
 
         //кнопки
-        $keyboard               = new Keyboard(
+        $keyboard = new Keyboard(
             [
                 ['text' => $this->config['buttons']['time']['label']],
                 ['text' => $this->config['buttons']['menu']['label']],

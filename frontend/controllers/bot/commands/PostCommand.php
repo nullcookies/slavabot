@@ -3,16 +3,15 @@
 namespace Longman\TelegramBot\Commands\UserCommands;
 
 use Carbon\Carbon;
-use Libs\Utils;
+use frontend\controllers\bot\libs\SalesBotApi;
+use frontend\controllers\bot\libs\TelegramWrap;
+use frontend\controllers\bot\libs\Utils;
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Conversation;
 use Longman\TelegramBot\Entities\InlineKeyboard;
-use Longman\TelegramBot\Entities\Keyboard;
-use Longman\TelegramBot\Entities\MessageEntity;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
-use frontend\controllers\bot\libs\TelegramWrap;
-use frontend\controllers\bot\libs\SalesBotApi;
+use Longman\TelegramBot\TelegramLog;
 
 class PostCommand extends UserCommand
 {
@@ -42,14 +41,12 @@ class PostCommand extends UserCommand
             'user_id' => $user_id
         ];
 
-
-
-
         try {
 
             $this->conversation = new Conversation($user_id, $chat_id, $this->getName());
 
-            file_put_contents(__DIR__ . '/../logs/cbb.log', json_encode($this->conversation));
+            file_put_contents(\Yii::getAlias('@frontend') . '/runtime/logs/cbb.log',
+                json_encode($this->conversation) . "\n", FILE_APPEND);
 
             $notes = &$this->conversation->notes;
             !is_array($notes) && $notes = [];
@@ -166,7 +163,7 @@ class PostCommand extends UserCommand
                         ];
 
                         Request::deleteMessage([
-                            'chat_id'    => $chat_id,
+                            'chat_id' => $chat_id,
                             'message_id' => $notes['fm']['result']['message_id'],
                         ]);
 
@@ -183,7 +180,7 @@ class PostCommand extends UserCommand
 
                 case 2:
                     Request::deleteMessage([
-                        'chat_id'    => $chat_id,
+                        'chat_id' => $chat_id,
                         'message_id' => $notes['fm']['result']['message_id'],
                     ]);
 
@@ -195,7 +192,7 @@ class PostCommand extends UserCommand
                         ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
                     ]);
 
-                    $data['text']  = "Опубликовать?";
+                    $data['text'] = "Опубликовать?";
                     $data['reply_markup'] = $inline_keyboard;
 
                     $notes['state'] = 3;
@@ -208,7 +205,7 @@ class PostCommand extends UserCommand
 
                 case 3:
                     Request::deleteMessage([
-                        'chat_id'    => $chat_id,
+                        'chat_id' => $chat_id,
                         'message_id' => $notes['fm']['result']['message_id'],
                     ]);
 
@@ -233,9 +230,9 @@ class PostCommand extends UserCommand
 //                    if ($user) {
 //                        $timeZone = $user->GetTimezone();
 //
-                        //проверяем часовой пояс из ЛК
-                        $SalesBot = new SalesBotApi();
-                        $tz = $SalesBot->getTimezone(['tid'=>$user_id]);
+                    //проверяем часовой пояс из ЛК
+                    $SalesBot = new SalesBotApi();
+                    $tz = $SalesBot->getTimezone(['tid' => $user_id]);
 //                        if ($tz != $timeZone) {
 //                            $timeZone = $tz;
 //                            $user->SetTimezone( $timeZone );
@@ -244,7 +241,7 @@ class PostCommand extends UserCommand
 //                        }
 //                    }
 
-                    $data['text'] = "Введите время публикации.\nНапример: ".Carbon::now()->timezone($timeZone)->addHour()->format('d.m.Y H:i');
+                    $data['text'] = "Введите время публикации.\nНапример: " . Carbon::now()->timezone($timeZone)->addHour()->format('d.m.Y H:i');
 
                     $data['reply_markup'] = $inline_keyboard;
                     $notes['state'] = 4;
@@ -280,7 +277,7 @@ class PostCommand extends UserCommand
 //                        if ($user) {
 //                            $timeZone = $user->GetTimezone();
 
-                            //проверяем часовой пояс из ЛК
+                        //проверяем часовой пояс из ЛК
 //                            $SalesBot = new SalesBotApi();
 //                            $tz = $SalesBot->getTimezone(['tid'=>$user_id]);
 //                            if ($tz != $timeZone) {
@@ -324,7 +321,7 @@ class PostCommand extends UserCommand
                             $dif .= Utils::human_plural_form($td->s, ["секунду", "секунды", "секунд"]);
                         }
 
-                        $data['text'] = "Ваш пост будет опубликован через ".$dif;
+                        $data['text'] = "Ваш пост будет опубликован через " . $dif;
 
                     }
                     $this->changeFM($notes, $inline_keyboard, $user_id, $chat_id, true);
@@ -337,7 +334,7 @@ class PostCommand extends UserCommand
 
 
         } catch (TelegramException $e) {
-            //
+            TelegramLog::error($e->getMessage());
         }
 
     }

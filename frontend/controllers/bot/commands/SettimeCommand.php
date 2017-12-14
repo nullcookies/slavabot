@@ -2,9 +2,12 @@
 
 namespace Longman\TelegramBot\Commands\UserCommands;
 
+use common\models\User;
+use frontend\controllers\bot\libs\Logger;
+use frontend\controllers\bot\libs\SalesBotApi;
 use frontend\controllers\bot\libs\TelegramWrap;
-use Libs\SalesBotApi;
 use Longman\TelegramBot\Commands\UserCommand;
+use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 
 class SettimeCommand extends UserCommand
@@ -37,30 +40,30 @@ class SettimeCommand extends UserCommand
 
             $arUpdates = $this->getUpdate()->getRawData();
 
-            if (isset( $telConfig->config['timezones']['buttons'][ $arUpdates['callback_query']['data'] ]['value'] )) {
 
-                $db            = new \Libs\Db();
-                $entityManager = $db->GetManager();
+            if (isset($telConfig->config['timezones']['buttons'][$arUpdates['callback_query']['data']]['value'])) {
 
-                $user = $entityManager->getRepository('Models\Users')->findOneBy([
+                $user = User::findOne([
                     'telegram_id' => $user_id,
                 ]);
 
                 if ($user) {
-                    $user->SetTimezone( $telConfig->config['timezones']['buttons'][ $arUpdates['callback_query']['data'] ]['value'] );
-                    $entityManager->persist($user);
-                    $entityManager->flush();
+                    $user->timezone = $telConfig->config['timezones']['buttons'][$arUpdates['callback_query']['data']]['value'];
+                    $user->save(false);
 
                     //устанавливаем часовой пояс
                     $SalesBot = new SalesBotApi();
-                    $arRequest = $SalesBot->setTimezone(['tid' => $user_id, 'timezone' => $telConfig->config['timezones']['buttons'][ $arUpdates['callback_query']['data'] ]['value']]);
+                    $arRequest = $SalesBot->setTimezone([
+                        'tid' => $user_id,
+                        'timezone' => $telConfig->config['timezones']['buttons'][$arUpdates['callback_query']['data']]['value']
+                    ]);
 
                 }
             }
 
             $data = [
                 'chat_id' => $chat_id,
-                'text' => 'время установлено '.$telConfig->config['timezones']['buttons'][ $arUpdates['callback_query']['data'] ]['label'].' ('.$arUpdates['callback_query']['data'].')'
+                'text' => 'время установлено ' . $telConfig->config['timezones']['buttons'][$arUpdates['callback_query']['data']]['label'] . ' (' . $arUpdates['callback_query']['data'] . ')'
             ];
 
             $data = $telConfig->getSettingsKeyboard($data);
@@ -68,7 +71,15 @@ class SettimeCommand extends UserCommand
             return Request::sendMessage($data);
 
         } catch (Longman\TelegramBot\Exception\TelegramException $e) {
+            Logger::error(__METHOD__, [
+                'message' => $e->getMessage()
+            ]);
+
             $this->conversation->cancel();
+        } catch (TelegramException $e) {
+            Logger::error(__METHOD__, [
+                'message' => $e->getMessage()
+            ]);
         }
     }
 

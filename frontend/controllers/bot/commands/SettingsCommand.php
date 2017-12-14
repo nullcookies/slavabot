@@ -3,7 +3,7 @@
 namespace Longman\TelegramBot\Commands\UserCommands;
 
 use frontend\controllers\bot\libs\TelegramWrap;
-use Libs\SalesBotApi;
+
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Conversation;
 use Longman\TelegramBot\Entities\Keyboard;
@@ -48,7 +48,6 @@ class SettingsCommand extends UserCommand
              * Start conversation
              */
             $this->conversation = new Conversation($user_id, $chat_id, $this->getName());
-
 
             $result = Request::emptyResponse();
 

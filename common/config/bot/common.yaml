@@ -1,6 +1,4 @@
 bot:
-#  api_key: 494827287:AAF-HEVOxrPxndlA_MRBoVwRQPFPV3Zo6TI
-#  username: slavarubot
   api_key: 466074967:AAHAEaiBAHz5im_pdzNmW1gR1NGOAAR5JB8
   username: MltTempBot
   hook_url: https://salesbot.medialogic.ddemo.ru/bot/hook
@@ -15,3 +13,22 @@ apps:
     access_token: EAAaTiDoBLssBAJg2qrTZAsL2vcpOCeoT5UgXal7ZCXygmP6k0ZApUER0QyLcf5MR5V8bZBoZA9uQ2qwOJ8qdn9waE8FxZCZC2Bpxerfgi7wh6y5MDzoJd6avZCPU9P81OndZCx2UxscM2fjnGoaOzlCxY4qufKbU00J6qyZAwB9r10zZBEKSx2L0esL
     default_graph_version: v2.10
 hostname: https://salesbot.medialogic.ddemo.ru
+sales_bot_api: https://salesbot.medialogic.ddemo.ru
+
+
+#bot:
+#  api_key: 494827287:AAF-HEVOxrPxndlA_MRBoVwRQPFPV3Zo6TI
+#  username: slavarubot
+#  hook_url: https://salesbot.medialogic.ddemo.ru/bot/hook
+#  cert: /etc/ssl/mycerts/salesbot.medialogic.ddemo.ru/cert.pem
+#apps:
+#  vkontakte:
+#    client_id: 6223471
+#    secret_key: ilsUQvhc50T6nEdsjzWS
+#  facebook:
+#    app_id: 1851063158255307
+#    app_secret: 38e43b5ab78044815bcc51314fdb20a0
+#    access_token: EAAaTiDoBLssBAJg2qrTZAsL2vcpOCeoT5UgXal7ZCXygmP6k0ZApUER0QyLcf5MR5V8bZBoZA9uQ2qwOJ8qdn9waE8FxZCZC2Bpxerfgi7wh6y5MDzoJd6avZCPU9P81OndZCx2UxscM2fjnGoaOzlCxY4qufKbU00J6qyZAwB9r10zZBEKSx2L0esL
+#    default_graph_version: v2.10
+#hostname: https://app.slavabot.ru/
+#sales_bot_api: https://app.slavabot.ru/
