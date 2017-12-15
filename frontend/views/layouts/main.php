@@ -62,23 +62,20 @@ AppAsset::register($this);
                 </div>
 
 
-                <div class="nav-no-collapse pull-right" id="header-nav">
+                <div class="nav-no-collapse pull-right" id="header-nav" ng-controller="header">
                     <ul class="nav navbar-nav pull-right">
-                        <?if(Yii::$app->user->identity->telegram_id>0){?>
-                        <li class="dropdown profile-dropdown">
-                            <span class="alert fade in">
+                        <li class="dropdown profile-dropdown" ng-show="telegramStatus">
+                            <span class=" fade in">
                                 <i class="fa fa-check-circle fa-fw fa-lg"></i>
                                 Аккаунт Telegram активен
                             </span>
                         </li>
-                        <?}else{?>
-                        <li class="dropdown profile-dropdown">
-                            <span class="alert fade in">
+                        <li class="dropdown profile-dropdown" ng-show="!telegramStatus">
+                            <span class=" fade in">
                                 <i class="fa fa-times-circle fa-fw fa-lg"></i>
                                 <strong>Аккаунт Telegram не активен</strong>
                             </span>
                         </li>
-                            <?}?>
                         <li class="dropdown profile-dropdown">
                             <span>
                                 <span class="hidden-xs"><?=Yii::$app->user->identity->username?></span>

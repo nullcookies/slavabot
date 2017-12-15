@@ -31,7 +31,7 @@ class SystemController extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['help', 'contact', 'timezones'],
+                        'actions' => ['help', 'contact', 'timezones', 'main-data'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -41,11 +41,12 @@ class SystemController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'logout' => ['post'],
+                    'main-data' => ['post']
                 ],
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['help', 'contact', 'timezones'],
+                'only' => ['help', 'contact', 'timezones', 'main-data'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -113,5 +114,12 @@ class SystemController extends Controller
                 }
             }
         }
+    }
+
+    public function actionMainData()
+    {
+        return [
+            'user' => UserConfig::getUserData()
+        ];
     }
 }

@@ -47,7 +47,8 @@ class UserConfig extends Model
             'id' => $user->id,
             'name' => $user->username,
             'email' => $user->email,
-            'phone' => $user->phone
+            'phone' => $user->phone,
+            'telegram' => $user->telegram_id > 0 ? true : false
         );
     }
 
