@@ -5,10 +5,10 @@
  * Date: 05.12.2017
  */
 
-namespace Libs\notifications;
+namespace frontend\controllers\bot\libs\notifications;
 
-use App\Bot;
-use Libs\SalesBotApi;
+use frontend\controllers\bot\Bot;
+use frontend\controllers\bot\libs\SalesBotApi;
 use Longman\TelegramBot\Commands\UserCommands\NotificationCommand;
 use Longman\TelegramBot\Exception\TelegramException;
 
@@ -24,9 +24,6 @@ class NotificationsBase
     public function __construct()
     {
         $this->salesBot = new SalesBotApi();
-
-        $db = new \Libs\Db();
-        $this->manager = $db->GetManager();
     }
 
     /**
@@ -53,10 +50,8 @@ class NotificationsBase
         }
 
         if(($command = $this->GetCommand()) instanceof NotificationCommand) {
-            $command = $this->GetCommand();
             $command->prepareParams($_params);
             $result = $command->execute();
-            //var_dump($result);
         }
     }
 

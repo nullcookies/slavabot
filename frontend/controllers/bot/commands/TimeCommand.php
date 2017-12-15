@@ -35,7 +35,6 @@ class TimeCommand extends UserCommand
             $chat = $message->getChat();
             $user = $message->getFrom();
 
-
             $chat_id = $chat->getId();
             $user_id = $user->getId();
 
@@ -59,7 +58,7 @@ class TimeCommand extends UserCommand
                     $user_timezone = '';
                 }
 
-                $inline_keyboard = new InlineKeyboard();
+                $inline_keyboard = new InlineKeyboard([]);
                 foreach ($telConfig->config['timezones']['buttons'] as $zone => $arButton) {
 
                     //добавляем галочку активности

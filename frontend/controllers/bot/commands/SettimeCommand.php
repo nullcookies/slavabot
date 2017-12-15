@@ -9,6 +9,7 @@ use frontend\controllers\bot\libs\TelegramWrap;
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
+use Longman\TelegramBot\TelegramLog;
 
 class SettimeCommand extends UserCommand
 {
@@ -40,7 +41,6 @@ class SettimeCommand extends UserCommand
 
             $arUpdates = $this->getUpdate()->getRawData();
 
-
             if (isset($telConfig->config['timezones']['buttons'][$arUpdates['callback_query']['data']]['value'])) {
 
                 $user = User::findOne([
@@ -70,16 +70,9 @@ class SettimeCommand extends UserCommand
 
             return Request::sendMessage($data);
 
-        } catch (Longman\TelegramBot\Exception\TelegramException $e) {
-            Logger::error(__METHOD__, [
-                'message' => $e->getMessage()
-            ]);
-
-            $this->conversation->cancel();
         } catch (TelegramException $e) {
-            Logger::error(__METHOD__, [
-                'message' => $e->getMessage()
-            ]);
+            TelegramLog::error($e->getMessage());
+            $this->conversation->cancel();
         }
     }
 

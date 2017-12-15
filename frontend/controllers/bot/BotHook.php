@@ -11,6 +11,7 @@ namespace frontend\controllers\bot;
 use common\services\StaticConfig;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Telegram;
+use Longman\TelegramBot\TelegramLog;
 
 
 class BotHook extends Bot
@@ -41,12 +42,11 @@ class BotHook extends Bot
             \Longman\TelegramBot\TelegramLog::initDebugLog(\Yii::getAlias('@frontend') . "/runtime/logs/{$this->bot_username}_debug.log");
             \Longman\TelegramBot\TelegramLog::initUpdateLog(\Yii::getAlias('@frontend') . "/runtime/logs/{$this->bot_username}_update.log");
 
-
             // Handle telegram webhook request
             $telegram->handle();
 
         }  catch (TelegramException $e) {
-            echo $e->getMessage();
+            TelegramLog::error($e->getMessage());
         }
     }
 }

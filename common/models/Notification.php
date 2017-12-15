@@ -2,23 +2,45 @@
 /**
  * Created by PhpStorm.
  * User: Eric Mikhaelyan
- * Date: 05.12.2017
+ * Date: 15.12.2017
+ * Time: 17:12
  */
 
-namespace Libs\notifications;
+namespace common\models;
 
 
-class NotificationsModel
+use yii\db\ActiveRecord;
+
+/**
+ * Class Notification
+ * @package common\models
+ *
+ * @property integer $id
+ * @property string $created_at
+ * @property string $internal_uid
+ * @property string $social
+ * @property string $message
+ * @property string $hash
+ */
+class Notification extends ActiveRecord
 {
-    protected $manager;
-    protected $uid;
-
-    public function __construct()
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
     {
-        $db = new \Libs\Db();
-        $this->manager = $db->GetManager();
+        return 'table_notifications';
+    }
 
-        $this->uid = time();
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            ['id', 'integer'],
+            [['created_at', 'internal_uid', 'social', 'message', 'hash'], 'string']
+        ];
     }
 
     public function getNotifications()
@@ -29,9 +51,7 @@ class NotificationsModel
             $a = [];
 
             $sql = 'select hash from table_notifications where created_at>now()-interval 1 HOUR';
-            $statement = $this->manager->getConnection()->prepare($sql);
-            $statement->execute();
-            $items = $statement->fetchAll();
+            $items = \Yii::$app->db->createCommand($sql)->queryAll();
 
             foreach ($items as $item) {
                 $a[$this->uid][$item['hash']] = true;

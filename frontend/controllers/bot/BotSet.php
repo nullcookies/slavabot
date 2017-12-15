@@ -8,7 +8,9 @@
 
 namespace frontend\controllers\bot;
 
+use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Telegram;
+use Longman\TelegramBot\TelegramLog;
 
 class BotSet extends Bot
 {
@@ -29,8 +31,8 @@ class BotSet extends Bot
             if ($result->isOk()) {
                 return $result->getDescription();
             }
-        } catch (Longman\TelegramBot\Exception\TelegramException $e) {
-             echo $e->getMessage();
+        } catch (TelegramException $e) {
+            TelegramLog::error($e->getMessage());
         }
     }
 }

@@ -5,9 +5,11 @@
  * Date: 04.12.2017
  */
 
-namespace Libs\notifications;
+namespace frontend\controllers\bot\libs\notifications;
 
-use Models\Posts;
+use common\models\Notification;
+use common\models\Post;
+use frontend\controllers\bot\libs\Logger;
 
 class VK extends NotificationsBase
 {
@@ -21,8 +23,6 @@ class VK extends NotificationsBase
 
     protected function GetUsers()
     {
-
-
         $users = $this->salesBot->getVkAccounts();
 
         if(is_array($users)) {
@@ -48,13 +48,13 @@ class VK extends NotificationsBase
             'access_token' => $access_token,
         ];
 
-        $model = new NotificationsModel();
+        $model = new Notification();
 
         try {
 
             $startTime = time() - self::LIFETIME;
 
-            $vk = new \Libs\Vk($options);
+            $vk = new \frontend\controllers\bot\libs\Vk($options);
             $res = $vk->getNotifications([
                 'filters' => 'mentions,comments',
                 'start_time' => $startTime
@@ -116,14 +116,12 @@ class VK extends NotificationsBase
 
                     try {
 
-                        $notification = new \Models\Notifications();
-                        $notification->SetInternalId($_params['tid']);
-                        $notification->SetSocial(Posts::SOCIAL_VK);
-                        $notification->SetMessage($text);
-                        $notification->SetHash($response_hash);
-
-                        $this->manager->persist($notification);
-                        $this->manager->flush();
+                        $notification = new Notification();
+                        $notification->internal_uid = $_params['tid'];
+                        $notification->social = Post::SOCIAL_VK;
+                        $notification->message = $text;
+                        $notification->hash = $response_hash;
+                        $notification->save(false);
 
                         $this->notify([
                             'tid' => $telegram_id,
@@ -139,10 +137,9 @@ class VK extends NotificationsBase
             }
 
         } catch (\Exception $e) {
-            echo $e->getMessage();
+            Logger::error($e->getMessage());
         }
 
-        usleep(500);
     }
 
 }

@@ -8,6 +8,7 @@ use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Conversation;
 use Longman\TelegramBot\Entities\Keyboard;
 use Longman\TelegramBot\Request;
+use Longman\TelegramBot\TelegramLog;
 
 
 class SettingsCommand extends UserCommand
@@ -66,6 +67,7 @@ class SettingsCommand extends UserCommand
 
             return $result;        // Send message!
         } catch (\Exception $e) {
+            TelegramLog::error($e->getMessage());
             $this->conversation->stop();
         }
     }

@@ -8,7 +8,9 @@ use frontend\controllers\bot\libs\TelegramWrap;
 
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Conversation;
+use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
+use Longman\TelegramBot\TelegramLog;
 
 class EmailCommand extends UserCommand
 {
@@ -31,9 +33,9 @@ class EmailCommand extends UserCommand
         $text = trim($message->getText(true));
         $chat_id = $chat->getId();
         $user_id = $user->getId();
+
         //Preparing Response
         $data = ['chat_id' => $chat_id];
-
 
         //Conversation start
         $this->conversation = new Conversation($user_id, $chat_id, $this->name);
@@ -44,10 +46,11 @@ class EmailCommand extends UserCommand
         if (isset($notes['state'])) {
             $state = $notes['state'];
         }
-        $result = Request::emptyResponse();
-        //State machine
-        //Entrypoint of the machine state if given by the track
-        //Every time a step is achieved the track is updated
+        try {
+            $result = Request::emptyResponse();
+        } catch (TelegramException $e) {
+            TelegramLog::error($e->getMessage());
+        }
 
         if (
             ($text == $telConfig->config['buttons']['email']['label']) ||
@@ -74,7 +77,11 @@ class EmailCommand extends UserCommand
 
                     $data = $telConfig->getEmailWindow($data);
 
-                    $result = Request::sendMessage($data);
+                    try {
+                        $result = Request::sendMessage($data);
+                    } catch (TelegramException $e) {
+                        TelegramLog::error($e->getMessage());
+                    }
                     break;
                 }
 
@@ -86,7 +93,11 @@ class EmailCommand extends UserCommand
                     //письмо не отправленно,пользователь не найден
                     $data = $telConfig->getWrongEmailWindow($data, $text);
 
-                    $result = Request::sendMessage($data);
+                    try {
+                        $result = Request::sendMessage($data);
+                    } catch (TelegramException $e) {
+                        TelegramLog::error($e->getMessage());
+                    }
                     break;
 
                 }
@@ -108,7 +119,11 @@ class EmailCommand extends UserCommand
 
                     $data = $telConfig->getCodeWindow($data, $notes);
 
-                    $result = Request::sendMessage($data);
+                    try {
+                        $result = Request::sendMessage($data);
+                    } catch (TelegramException $e) {
+                        TelegramLog::error($e->getMessage());
+                    }
                     break;
                 }
 
@@ -134,7 +149,11 @@ class EmailCommand extends UserCommand
                         //письмо не отправленно, пользователь не найден
 
                         $data = $telConfig->getCodeWrongWindow($data);
-                        $result = Request::sendMessage($data);
+                        try {
+                            $result = Request::sendMessage($data);
+                        } catch (TelegramException $e) {
+                            TelegramLog::error($e->getMessage());
+                        }
                         break;
 
                     }
@@ -150,7 +169,11 @@ class EmailCommand extends UserCommand
                 $data = $telConfig->getCodeSuccessWindow($data);
 
                 $this->conversation->stop();
-                $result = Request::sendMessage($data);
+                try {
+                    $result = Request::sendMessage($data);
+                } catch (TelegramException $e) {
+                    TelegramLog::error($e->getMessage());
+                }
                 break;
         }
         return $result;

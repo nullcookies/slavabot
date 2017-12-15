@@ -11,9 +11,10 @@ namespace frontend\controllers\bot\libs;
 
 class Logger
 {
-    public static function logger()
+    public static function logger($filename = '')
     {
-        $filename = 'logs';
+        $filename = $filename ? $filename : 'logs';
+
         $path = \Yii::getAlias('@frontend') . '/runtime/logs/' . date('Y.m.d') . '/' . $filename . '.log';
 
         $logger = new \Monolog\Logger($filename);
@@ -22,15 +23,15 @@ class Logger
         return $logger;
     }
 
-    public static function error($message, $context = [])
+    public static function error($message, $context = [], $filename = '')
     {
-        $logger = self::logger();
+        $logger = self::logger($filename);
         $logger->addRecord(\Monolog\Logger::ERROR, $message, $context);
     }
 
-    public static function info($message, $context = [])
+    public static function info($message, $context = [], $filename = '')
     {
-        $logger = self::logger();
+        $logger = self::logger($filename);
         $logger->addRecord(\Monolog\Logger::INFO, $message, $context);
     }
 

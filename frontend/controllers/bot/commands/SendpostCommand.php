@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use common\models\JobPost;
 use common\models\Post;
 use common\services\StaticConfig;
+use frontend\controllers\bot\libs\jobs\SocialJobs;
 use frontend\controllers\bot\libs\SalesBotApi;
 use frontend\controllers\bot\libs\SocialNetworks;
 use Longman\TelegramBot\Commands\UserCommand;
@@ -150,7 +151,7 @@ class SendpostCommand extends UserCommand
             }
 
             $client = new \Kicken\Gearman\Client('127.0.0.1:4730');
-            $job = $client->submitBackgroundJob('sales_post_vk', json_encode($arr));
+            $job = $client->submitBackgroundJob(SocialJobs::FUNCTION_VK, json_encode($arr));
 
             return $job;
         }
@@ -242,7 +243,7 @@ class SendpostCommand extends UserCommand
             }
 
             $client = new \Kicken\Gearman\Client('127.0.0.1:4730');
-            $job = $client->submitBackgroundJob('sales_post_fb', json_encode($arr));
+            $job = $client->submitBackgroundJob(SocialJobs::FUNCTION_FB, json_encode($arr));
 
             return $job;
         }
@@ -328,13 +329,10 @@ class SendpostCommand extends UserCommand
 
         }
 
-
         $client = new \Kicken\Gearman\Client('127.0.0.1:4730');
-        $job = $client->submitBackgroundJob('sales_post_ig', json_encode($arr));
+        $job = $client->submitBackgroundJob(SocialJobs::FUNCTION_IG, json_encode($arr));
 
         return $job;
-
-        //}
 
     }
 

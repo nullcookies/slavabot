@@ -3,7 +3,7 @@
 namespace Longman\TelegramBot\Commands\UserCommands;
 
 use Carbon\Carbon;
-use frontend\controllers\bot\libs\SalesBotApi;
+use common\models\User;
 use frontend\controllers\bot\libs\TelegramWrap;
 use frontend\controllers\bot\libs\Utils;
 use Longman\TelegramBot\Commands\UserCommand;
@@ -217,29 +217,18 @@ class PostCommand extends UserCommand
 
                     $notes['MsgId'] = $message->getMessageId();
 
-//                     //часовой пояс пользователя
-//                    $db            = new \Libs\Db();
-//                    $entityManager = $db->GetManager();
-//
-//                    $user = $entityManager->getRepository('Models\Users')->findOneBy([
-//                        'telegram_id' => $user_id,
-//                    ]);
-//
+                    //часовой пояс пользователя
+
+                    /** @var User $user */
+                    $user = User::findOne([
+                        'telegram_id' => $user_id,
+                    ]);
+
 //                   //по умолчанию ставим
                     $timeZone = 'Europe/Moscow';
-//                    if ($user) {
-//                        $timeZone = $user->GetTimezone();
-//
-                    //проверяем часовой пояс из ЛК
-                    $SalesBot = new SalesBotApi();
-                    $tz = $SalesBot->getTimezone(['tid' => $user_id]);
-//                        if ($tz != $timeZone) {
-//                            $timeZone = $tz;
-//                            $user->SetTimezone( $timeZone );
-//                            $entityManager->persist($user);
-//                            $entityManager->flush();
-//                        }
-//                    }
+                    if ($user) {
+                        $timeZone = $user->timezone;
+                    }
 
                     $data['text'] = "Введите время публикации.\nНапример: " . Carbon::now()->timezone($timeZone)->addHour()->format('d.m.Y H:i');
 
@@ -265,28 +254,17 @@ class PostCommand extends UserCommand
                     } else {
 
                         //часовой пояс пользователя
-//                        $db            = new \Libs\Db();
-//                        $entityManager = $db->GetManager();
 
-//                        $user = $entityManager->getRepository('Models\Users')->findOneBy([
-//                            'telegram_id' => $user_id,
-//                        ]);
+                        /** @var User $user */
+                        $user = User::findOne([
+                            'telegram_id' => $user_id,
+                        ]);
 
                         //по умолчанию ставим
                         $timeZone = 'Europe/Moscow';
-//                        if ($user) {
-//                            $timeZone = $user->GetTimezone();
-
-                        //проверяем часовой пояс из ЛК
-//                            $SalesBot = new SalesBotApi();
-//                            $tz = $SalesBot->getTimezone(['tid'=>$user_id]);
-//                            if ($tz != $timeZone) {
-//                                $timeZone = $tz;
-//                                $user->SetTimezone( $timeZone );
-//                                $entityManager->persist($user);
-//                                $entityManager->flush();
-//                            }
-//                        }
+                        if ($user) {
+                            $timeZone = $user->timezone;
+                        }
 
                         $notes['state'] = 5;
                         $notes['schedule_dt'] = Carbon::parse($text)->timezone($timeZone)->timezone('Europe/London')->toDateTimeString();
