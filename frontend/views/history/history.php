@@ -231,6 +231,6 @@ use common\models\User;
         });
     </script>
     <?
-    //User::setAuth(Yii::$app->user->identity['id']);
+    User::setAuth(Yii::$app->user->identity['id']);
 }
 ?>
