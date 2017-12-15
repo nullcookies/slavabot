@@ -71,10 +71,10 @@ AppAsset::register($this);
                             </span>
                         </li>
                         <li class="dropdown profile-dropdown" ng-show="!telegramStatus">
-                            <span class=" fade in">
+                            <a target="_blank" href="<?=\common\services\StaticConfig::botUrl()?>" class=" fade in">
                                 <i class="fa fa-times-circle fa-fw fa-lg"></i>
                                 <strong>Аккаунт Telegram не активен</strong>
-                            </span>
+                            </a>
                         </li>
                         <li class="dropdown profile-dropdown">
                             <span>
