@@ -1,3 +1,4 @@
+# Тестовый сервер salesbot.medialogic.ddemo.ru
 bot:
   api_key: 466074967:AAHAEaiBAHz5im_pdzNmW1gR1NGOAAR5JB8
   username: MltTempBot
@@ -15,11 +16,11 @@ apps:
 hostname: https://salesbot.medialogic.ddemo.ru
 sales_bot_api: https://salesbot.medialogic.ddemo.ru
 
-
+# Боевой сервер app.slavabot.ru
 #bot:
 #  api_key: 494827287:AAF-HEVOxrPxndlA_MRBoVwRQPFPV3Zo6TI
 #  username: slavarubot
-#  hook_url: https://salesbot.medialogic.ddemo.ru/bot/hook
+#  hook_url: https://app.slavabot.ru/bot/hook
 #  cert: /etc/ssl/mycerts/salesbot.medialogic.ddemo.ru/cert.pem
 #apps:
 #  vkontakte:
