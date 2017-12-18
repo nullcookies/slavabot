@@ -73,8 +73,7 @@ class History extends \yii\db\ActiveRecord
 
                 if(isset(Json::decode($this->data)['schedule_dt'])){
                     $postDate = Json::decode($this->data)['schedule_dt'];
-                    $date = $postDate['date'];
-                    $timezone = $postDate['timezone'];
+                    $date = $postDate;
                     $redate = Carbon::parse($date, 'Europe/London');
                     $redate->setTimezone(\Yii::$app->user->identity->timezone);
                     $redate->setToStringFormat($corbon);
@@ -100,8 +99,7 @@ class History extends \yii\db\ActiveRecord
 
                 if(isset(Json::decode($this->data)['schedule_dt'])){
                     $postDate = Json::decode($this->data)['schedule_dt'];
-                    $date = $postDate['date'];
-                    $timezone = $postDate['timezone'];
+                    $date = $postDate;
                     $redate = Carbon::parse($date, 'Europe/London');
                     $redate->setTimezone(\Yii::$app->user->identity->timezone);
                     $redate->setToStringFormat($corbon);
