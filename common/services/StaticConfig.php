@@ -31,4 +31,25 @@ class StaticConfig
     static function botUrl(){
         return self::config('bot_url');
     }
+
+    public static function getDownloadDir($server = false)
+    {
+        if($server) {
+            return \Yii::getAlias('@webroot') . '/storage/download/';
+        }
+        else {
+            return '/storage/download/';
+        }
+    }
+
+    public static function getUploadDir($server = false)
+    {
+        if($server) {
+            return \Yii::getAlias('@webroot') . '/storage/upload/';
+        }
+        else {
+            return '/storage/upload/';
+        }
+    }
+
 }

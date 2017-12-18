@@ -29,8 +29,8 @@ class Bot
 
     public function __construct()
     {
-        $this->download_dir = \Yii::getAlias('@frontend') . '/storage/download';
-        $this->upload_dir = \Yii::getAlias('@frontend') . '/storage/upload';
+        $this->download_dir = StaticConfig::getDownloadDir(true);
+        $this->upload_dir = StaticConfig::getUploadDir(true);
 
         $settings = StaticConfig::configBot('common');
 

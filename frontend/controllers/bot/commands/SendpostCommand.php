@@ -7,6 +7,7 @@ use common\models\JobPost;
 use common\models\Post;
 use common\services\StaticConfig;
 use frontend\controllers\bot\libs\jobs\SocialJobs;
+use frontend\controllers\bot\libs\Logger;
 use frontend\controllers\bot\libs\SalesBotApi;
 use frontend\controllers\bot\libs\SocialNetworks;
 use Longman\TelegramBot\Commands\UserCommand;
@@ -101,7 +102,7 @@ class SendpostCommand extends UserCommand
             $arr['post_model_id'] = $post->id;
             $arr['Text'] = $notes['Text'] ?: "";
 
-            file_put_contents(\Yii::getAlias('@frontend') . '/runtime/logs/photos.log', $notes['Photo']);
+            Logger::info($notes['Photo']);
 
             if (isset($notes['Photo']) && !empty($notes['Photo'])) {
                 $p = json_decode($notes['Photo'], true);
@@ -110,7 +111,7 @@ class SendpostCommand extends UserCommand
                 } else {
                     $photo = end($p);
                 }
-                $photos[] = \Yii::getAlias('@frontend') . "/storage/download/" . $photo['file_path'];
+                $photos[] = StaticConfig::getDownloadDir(true) . $photo['file_path'];
                 $arr['Photos'] = $photos;
             }
             if (isset($notes['Video']) && !empty($notes['Video'])) {
@@ -118,12 +119,12 @@ class SendpostCommand extends UserCommand
                 if (isset($v['file_path'])) {
                     $video = $v;
                 }
-                $videos[] = \Yii::getAlias('@frontend') . "/storage/download/" . $video['file_path'];
+                $videos[] = StaticConfig::getDownloadDir(true) . $video['file_path'];
                 $arr['Videos'] = $videos;
             }
             if (isset($notes['Audio']) && !empty($notes['Audio'])) {
                 $audio = end(json_decode($notes['Audio'], true));
-                $audios[] = \Yii::getAlias('@frontend') . "/storage/download/" . $audio['file_path'];
+                $audios[] = StaticConfig::getDownloadDir(true) . $audio['file_path'];
                 $arr['Audios'] = $audios;
             }
 
@@ -210,12 +211,12 @@ class SendpostCommand extends UserCommand
                 if (isset($v['file_path'])) {
                     $video = $v;
                 }
-                $videos[] = \Yii::getAlias('@frontend') . "/storage/download/" . $video['file_path'];
+                $videos[] = StaticConfig::getDownloadDir(true) . $video['file_path'];
                 $arr['Videos'] = $videos;
             }
             if (isset($notes['Audio']) && !empty($notes['Audio'])) {
                 $audio = end(json_decode($notes['Audio'], true));
-                $audios[] = \Yii::getAlias('@frontend') . "/storage/download/" . $audio['file_path'];
+                $audios[] = StaticConfig::getDownloadDir(true) . $audio['file_path'];
                 $arr['Audios'] = $audios;
             }
 
@@ -297,12 +298,12 @@ class SendpostCommand extends UserCommand
             if (isset($v['file_path'])) {
                 $video = $v;
             }
-            $videos[] = \Yii::getAlias('@frontend') . "/storage/download/" . $video['file_path'];
+            $videos[] = StaticConfig::getDownloadDir(true) . $video['file_path'];
             $arr['Videos'] = $videos;
         }
         if (isset($notes['Audio']) && !empty($notes['Audio'])) {
             $audio = end(json_decode($notes['Audio'], true));
-            $audios[] = \Yii::getAlias('@frontend') . "/storage/download/" . $audio['file_path'];
+            $audios[] = StaticConfig::getDownloadDir(true) . $audio['file_path'];
             $arr['Audios'] = $audios;
         }
 

@@ -9,10 +9,12 @@ namespace frontend\controllers\bot\libs\jobs;
 
 use common\models\JobPost;
 use common\models\Post;
+use common\services\StaticConfig;
 use frontend\controllers\bot\libs\Files;
 use frontend\controllers\bot\libs\Logger;
 use frontend\controllers\bot\libs\SalesBotApi;
 use frontend\controllers\bot\libs\SocialNetworks;
+use Facebook\Facebook;
 
 class FbJobs implements SocialJobs
 {
@@ -30,7 +32,7 @@ class FbJobs implements SocialJobs
                 $notes = json_decode($notes, true);
             }
 
-            $fb = new Facebook\Facebook($notes['access']);
+            $fb = new Facebook($notes['access']);
 
             //получаем доп. ключ для публикации на стену группы
             if ($notes['is_group']) {
@@ -63,12 +65,20 @@ class FbJobs implements SocialJobs
 
                     $arPhoto = json_decode($strPhoto, true);
 
-                    $file_uri = '/storage/download/' . $arPhoto[0]["file_path"];
+                    $file_uri = StaticConfig::getDownloadDir() . $arPhoto[0]["file_path"];
+                    Logger::error('file_uri', [
+                        'f' => $file_uri
+                    ]);
 
-                    $waitExists = Files::WaitExists([\Yii::getAlias('@frontend') . $file_uri]);
+                    $waitExists = Files::WaitExists([\Yii::getAlias('@webroot') . $file_uri]);
                     if ($waitExists == true) {
 
                         $link = rtrim($notes['hostname'], '/') . $file_uri;
+
+                        Logger::info('Изображение', [
+                            'link' => $link
+                        ]);
+
                         $uploadPhoto = $fb->post("/{$page_id}/photos", ['url' => $link, 'published' => 'false'],
                             $access_token);
 
@@ -81,7 +91,9 @@ class FbJobs implements SocialJobs
 
                     } else {
                         Logger::error('Ошибка получения файлов из telegram', [
-                            'notes' => $notes
+                            'file' => __FILE__,
+                            'notes' => $notes,
+                            'link' => $link
                         ]);
                         throw new \Exception("Ошибка получения файлов из telegram");
                     }

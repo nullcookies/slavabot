@@ -9,6 +9,7 @@ namespace frontend\controllers\bot\libs\jobs;
 
 use common\models\JobPost;
 use common\models\Post;
+use common\services\StaticConfig;
 use frontend\controllers\bot\libs\Files;
 use frontend\controllers\bot\libs\Logger;
 use frontend\controllers\bot\libs\SalesBotApi;
@@ -62,13 +63,12 @@ class IGJobs implements SocialJobs
 
                     $arPhoto = json_decode($strPhoto, true);
 
-                    $file_uri = '/storage/download/' . $arPhoto[0]["file_path"];
+                    $file_uri = StaticConfig::getDownloadDir(true) . $arPhoto[0]["file_path"];
 
-                    $waitExists = Files::WaitExists([\Yii::getAlias('@frontend') . $file_uri]);
+                    $waitExists = Files::WaitExists([$file_uri]);
                     if ($waitExists == true) {
 
-                        $link = \Yii::getAlias('@frontend') . $file_uri;
-                        $resizer = new \InstagramAPI\MediaAutoResizer($link);
+                        $resizer = new \InstagramAPI\MediaAutoResizer($file_uri);
                         $result = $ig->timeline->uploadPhoto($resizer->getFile(), ['caption' => $messages]);
 
                         echo "Загрузка картинки IG \n";

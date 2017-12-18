@@ -79,7 +79,7 @@ class SalesBotApi
 
 
         } catch (RequestException $e) {
-            echo $e->getMessage();
+            Logger::error($e->getMessage());
         }
 
     }
@@ -127,7 +127,7 @@ class SalesBotApi
             }
 
         } catch (RequestException $e) {
-            echo $e->getMessage();
+            Logger::error($e->getMessage());
         }
     }
 
@@ -164,7 +164,7 @@ class SalesBotApi
             }
 
         } catch (RequestException $e) {
-            echo $e->getMessage();
+            Logger::error($e->getMessage());
         }
 
     }
@@ -208,7 +208,7 @@ class SalesBotApi
             }
 
         } catch (RequestException $e) {
-            echo $e->getMessage();
+            Logger::error($e->getMessage());
         }
 
     }
@@ -222,7 +222,7 @@ class SalesBotApi
     public function newEvent($arParams)
     {
 
-        Logger::info('отправлем данные в ЛК', [
+        Logger::info('Отправлем данные в ЛК', [
             'method' => __METHOD__,
             'arParams' => $arParams
         ]);
@@ -242,14 +242,13 @@ class SalesBotApi
 
             );
 
-            file_put_contents(\Yii::getAlias('@frontend') . '/runtime/logs/' . date('Y.m.d') . '/salesBotApi.log',
-                json_encode([
-                    'form_params' => [
-                        'data' => $arParams['data'],
-                        'type' => $arParams['type'],
-                        'tid' => $arParams['tid'],
-                    ]
-                ]));
+            Logger::info(__METHOD__, [
+                'form_params' => [
+                    'data' => $arParams['data'],
+                    'type' => $arParams['type'],
+                    'tid' => $arParams['tid'],
+                ]
+            ]);
 
             $arResult = json_decode($response->getBody(), true);
 
@@ -260,7 +259,7 @@ class SalesBotApi
             }
 
         } catch (RequestException $e) {
-            echo $e->getMessage();
+            Logger::error($e->getMessage());
         }
 
     }
@@ -300,7 +299,7 @@ class SalesBotApi
             }
 
         } catch (RequestException $e) {
-            echo $e->getMessage();
+            Logger::error($e->getMessage());
         }
 
     }
@@ -339,7 +338,7 @@ class SalesBotApi
             }
 
         } catch (RequestException $e) {
-            echo $e->getMessage();
+            Logger::error($e->getMessage());
         }
 
     }
@@ -365,7 +364,7 @@ class SalesBotApi
                 return [];
             }
         } catch (RequestException $e) {
-            echo $e->getMessage();
+            Logger::error($e->getMessage());
         }
     }
 
