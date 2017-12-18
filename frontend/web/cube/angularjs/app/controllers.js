@@ -43,6 +43,8 @@ angular.module('cubeWebApp')
         $scope.fbAuthBox = true;
         $scope.fbFinish = false;
 
+
+
         $scope.InstaSave = function(){
             $scope.data = {
                 Instagram:{
@@ -174,14 +176,38 @@ angular.module('cubeWebApp')
 
 
     })
-    .controller('header', function ($scope, $http) {})
+    .controller('header', function ($scope, $http, $interval) {
+        $scope.telegramStatus = false;
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+                'X-CSRF-Token': getCSRF()
+            }
+        };
+
+        $scope.getUserData = function(){
+            $http.post('/system/main-data', {}, config).then(function success(response) {
+                $scope.telegramStatus = response.data.user.telegram;
+            });
+        };
+
+        $scope.Timer = $interval(function () {
+            $scope.getUserData()
+        }, 5000);
+
+
+        $scope.getUserData();
+    })
     .controller('menu', function ($scope, $http) {
 
         $scope.potentialSubMenu = [];
 
+
         $http({method: 'GET', url: '/potential/filters'}).then(function success(response) {
             $scope.potentialSubMenu = response.data;
         });
+
+
     })
     .controller('potentialCtrl', function ($scope, $http, $sce, $location, $interval) {
         $scope.webhooks = [];

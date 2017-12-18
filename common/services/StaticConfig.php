@@ -27,4 +27,8 @@ class StaticConfig
     static function vk(){
         return self::config('social')['vk'];
     }
+
+    static function botUrl(){
+        return self::config('bot_url');
+    }
 }

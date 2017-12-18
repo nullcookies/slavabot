@@ -299,7 +299,7 @@ li.wizard-nav-item {
 }
 .scroll-block{
     overflow: scroll;
-    width: 100%;
+    width: 380px;
     height: 220px;
     padding-left: 15px;
 }
