@@ -15,7 +15,7 @@ class Logger
     {
         $filename = $filename ? $filename : 'logs';
 
-        $path = \Yii::getAlias('@frontend') . '/runtime/logs/' . date('Y.m.d') . '/' . $filename . '.log';
+        $path = \Yii::getAlias('@frontend') . '/runtime/logs/' . /*date('Y.m.d') . '/' . */$filename . '.log';
 
         $logger = new \Monolog\Logger($filename);
         $logger->pushProcessor(new \Monolog\Processor\UidProcessor());
@@ -25,13 +25,13 @@ class Logger
 
     public static function error($message, $context = [], $filename = '')
     {
-        $logger = self::logger($filename);
+        $logger = self::logger('errors');
         $logger->addRecord(\Monolog\Logger::ERROR, $message, $context);
     }
 
     public static function info($message, $context = [], $filename = '')
     {
-        $logger = self::logger($filename);
+        $logger = self::logger('info');
         $logger->addRecord(\Monolog\Logger::INFO, $message, $context);
     }
 
