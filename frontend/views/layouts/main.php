@@ -78,7 +78,7 @@ AppAsset::register($this);
                         </li>
                         <li class="dropdown profile-dropdown">
                             <span>
-                                <span class="hidden-xs"><?=Yii::$app->user->identity->username?></span>
+                                <span class="hidden-xs">{{UserName}}</span>
                             </span>
                         </li>
                         <li class="hidden-xxs">

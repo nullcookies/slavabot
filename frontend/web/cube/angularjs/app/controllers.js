@@ -188,6 +188,7 @@ angular.module('cubeWebApp')
         $scope.getUserData = function(){
             $http.post('/system/main-data', {}, config).then(function success(response) {
                 $scope.telegramStatus = response.data.user.telegram;
+                $scope.UserName = response.data.user.name;
             });
         };
 
