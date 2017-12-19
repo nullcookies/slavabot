@@ -21,7 +21,7 @@ bot:
   api_key: 494827287:AAF-HEVOxrPxndlA_MRBoVwRQPFPV3Zo6TI
   username: slavarubot
   hook_url: https://app.slavabot.ru/bot/hook
-  cert: /etc/ssl/mycerts/salesbot.medialogic.ddemo.ru/cert.pem
+  cert: /etc/nginx/ssl/app.slavabot.ru.pem
 apps:
   vkontakte:
     client_id: 6223471
