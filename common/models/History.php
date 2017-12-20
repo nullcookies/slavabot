@@ -70,15 +70,30 @@ class History extends \yii\db\ActiveRecord
                 }
 
                 $redate = \Yii::$app->formatter->asDatetime($this->updated_at, $format);
-
+                if(!is_array($redate)){
+                    return $redate;
+                }
                 if(isset(Json::decode($this->data)['schedule_dt'])){
-                    $postDate = Json::decode($this->data)['schedule_dt'];
+
+                    try{
+                        $postDate = \Yii::$app->formatter->asDatetime(Json::decode($this->data)['schedule_dt'], $format);
+                    } catch (\Exception $e) {
+                        $postDate = Json::decode($this->data)['schedule_dt'];
+                    }
+
+                    if(!is_array($postDate)){
+                        return $postDate;
+                    }
+
                     $date = $postDate;
                     $redate = Carbon::parse($date, 'Europe/London');
                     $redate->setTimezone(\Yii::$app->user->identity->timezone);
                     $redate->setToStringFormat($corbon);
                     $redate = $redate->__toString();
                 }else{
+                    if(!is_array($redate)){
+                        return $redate;
+                    }
                     $redate = Carbon::parse($redate, 'Europe/Moscow');
                     $redate->setTimezone(\Yii::$app->user->identity->timezone);
                     $redate->setToStringFormat($corbon);
@@ -86,32 +101,7 @@ class History extends \yii\db\ActiveRecord
                 }
                 return $redate;
             },
-            'debug' => function(){
-                $format = "dd.M.y HH:mm";
 
-                if(time()-$this->updated_at > 86400){
-                    $corbon = "j.m.Y H:i";
-                }else{
-                    $corbon = "H:i";
-                }
-
-                $redate = \Yii::$app->formatter->asDatetime($this->updated_at, $format);
-
-                if(isset(Json::decode($this->data)['schedule_dt'])){
-                    $postDate = Json::decode($this->data)['schedule_dt'];
-                    $date = $postDate;
-                    $redate = Carbon::parse($date, 'Europe/London');
-                    $redate->setTimezone(\Yii::$app->user->identity->timezone);
-                    $redate->setToStringFormat($corbon);
-                    $redate = $redate->__toString();
-                }else{
-                    $redate = Carbon::parse($redate, 'Europe/Moscow');
-                    $redate->setTimezone(\Yii::$app->user->identity->timezone);
-                    $redate->setToStringFormat($corbon);
-                    $redate = $redate->__toString();
-                }
-                return $this->updated_at-time();
-            },
             'callback_tlg_message_status',
             'updated_at'
         ];
