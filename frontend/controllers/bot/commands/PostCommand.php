@@ -132,8 +132,8 @@ class PostCommand extends UserCommand
                             ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
                         ]);
                         $data['reply_markup'] = $inline_keyboard;
-                        $this->changeFM($notes, $inline_keyboard, $user_id, $chat_id);
                         $notes['fm'] = Request::sendMessage($data);
+                        $this->changeFM($notes, $inline_keyboard, $user_id, $chat_id);
 
                         $this->conversation->update();
                         break;
@@ -167,8 +167,8 @@ class PostCommand extends UserCommand
                             'message_id' => $notes['fm']['result']['message_id'],
                         ]);
 
-                        $this->changeFM($notes, $inline_keyboard, $user_id, $chat_id);
                         $notes['fm'] = Request::sendMessage($data);
+                        $this->changeFM($notes, $inline_keyboard, $user_id, $chat_id);
 
                         $notes['MsgId'] = $message->getMessageId();
 
@@ -213,8 +213,8 @@ class PostCommand extends UserCommand
                         ['text' => 'Опубликовать сейчас', 'callback_data' => 'sendpost'],
                         ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
                     ]);
-                    $this->changeFM($notes, $inline_keyboard, $user_id, $chat_id, true);
 
+                    $this->changeFM($notes, $inline_keyboard, $user_id, $chat_id, true);
                     $notes['MsgId'] = $message->getMessageId();
 
                     //часовой пояс пользователя
@@ -303,7 +303,9 @@ class PostCommand extends UserCommand
 
                     }
                     $this->changeFM($notes, $inline_keyboard, $user_id, $chat_id, true);
+
                     $data['reply_markup'] = $inline_keyboard;
+
                     $notes['fm'] = Request::sendMessage($data);
 
                     $this->conversation->update();
@@ -319,9 +321,10 @@ class PostCommand extends UserCommand
 
     private function changeFM($notes, $inline_keyboard, $user_id, $chat_id, $remove_kb = false)
     {
+
+        $notes=json_decode(json_encode($notes),true);
+
         $mid = $notes['fm']['result']['message_id'];
-
-
         $mtext = $notes['fm']['result']['text'];
 
         if (!$remove_kb) {
