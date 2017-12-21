@@ -31,6 +31,7 @@ class TelegramWrap
 
         //убираем обратные слеши для вывода emoji
         $this->config['buttons']['email']['label'] = stripcslashes($this->config['buttons']['email']['label']);
+        $this->config['buttons']['reemail']['label'] = stripcslashes($this->config['buttons']['reemail']['label']);
         $this->config['buttons']['menu']['label'] = stripcslashes($this->config['buttons']['menu']['label']);
         $this->config['buttons']['repeatcode']['label'] = stripcslashes($this->config['buttons']['repeatcode']['label']);
         $this->config['buttons']['post']['label'] = stripcslashes($this->config['buttons']['post']['label']);
@@ -265,6 +266,10 @@ class TelegramWrap
                 $this->config['buttons']['time']['command'],
                 $this->config['buttons']['time']['description']
             ) . "\n";
+        $str .= sprintf("%s - %s.",
+                $this->config['buttons']['reemail']['command'],
+                $this->config['buttons']['reemail']['description']
+            ) . "\n";
         $arDate['text'] = $str;
 
         //кнопки
@@ -284,6 +289,7 @@ class TelegramWrap
         $keyboard = new Keyboard(
             [
                 ['text' => $this->config['buttons']['time']['label']],
+                ['text' => $this->config['buttons']['reemail']['label']],
                 ['text' => $this->config['buttons']['menu']['label']],
             ]
         );
