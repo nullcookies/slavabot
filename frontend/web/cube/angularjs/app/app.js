@@ -82,10 +82,13 @@ app.config(['$routeProvider', function ($routeProvider) {
             controller: "postsCtrl",
             title: 'Посты и комментарии'
         })
-		.otherwise({
-			redirectTo:'/',
-            title: ''
-		});
+        .when("/error-404", {
+            templateUrl: "views/error404.html",
+            title: 'Страница не найдена!'
+        })
+        .otherwise({
+            redirectTo:'/error-404'
+        });
 }]);
 
 app.run(['$location', '$rootScope', function($location, $rootScope) {
