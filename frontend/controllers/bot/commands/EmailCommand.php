@@ -3,6 +3,7 @@
 namespace Longman\TelegramBot\Commands\UserCommands;
 
 use common\models\User;
+use frontend\controllers\bot\libs\Logger;
 use frontend\controllers\bot\libs\SalesBotApi;
 use frontend\controllers\bot\libs\TelegramWrap;
 
@@ -130,37 +131,31 @@ class EmailCommand extends UserCommand
                 //отправляем запрос на отправку проверочного кода
                 $SalesBot = new SalesBotApi();
 
-                $user = User::findOne([
-                    'telegram_id' => $user_id
-                ]);
 
-                if ($user) {
+                if ($SalesBot->authTelegram(
+                    [
+                        'login' => $notes['email'],
+                        'code' => $text,
+                        'tid' => $user_id
+                    ]
+                )) {
+                    $notes['state'] = 2;
+                    $this->conversation->update();
+                } else {
+                    //письмо не отправленно, пользователь не найден
 
-                    if ($SalesBot->authTelegram(
-                        [
-                            'login' => $user->email,
-                            'code' => $text,
-                            'tid' => $user_id
-                        ]
-                    )) {
-                        $notes['state'] = 2;
-                        $this->conversation->update();
-                    } else {
-                        //письмо не отправленно, пользователь не найден
-
-                        $data = $telConfig->getCodeWrongWindow($data);
-                        try {
-                            $result = Request::sendMessage($data);
-                        } catch (TelegramException $e) {
-                            TelegramLog::error($e->getMessage());
-                        }
-                        break;
-
+                    $data = $telConfig->getCodeWrongWindow($data);
+                    try {
+                        $result = Request::sendMessage($data);
+                    } catch (TelegramException $e) {
+                        TelegramLog::error($e->getMessage());
                     }
-
+                    break;
                 }
 
                 $text = '';
+
+
             // no break
             // no break
             case 2:
