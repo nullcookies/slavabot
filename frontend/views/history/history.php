@@ -155,7 +155,7 @@ use common\models\User;
             <div class="fbcard__auth" ng-show="fbAuthBox">
                 <?=
                     SocialController::getFBBtn(
-                        'http://'.$_SERVER['HTTP_HOST'].'/social/wizard-fb',
+                        'https://'.$_SERVER['HTTP_HOST'].'/social/wizard-fb',
                         'Подключить аккаунт Facebook',
                         'facebook',
                         '<a class="btn btn-success" href="LINK" target="_blank" id="ID">TEXT</a>'
