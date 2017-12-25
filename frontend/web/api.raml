@@ -117,7 +117,43 @@ description: "REST-api для обмена данными c SalesBot."
                           "status": true,
                           "timezone": "Asia/Yekaterinburg"
                       }
-
+  /get-user-email/:
+    description: Получить email пользователя по Telegram ID
+    post:
+      body:
+        application/x-www-form-urlencoded:
+          properties:
+            tid:
+              description: Telegram ID пользователя
+              type: integer
+      responses:
+        200:
+        body:
+          application/json:
+            type: object
+              example: |
+                {
+                    "status": true,
+                    "email": "user@mail.ru"
+                }
+  /clear-telegram/:
+      description: Отвязать аккаунт пользователя
+      post:
+        body:
+          application/x-www-form-urlencoded:
+            properties:
+              tid:
+                description: Telegram ID пользователя
+                type: integer
+        responses:
+          200:
+          body:
+            application/json:
+              type: object
+                example: |
+                  {
+                      "status": true,
+                  }
 
 /rest/accounts/v1:
   displayName: Работа с аккаунтами соц. сетей
