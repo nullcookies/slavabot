@@ -72,6 +72,13 @@ class UserConfig extends Model
         return $model->save();
     }
 
+    public function clearTelegramID($tig)
+    {
+        $model = User::findByTIG($tig);
+        $model->telegram_id = '';
+        return $model->save();
+    }
+
     public function saveTimezone($user_id, $timezone)
     {
         $model = self::findModel($user_id);

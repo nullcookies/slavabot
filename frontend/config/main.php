@@ -26,7 +26,9 @@ return [
                     'get-vk-accounts',
                     'set',
                     'unset',
-                    'hook'
+                    'hook',
+                    'get-user-email',
+                    'clear-telegram'
                 ],
                 'allow' => true,
                 'roles' => ['?'],

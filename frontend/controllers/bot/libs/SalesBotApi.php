@@ -374,4 +374,68 @@ class SalesBotApi
         }
     }
 
+    public function getUserEmail($arParams)
+    {
+
+        $arResult = array();
+
+        try {
+
+            $response = $this->SalesBot->request(
+                'POST',
+                '/rest/user/v1/get-user-email/',
+                [
+                    'form_params' => [
+                        'tid' => $arParams['tid'],
+                    ]
+                ]
+
+            );
+
+            $arResult = json_decode($response->getBody(), true);
+
+            if (!$arResult['status']) {
+                return false;
+            } else {
+                return $arResult['email'];
+            }
+
+        } catch (RequestException $e) {
+            Logger::error($e->getMessage());
+        }
+
+    }
+
+    public function clearAccount($arParams)
+    {
+
+        $arResult = array();
+
+        try {
+
+            $response = $this->SalesBot->request(
+                'POST',
+                '/rest/user/v1/clear-telegram/',
+                [
+                    'form_params' => [
+                        'tid' => $arParams['tid'],
+                    ]
+                ]
+
+            );
+
+            $arResult = json_decode($response->getBody(), true);
+
+            if (!$arResult['status']) {
+                return false;
+            } else {
+                return true;
+            }
+
+        } catch (RequestException $e) {
+            Logger::error($e->getMessage());
+        }
+
+    }
+
 }

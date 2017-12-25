@@ -31,7 +31,8 @@ class TelegramWrap
 
         //убираем обратные слеши для вывода emoji
         $this->config['buttons']['email']['label'] = stripcslashes($this->config['buttons']['email']['label']);
-        $this->config['buttons']['reemail']['label'] = stripcslashes($this->config['buttons']['reemail']['label']);
+        $this->config['buttons']['account']['label'] = stripcslashes($this->config['buttons']['account']['label']);
+        $this->config['buttons']['clear']['label'] = stripcslashes($this->config['buttons']['clear']['label']);
         $this->config['buttons']['menu']['label'] = stripcslashes($this->config['buttons']['menu']['label']);
         $this->config['buttons']['repeatcode']['label'] = stripcslashes($this->config['buttons']['repeatcode']['label']);
         $this->config['buttons']['post']['label'] = stripcslashes($this->config['buttons']['post']['label']);
@@ -267,8 +268,8 @@ class TelegramWrap
                 $this->config['buttons']['time']['description']
             ) . "\n";
         $str .= sprintf("%s - %s.",
-                $this->config['buttons']['reemail']['command'],
-                $this->config['buttons']['reemail']['description']
+                $this->config['buttons']['account']['command'],
+                $this->config['buttons']['account']['description']
             ) . "\n";
         $arDate['text'] = $str;
 
@@ -289,7 +290,26 @@ class TelegramWrap
         $keyboard = new Keyboard(
             [
                 ['text' => $this->config['buttons']['time']['label']],
-                ['text' => $this->config['buttons']['reemail']['label']],
+                ['text' => $this->config['buttons']['account']['label']],
+                ['text' => $this->config['buttons']['menu']['label']],
+            ]
+        );
+        $arDate['reply_markup'] = $keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
+
+
+        return $arDate;
+    }
+
+    /*
+     * Клавиатура для настроек учетной записи
+     */
+    public function getAccountSettingsKeyboard(array $arDate)
+    {
+
+        //кнопки
+        $keyboard = new Keyboard(
+            [
+                ['text' => $this->config['buttons']['clear']['label']],
                 ['text' => $this->config['buttons']['menu']['label']],
             ]
         );

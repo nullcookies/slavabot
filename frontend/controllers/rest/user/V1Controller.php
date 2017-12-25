@@ -45,7 +45,9 @@ class V1Controller extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'send-password' => ['post'],
-                    'auth-telegram' => ['post']
+                    'auth-telegram' => ['post'],
+                    'get-user-email' => ['post'],
+                    'clear-telegram' => ['post']
                 ],
             ],
             [
@@ -54,7 +56,9 @@ class V1Controller extends Controller
                     'send-password',
                     'auth-telegram',
                     'set-time-zone',
-                    'get-time-zone'
+                    'get-time-zone',
+                    'get-user-email',
+                    'clear-telegram'
                 ],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
@@ -259,6 +263,54 @@ class V1Controller extends Controller
             'timezone' => $user->timezone,
         ];
 
+    }
+
+    /**
+     * Получение пользователю часового пояса
+     */
+
+    public function actionGetUserEmail(){
+
+        $telegram_id = \Yii::$app->request->post('tid');
+
+        if(!$telegram_id || (int)$telegram_id==0){
+            return [
+                'status' => false,
+                'error' => 'Telegram ID error!'
+            ];
+        }
+
+        $user = User::findByTIG($telegram_id);
+
+        if(!$user){
+            return [
+                'status' => false,
+                'error' => 'User not found!'
+            ];
+        }
+
+        return [
+            'status' => true,
+            'email' => $user->email,
+        ];
+
+    }
+
+    public function actionClearTelegram(){
+        $telegram_id = \Yii::$app->request->post('tid');
+
+        if(!$telegram_id || (int)$telegram_id==0){
+            return [
+                'status' => false,
+                'error' => 'Telegram ID error!'
+            ];
+        }
+
+        $status = UserConfig::clearTelegramID($telegram_id);
+
+        return [
+            'status' => $status
+        ];
     }
 
 
