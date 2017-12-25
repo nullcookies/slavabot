@@ -105,7 +105,7 @@ use common\models\User;
                 </h4>
                 <div class="form-group scroll-block">
                     <div class="radio" style="margin-top: 25px;" ng-repeat="groupe in unprocessed">
-                        <input type="radio" name="optionsRadios" ng-model="userSelection.activeValue" id="optionsRadios{{groupe.id}}" ng-value="groupe">
+                        <input type="radio" name="optionsRadios" ng-model="userSelection.activeValueVK" value="{{groupe.id}}" id="optionsRadios{{groupe.id}}">
                         <label for="optionsRadios{{groupe.id}}">
                             <img src="{{groupe.photo_50}}" alt="" style="margin-top: -15px; border-radius: 100%;">
                             <span style="margin-left: 10px; display: block; float: right;">{{groupe.name}}</span>
@@ -113,7 +113,7 @@ use common\models\User;
                     </div>
                 </div>
                 <div class="form-group">
-                    <button type="button" class="btn btn-success" ng-click="accountSave('vk')">Сохранить</button>
+                    <button type="button" ng-class="{'active_save_btn' : vkGroupBox}" class="btn btn-success" ng-click="accountSave('vk')">Сохранить</button>
                 </div>
             </div>
             <div class="vkcard__content" ng-show="vkfinish">
@@ -155,7 +155,7 @@ use common\models\User;
             <div class="fbcard__auth" ng-show="fbAuthBox">
                 <?=
                     SocialController::getFBBtn(
-                        'https://'.$_SERVER['HTTP_HOST'].'/social/wizard-fb',
+                        'http://'.$_SERVER['HTTP_HOST'].'/social/wizard-fb',
                         'Подключить аккаунт Facebook',
                         'facebook',
                         '<a class="btn btn-success" href="LINK" target="_blank" id="ID">TEXT</a>'
@@ -168,7 +168,7 @@ use common\models\User;
                 </h4>
                 <div class="form-group scroll-block">
                     <div class="radio" style="margin-top: 25px;" ng-repeat="groupe in unprocessed">
-                        <input type="radio" name="optionsRadios" ng-model="userSelection.activeValue" id="optionsRadios{{groupe.id}}" ng-value="groupe">
+                        <input type="radio" name="optionsRadios" ng-model="userSelection.activeValueFB" value="{{groupe.id}}" id="optionsRadios{{groupe.id}}">
                         <label for="optionsRadios{{groupe.id}}">
                             <img src="{{groupe.photo_50}}" alt="" style="margin-top: -15px; border-radius: 100%;">
                             <span style="margin-left: 10px; display: block; float: right;">{{groupe.name}}</span>
@@ -176,7 +176,7 @@ use common\models\User;
                     </div>
                 </div>
                 <div class="form-group">
-                    <button type="button" class="btn btn-success" ng-click="accountSave('fb')">Сохранить</button>
+                    <button type="button" ng-class="{'active_save_btn' : fbGroupBox}" class="btn btn-success" ng-click="accountSave('fb')">Сохранить</button>
                 </div>
             </div>
             <div class="fbcard__content" ng-show="fbFinish">
@@ -264,6 +264,10 @@ use common\models\User;
                 wizard.close();
             });
 
+            $(".wizard-next").on('click', function(){
+                console.log('click');
+                $('.active_save_btn').click();
+            });
             if(!getCookie('modal')){
                 wizard.show();
                 setCookie('modal', true)

@@ -298,9 +298,9 @@ li.wizard-nav-item {
     width: 100%;
 }
 .scroll-block{
-    overflow: scroll;
+    overflow: auto;
     overflow-x:hidden;
-    width: 380px;
+    width: 450px;
     height: 220px;
     padding-left: 15px;
 }

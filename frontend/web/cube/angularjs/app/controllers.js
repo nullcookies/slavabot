@@ -13,6 +13,15 @@ function checkData($str, $len){
     return $str.length>$len;
 }
 
+function checkArray($arr, $param, $value){
+    $status = false;
+    for (var i = 0; i < $arr.length; i++) {
+        if(parseInt($arr[i][$param]) === parseInt($value)){
+            return $arr[i];
+        }
+    }
+    return $status;
+}
 
 angular.module('cubeWebApp')
     .controller('dashboardCtrl', function ($scope, $http, $sce, $interval) {
@@ -80,6 +89,7 @@ angular.module('cubeWebApp')
                     $scope.unpID = response.data.id;
                     $scope.unprocessedType = response.data.type;
                     $scope.unprocessedName = response.data.data.user_name;
+                    $scope.userSelection.activeValueVK = $scope.unprocessed[0].id;
                 }
             });
         };
@@ -94,7 +104,10 @@ angular.module('cubeWebApp')
                     $scope.unprocessedName = response.data.data.user_name;
                     $scope.fbGroupBox = true;
                     $scope.fbAuthBox = false;
-                    console.log('Facebook found');
+
+                    console.log($scope.unprocessed);
+
+                    $scope.userSelection.activeValueFB = $scope.unprocessed[0].id;
                 }
             });
         };
@@ -108,7 +121,14 @@ angular.module('cubeWebApp')
         $scope.accountSave = function($type) {
             var data = $scope.accountData;
 
-            data.groups = $scope.userSelection.activeValue;
+            if($type === 'vk'){
+                data.groups = checkArray($scope.unprocessed, 'id',$scope.userSelection.activeValueVK);
+            }else if($type === 'fb'){
+                data.groups = checkArray($scope.unprocessed, 'id',$scope.userSelection.activeValueFB);
+            }else{
+                data.groups = $scope.userSelection.activeValue;
+            }
+
             $scope.data = {
                 id: $scope.unpID,
                 data: data
@@ -176,6 +196,7 @@ angular.module('cubeWebApp')
 
 
     })
+
     .controller('header', function ($scope, $http, $interval) {
         $scope.telegramStatus = false;
         var config = {
