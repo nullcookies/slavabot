@@ -11,6 +11,7 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Response;
 use frontend\models\UserConfig;
+use yii\web\HttpException;
 
 
 
@@ -88,6 +89,9 @@ class V1Controller extends Controller
      */
 
     public function actionSendPassword(){
+
+//        \Yii::$app->response->setStatusCode(403);
+//        return false;
 
         $login = \Yii::$app->request->post('login');
 

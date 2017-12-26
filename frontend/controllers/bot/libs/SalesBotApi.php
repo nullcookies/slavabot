@@ -11,7 +11,7 @@ namespace frontend\controllers\bot\libs;
 
 use common\services\StaticConfig;
 use GuzzleHttp\Exception\RequestException;
-
+use frontend\controllers\bot\libs\Logger;
 
 /**
  * Class SalesBotApi
@@ -139,9 +139,6 @@ class SalesBotApi
      */
     public function sendPassword($arParams)
     {
-
-        $arResult = array();
-
         try {
 
             $response = $this->SalesBot->request(
@@ -150,21 +147,36 @@ class SalesBotApi
                 [
                     'form_params' => [
                         'login' => $arParams['login'],
-                    ]
+                    ],
+                    'timeout' => 10,
+                    'connect_timeout' => 10,
+                    'http_errors' => false
                 ]
 
             );
 
-            $arResult = json_decode($response->getBody(), true);
-
-            if (!$arResult['status']) {
-                return false;
-            } else {
-                return true;
+            try {
+                if ($response->getStatusCode() == 200 ) {
+                    return json_decode($response->getBody(), true);
+                }else{
+                    return [
+                        'status' => false,
+                        'error' => 'server error'
+                    ];
+                }
+            } catch (\Exception $e) {
+                return [
+                    'status' => false,
+                    'error' => 'server error'
+                ];
             }
 
-        } catch (RequestException $e) {
+        } catch (\Exception $e) {
             Logger::error($e->getMessage());
+            return [
+                'status' => false,
+                'error' => 'server error'
+            ];
         }
 
     }

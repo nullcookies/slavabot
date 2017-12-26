@@ -88,10 +88,22 @@ class EmailCommand extends UserCommand
 
                 //отправляем запрос на отправку проверочного кода
                 $SalesBot = new SalesBotApi();
-                if ($SalesBot->sendPassword(['login' => $text])) {
+
+                $res = $SalesBot->sendPassword(['login' => $text]);
+
+                if ($res['status']) {
                     $notes['email'] = $text;
-                } else {
-                    //письмо не отправленно,пользователь не найден
+                } else if($res['error'] == 'server error'){
+                    $data = $telConfig->getErrorEmailWindow($data);
+
+                    try {
+                        $result = Request::sendMessage($data);
+                    } catch (TelegramException $e) {
+                        TelegramLog::error($e->getMessage());
+                    }
+
+                } else if($res['error']=='User not found!'){
+
                     $data = $telConfig->getWrongEmailWindow($data, $text);
 
                     try {
@@ -101,6 +113,14 @@ class EmailCommand extends UserCommand
                     }
                     break;
 
+                }else{
+                    $data = $telConfig->getErrorEmailWindow($data);
+
+                    try {
+                        $result = Request::sendMessage($data);
+                    } catch (TelegramException $e) {
+                        TelegramLog::error($e->getMessage());
+                    }
                 }
                 $text = '';
             // no break

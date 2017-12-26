@@ -198,7 +198,7 @@ class History extends \yii\db\ActiveRecord
             ->where(['user_id' => $user_id])
             ->andWhere(['<>', 'callback_tlg_message_status', 0 ])
             ->groupBy('callback_tlg_message_status')
-            ->orderBy(['post_date' => $order]);
+            ->orderBy(['updated_at' => $order]);
 
         $countQuery = clone $history;
 

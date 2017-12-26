@@ -117,6 +117,25 @@ class TelegramWrap
         return $arDate;
     }
 
+    public function getErrorEmailWindow(array $arDate)
+    {
+        //текст приглашения
+        $str = "Ошибка при подключении аккаунта. Попробуйте еще раз.\n";
+        $arDate['text'] = $str;
+
+        //кнопки
+        $keyboard = new Keyboard(
+            [
+                ['text' => $this->config['buttons']['email']['label']],
+                ['text' => $this->config['buttons']['menu']['label']],
+            ]
+        );
+
+        $arDate['reply_markup'] = $keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
+
+        return $arDate;
+    }
+
 
     /**Окно ввода кода
      *
