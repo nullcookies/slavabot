@@ -70,36 +70,50 @@ class History extends \yii\db\ActiveRecord
                 }
 
                 $redate = \Yii::$app->formatter->asDatetime($this->updated_at, $format);
-                if(!is_array($redate)){
-                    return $redate;
-                }
+
                 if(isset(Json::decode($this->data)['schedule_dt'])){
 
+
                     try{
-                        $postDate = \Yii::$app->formatter->asDatetime(Json::decode($this->data)['schedule_dt'], $format);
+                        $postDate = Carbon::parse(Json::decode($this->data)['schedule_dt']['date'], 'Europe/London');
+                        $postDate->setTimezone(\Yii::$app->user->identity->timezone);
+                        $postDate->setToStringFormat($corbon);
+                        $postDate = $postDate->__toString();
                     } catch (\Exception $e) {
-                        $postDate = Json::decode($this->data)['schedule_dt'];
-                    }
 
-                    if(!is_array($postDate)){
-                        return $postDate;
-                    }
+                        try{
+                            $postDate = Carbon::parse(Json::decode($this->data)['schedule_dt'], 'Europe/London');
+                            $postDate->setTimezone(\Yii::$app->user->identity->timezone);
+                            $postDate->setToStringFormat($corbon);
+                            $postDate = $postDate->__toString();
+                        } catch (\Exception $e) {
+                            $postDate = Json::decode($this->data)['schedule_dt'];
+                        }
 
-                    $date = $postDate;
-                    $redate = Carbon::parse($date, 'Europe/London');
-                    $redate->setTimezone(\Yii::$app->user->identity->timezone);
-                    $redate->setToStringFormat($corbon);
-                    $redate = $redate->__toString();
+                    }
+                    return $postDate;
                 }else{
                     if(!is_array($redate)){
-                        return $redate;
+                        $res = Carbon::parse($redate, 'Europe/London');
+                        $res->setTimezone(\Yii::$app->user->identity->timezone);
+                        $res->setToStringFormat($corbon);
+                        $res = $res->__toString();
+
+                        return $res;
+
                     }
                     $redate = Carbon::parse($redate, 'Europe/Moscow');
                     $redate->setTimezone(\Yii::$app->user->identity->timezone);
                     $redate->setToStringFormat($corbon);
                     $redate = $redate->__toString();
+
+
                 }
-                return $redate;
+
+                return Carbon::parse($redate, 'Europe/London')
+                    ->setTimezone(\Yii::$app->user->identity->timezone)
+                    ->setToStringFormat($corbon)
+                    ->__toString();
             },
 
             'callback_tlg_message_status',
@@ -184,7 +198,7 @@ class History extends \yii\db\ActiveRecord
             ->where(['user_id' => $user_id])
             ->andWhere(['<>', 'callback_tlg_message_status', 0 ])
             ->groupBy('callback_tlg_message_status')
-            ->orderBy(['updated_at' => $order]);
+            ->orderBy(['post_date' => $order]);
 
         $countQuery = clone $history;
 

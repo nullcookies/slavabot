@@ -267,7 +267,8 @@ class PostCommand extends UserCommand
                         }
 
                         $notes['state'] = 5;
-                        $notes['schedule_dt'] = Carbon::parse($text)->timezone($timeZone)->timezone('Europe/London')->toDateTimeString();
+                        $notes['schedule_dt'] = Carbon::parse($text, $timeZone)->setTimezone('Europe/London')->toDateTimeString();
+                        //Carbon::parse($text)->timezone($timeZone)->timezone('Europe/London')->toDateTimeString();
 
                         $this->conversation->update();
                         $inline_keyboard = new InlineKeyboard([
@@ -276,7 +277,7 @@ class PostCommand extends UserCommand
                         ]);
 
                         Carbon::setLocale('ru');
-                        $td = Carbon::now()->timezone($timeZone)->diff(\Carbon\Carbon::parse($text)->timezone($timeZone));
+                        $td = Carbon::now()->timezone($timeZone)->diff(\Carbon\Carbon::parse($text, $timeZone));
 
                         $dif = "";
 
