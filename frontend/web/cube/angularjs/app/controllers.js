@@ -201,7 +201,7 @@ angular.module('cubeWebApp')
 
         $scope.getUserData = function(){
             $http.post('/system/main-data', {}, config).then(function success(response) {
-                console.log(response.data.user);
+                $scope.tariff = response.data.user.tariff;
                 $scope.telegramStatus = response.data.user.telegram;
                 $scope.UserName = response.data.user.name;
             });

@@ -27,7 +27,7 @@ class User extends ActiveRecord implements IdentityInterface
 {
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
-
+    //public $tariff;
 
     /**
      * @inheritdoc
@@ -73,14 +73,7 @@ class User extends ActiveRecord implements IdentityInterface
             'auth_key',
             'status',
             'timezone',
-            'tariff' => function(){
-                return [
-                    'title' => $this->tariffValue,
-                    'expire' => $this->tariffValue
-                ];
-            },
-
-
+            'tariff' => 'tariffValue',
         ];
     }
 
@@ -368,16 +361,17 @@ class User extends ActiveRecord implements IdentityInterface
 
     static function getUser()
     {
-        $user = self::find()->where(['id' => \Yii::$app->user->identity->id])->one();
+        $user = self::findByID(\Yii::$app->user->identity->id);
 
-        return $user;
-//        array(
-//            'id' => $user->id,
-//            'name' => $user->username,
-//            'email' => $user->email,
-//            'phone' => $user->phone,
-//            'telegram' => $user->telegram_id > 0 ? true : false,
-//            'tariff' => $user->tariff,
-//        );
+        return array(
+            'id' => $user->id,
+            'name' => $user->username,
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'telegram' => $user->telegram_id > 0 ? true : false,
+            'tariff' => $user->tariffValue,
+        );
+
+
     }
 }

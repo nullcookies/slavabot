@@ -38,7 +38,7 @@ AppAsset::register($this);
 <div id="theme-wrapper">
     <header class="navbar" id="header-navbar" ng-controller="header">
         <div class="container">
-            <a href="#/dasboard" id="logo" class="navbar-brand">
+            <a href="/" id="logo" class="navbar-brand">
                 <img src="/cube/img/logo.png" alt="" class="normal-logo logo-white"/>
                 <img src="/cube/img/logo-black.png" alt="" class="normal-logo logo-black"/>
                 <img src="/cube/img/logo-small.png" alt="" class="small-logo hidden-xs hidden-sm hidden"/>
@@ -64,6 +64,13 @@ AppAsset::register($this);
 
                 <div class="nav-no-collapse pull-right" id="header-nav" ng-controller="header">
                     <ul class="nav navbar-nav pull-right">
+
+                        <li class="dropdown profile-dropdown">
+                            <a href="#/tariffs" class=" fade in">
+                                {{tariff.title}} : {{tariff.expire}}
+                            </a>
+                        </li>
+
                         <li class="dropdown profile-dropdown" ng-show="telegramStatus">
                             <span class=" fade in">
                                 <i class="fa fa-check-circle fa-fw fa-lg"></i>
