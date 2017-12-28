@@ -181,7 +181,7 @@ class EmailCommand extends UserCommand
             case 2:
                 $this->conversation->update();
 
-                $data = $telConfig->getCodeSuccessWindow($data);
+                $data = $telConfig->getMainWindow($data, 'Аккаунт успешно подключен. ', ['post', 'settings']);
 
                 $this->conversation->stop();
                 try {

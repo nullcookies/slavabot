@@ -64,7 +64,7 @@ class MainCommand extends UserCommand
 
             }
 
-            $data = $telConfig->getMainWindow($data);
+            $data = $telConfig->getMainWindow($data, '', ['post', 'settings']);
             $result = Request::sendMessage($data);
 
             return $result;        // Send message!
