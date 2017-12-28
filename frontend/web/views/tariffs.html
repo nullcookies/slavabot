@@ -1,0 +1,60 @@
+<div class="row" style="opacity: 1;">
+    <div class="col-lg-12">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <ol class="breadcrumb">
+                    <li><a href="/">Главная</a></li>
+                    <li class="active"><span>Тарифы</span></li>
+                </ol>
+
+                <h1></h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="main-box clearfix">
+                    <header class="main-box-header clearfix">
+                        <h2></h2>
+                    </header>
+
+                    <div class="main-box-body clearfix">
+                        <div class="col-md-3 col-sm-6 col-xs-12 pricing-package" ng-repeat="tariff in tariffs">
+                            <div class="pricing-package-inner">
+                                <div class="package-header {{tariff.color}}">
+                                    <span class="stars center-block">
+                                        <i class="fa fa-star"></i>
+                                    </span>
+                                    <h3>{{tariff.title}}</h3>
+                                </div>
+                                <div class="package-content">
+                                    <div class="package-price {{tariff.color}}" ng-show="tariff.cost>0">
+                                        <span class="currency">₽</span>
+                                        <span class="price">{{tariff.cost}}</span>
+                                        <span class="package-month">/месяц</span>
+                                    </div>
+                                    <div class="package-price {{tariff.color}}"ng-show="tariff.cost==0">
+                                        <span class="currency"  style="opacity:0" >₽</span>
+                                        <span class="price"  style="opacity:0" >{{tariff.cost}}</span>
+                                        <span class="package-month"  style="opacity:0" >/месяц</span>
+                                    </div>
+                                    <ul class="package-top-features" style="min-height: 125px;">
+                                        <li ng-repeat="constraint in tariff.constraints">
+                                            {{constraint}}
+                                        </li>
+                                    </ul>
+                                    <div class="package-footer">
+                                        <button class="btn btn-success">
+                                            <span class="fa fa-shopping-cart fa-lg"></span>Установить
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -52,8 +52,6 @@ angular.module('cubeWebApp')
         $scope.fbAuthBox = true;
         $scope.fbFinish = false;
 
-
-
         $scope.InstaSave = function(){
             $scope.data = {
                 Instagram:{
@@ -191,12 +189,7 @@ angular.module('cubeWebApp')
 
             }
         }
-
-        // Сохранение аккаунтов конец
-
-
     })
-
     .controller('header', function ($scope, $http, $interval) {
         $scope.telegramStatus = false;
         var config = {
@@ -208,6 +201,7 @@ angular.module('cubeWebApp')
 
         $scope.getUserData = function(){
             $http.post('/system/main-data', {}, config).then(function success(response) {
+                console.log(response.data.user);
                 $scope.telegramStatus = response.data.user.telegram;
                 $scope.UserName = response.data.user.name;
             });
@@ -1310,6 +1304,26 @@ angular.module('cubeWebApp')
         //     $scope.setPlannedPage($scope.currentPage);
         //     $scope.setPage($scope.currentPage);
         // }, 5000);
+
+    })
+    .controller('tariffsCtrl', function($scope, $http, $sce, $interval){
+        $scope.tariffs = [];
+
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+                'X-CSRF-Token': getCSRF()
+            }
+        };
+
+        $scope.getTariffs = function(){
+            $http.post('/billing/tariffs', [], config).then(function success(response) {
+                console.log(response);
+                $scope.tariffs = response.data;
+            });
+        };
+
+        $scope.getTariffs();
 
     });
     app.filter('startFrom', function() {

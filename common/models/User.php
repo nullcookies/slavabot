@@ -6,7 +6,7 @@ use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
-
+use common\models\billing\Payment;
 /**
  * User model
  *
@@ -55,6 +55,32 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
+        ];
+    }
+    public function getTariffValue()
+    {
+        return $this->hasOne(Payment::className(), ['user_id' => 'id'])->where(['active' => 1]);
+
+    }
+
+    public function fields(){
+        return [
+            'id',
+            'username',
+            'password_hash',
+            'temp_password_hash',
+            'email',
+            'auth_key',
+            'status',
+            'timezone',
+            'tariff' => function(){
+                return [
+                    'title' => $this->tariffValue,
+                    'expire' => $this->tariffValue
+                ];
+            },
+
+
         ];
     }
 
@@ -338,5 +364,20 @@ class User extends ActiveRecord implements IdentityInterface
         $user = self::findByID($id);
         $user->clearTempCode();
         return $user->save();
+    }
+
+    static function getUser()
+    {
+        $user = self::find()->where(['id' => \Yii::$app->user->identity->id])->one();
+
+        return $user;
+//        array(
+//            'id' => $user->id,
+//            'name' => $user->username,
+//            'email' => $user->email,
+//            'phone' => $user->phone,
+//            'telegram' => $user->telegram_id > 0 ? true : false,
+//            'tariff' => $user->tariff,
+//        );
     }
 }

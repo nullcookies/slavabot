@@ -58,6 +58,11 @@ app.config(['$routeProvider', function ($routeProvider) {
             controller: "helpCtrl",
             title: 'Помощь'
         })
+        .when("/tariffs", {
+            templateUrl: "views/tariffs.html",
+            controller: "tariffsCtrl",
+            title: 'Тарифы'
+        })
         .when("/error/owner", {
             templateUrl: "views/errors/owner.html",
             title: 'Ошибка'
