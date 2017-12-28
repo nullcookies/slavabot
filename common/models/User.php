@@ -7,6 +7,9 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 use common\models\billing\Payment;
+use Carbon\Carbon;
+use frontend\controllers\bot\libs\Utils;
+
 /**
  * User model
  *
@@ -371,7 +374,33 @@ class User extends ActiveRecord implements IdentityInterface
             'telegram' => $user->telegram_id > 0 ? true : false,
             'tariff' => $user->tariffValue,
         );
+    }
 
+    static function expireToString()
+    {
+        $user = self::findByID(\Yii::$app->user->identity->id);
 
+        Carbon::setLocale('ru');
+        $td = Carbon::now()->diff(\Carbon\Carbon::parse($user->tariffValue->expire));
+
+        $dif = "";
+
+        if ($td->y > 0) {
+            $dif .= Utils::human_plural_form($td->y, ["год", "года", "лет"]) . " ";
+        }
+        if ($td->m > 0) {
+            $dif .= Utils::human_plural_form($td->m, ["месяц", "месяц", "месяцев"]) . " ";
+        }
+        if ($td->d > 0) {
+            $dif .= Utils::human_plural_form($td->d, ["день", "дня", "дней"]);
+        }
+
+        return $dif;
+
+    }
+
+    static function currentTariff()
+    {
+        return \Yii::$app->user->identity->tariffValue;
     }
 }

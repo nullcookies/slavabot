@@ -3,6 +3,7 @@ namespace common\models\billing;
 
 use yii\db\ActiveRecord;
 use common\models\billing\Tariffs;
+use common\services\StaticConfig;
 use Carbon\Carbon;
 use frontend\controllers\bot\libs\Utils;
 
@@ -28,6 +29,9 @@ class Payment extends ActiveRecord
 
     public function fields(){
         return [
+            'id' => function(){
+                return $this->tariffValue->id;
+            },
             'expire' => function(){
 
                 Carbon::setLocale('ru');
@@ -59,6 +63,23 @@ class Payment extends ActiveRecord
         return [
             [['id', 'user_id', 'tariff_id'], 'integer']
         ];
+    }
+
+    static function initDefaultTariff($user)
+    {
+        $tariff = StaticConfig::defaulTariff();
+
+        $elem = new Payment();
+
+        $elem->user_id = $user;
+        $elem->tariff_id = $tariff['id'];
+
+        $elem->begin = Carbon::now()->format('Y-m-d H:i');
+        $elem->expire = Carbon::now()->addDay($tariff['period'])->format('Y-m-d H:i');
+        $elem->active = 1;
+
+        $elem->save();
+
     }
 
 }

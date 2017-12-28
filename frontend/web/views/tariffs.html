@@ -44,10 +44,17 @@
                                             {{constraint}}
                                         </li>
                                     </ul>
-                                    <div class="package-footer">
+                                    <div class="package-footer" ng-show="!tariff.current">
                                         <button class="btn btn-success">
                                             <span class="fa fa-shopping-cart fa-lg"></span>Установить
                                         </button>
+                                    </div>
+
+                                    <div class="package-footer" style="padding: 0px 0 0px;" ng-show="tariff.current">
+                                        <div class="alert alert-success" style="margin: 8px 0px 11px;">
+                                            <i class="fa fa-check-circle fa-fw fa-lg"></i>
+                                            Осталось {{tariff.expire}}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

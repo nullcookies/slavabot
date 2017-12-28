@@ -24,6 +24,10 @@ class StaticConfig
         return self::config('social')['facebook'];
     }
 
+    static function defaulTariff(){
+        return self::config('defaul_tarif');
+    }
+
     static function vk(){
         return self::config('social')['vk'];
     }

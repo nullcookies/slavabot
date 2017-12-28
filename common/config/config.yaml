@@ -41,3 +41,6 @@ social:
     app_id: '6223471'
     app_secret: 'ilsUQvhc50T6nEdsjzWS'
 bot_url: 'http://t.me/slavarubot'
+defaul_tarif:
+  id: 4
+  period: 10
