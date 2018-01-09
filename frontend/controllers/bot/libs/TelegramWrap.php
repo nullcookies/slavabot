@@ -163,28 +163,6 @@ class TelegramWrap
         return $arDate;
     }
 
-    /**Успешная активация пользователя
-     * @param array $arDate
-     *
-     * @return array
-     */
-    public function getCodeSuccessWindow(array $arDate)
-    {
-
-        //текст приглашения
-        $str = "Аккаунт успешно подключен.";
-        $arDate['text'] = $str;
-
-//        //кнопки
-        $keyboard = new Keyboard(
-            [
-                ['text' => $this->config['buttons']['menu']['label']],
-            ]
-        );
-        $arDate['reply_markup'] = $keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
-
-        return $arDate;
-    }
 
     public function getCodeWrongWindow(array $arDate)
     {
@@ -214,34 +192,25 @@ class TelegramWrap
      *
      * @return array
      */
-    public function getMainWindow(array $arDate)
+    public function getMainWindow(array $arDate, $intro = 'Добро пожаловать. ', $buttons = ['post', 'menu', 'settings'])
     {
-        //текст приглашения
-        $str = "Добро пожаловать. Выберите ваше действие:\n";
-        $str .= sprintf("%s - %s.",
-                $this->config['buttons']['post']['command'],
-                $this->config['buttons']['post']['description']
-            ) . "\n";
-        $str .= sprintf("%s - %s.",
-                $this->config['buttons']['menu']['command'],
-                $this->config['buttons']['menu']['description']
-            ) . "\n";
-        $str .= sprintf("%s - %s.",
-            $this->config['buttons']['settings']['command'],
-            $this->config['buttons']['settings']['description']
-        );
+        $str = $intro."Выберите ваше действие:\n";
+
+        $keyboardArray = array();
+
+        foreach($buttons as $btn){
+            $str .= sprintf("%s - %s.",
+                    $this->config['buttons'][$btn]['command'],
+                    $this->config['buttons'][$btn]['description']
+                ) . "\n";
+
+            $keyboardArray[] = ['text' => $this->config['buttons'][$btn]['label']];
+        }
 
         $arDate['text'] = $str;
 
-        //кнопки
-        $keyboard = new Keyboard(
-            [
-                ['text' => $this->config['buttons']['post']['label']],
-                ['text' => $this->config['buttons']['menu']['label']],
-                ['text' => $this->config['buttons']['settings']['label']],
+        $keyboard = new Keyboard($keyboardArray);
 
-            ]
-        );
         $arDate['reply_markup'] = $keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
 
 
