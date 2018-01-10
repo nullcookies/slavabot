@@ -195,9 +195,7 @@ class SalesBotApi
     {
 
         $arResult = array();
-        Logger::info('Авторизация поьзователя', [
-            'params' => $arParams
-        ]);
+
         try {
 
             $response = $this->SalesBot->request(
@@ -220,11 +218,6 @@ class SalesBotApi
             } else {
                 return true;
             }
-
-            Logger::info('Привязка поьзователя', [
-                'result' => $arResult
-            ]);
-
         } catch (RequestException $e) {
             Logger::error($e->getMessage());
         }
