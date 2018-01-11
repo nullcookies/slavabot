@@ -44,7 +44,7 @@ class SendNotificationCommand extends BaseObject implements SelfHandlingCommand
             $html = "
                 <div>
                     <div>
-                        <p>Ваша подписка на сервис заканивается через ". Utils::human_plural_form($day, ["день", "дня", "дней"]) .".</p>
+                        <p>Ваша подписка на сервис заканчивается через ". Utils::human_plural_form($day, ["день", "дня", "дней"]) .".</p>
                     </div>
                     <div>
                     <br>
