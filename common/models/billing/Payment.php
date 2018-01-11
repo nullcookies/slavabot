@@ -24,7 +24,6 @@ class Payment extends ActiveRecord
     public function getTariffValue()
     {
         return $this->hasOne(Tariffs::className(), ['id' => 'tariff_id'])->where(['active' => 1]);
-
     }
 
     public function fields(){
@@ -48,12 +47,15 @@ class Payment extends ActiveRecord
                 if ($td->d > 0) {
                     $dif .= Utils::human_plural_form($td->d, ["день", "дня", "дней"]);
                 }
+                if ($td->d == 0 && $td->h > 0) {
+                    $dif .= Utils::human_plural_form($td->h, ["час", "часа", "часов"]);
+                }
 
                 return $dif;
             },
             'title' => function(){
                 return $this->tariffValue->title;
-            },
+            }
         ];
     }
 

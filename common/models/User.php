@@ -9,6 +9,8 @@ use yii\web\IdentityInterface;
 use common\models\billing\Payment;
 use Carbon\Carbon;
 use frontend\controllers\bot\libs\Utils;
+use common\commands\command\SendNotificationCommand;
+
 
 /**
  * User model
@@ -394,6 +396,9 @@ class User extends ActiveRecord implements IdentityInterface
         if ($td->d > 0) {
             $dif .= Utils::human_plural_form($td->d, ["день", "дня", "дней"]);
         }
+        if ($td->d == 0 && $td->h > 0) {
+            $dif .= Utils::human_plural_form($td->h, ["час", "часа", "часов"]);
+        }
 
         return $dif;
 
@@ -402,5 +407,20 @@ class User extends ActiveRecord implements IdentityInterface
     static function currentTariff()
     {
         return \Yii::$app->user->identity->tariffValue;
+    }
+
+    static function notification($day)
+    {
+        $res = \Yii::$app->commandBus->handle(
+
+            new SendNotificationCommand(
+                [
+                    'day' => $day,
+                ]
+            )
+
+        );
+
+        return $res;
     }
 }
