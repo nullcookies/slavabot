@@ -160,7 +160,7 @@ class SocialController extends Controller
         $auth = new VkService;
         $res = $auth->init($login, $password);
 
-        if($res){
+        if($res['status']){
             $save = Accounts::saveReference($res,  0);
 
             if($save){

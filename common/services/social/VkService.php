@@ -58,7 +58,7 @@ class VkService
         ob_start();
         $res = $this->initVKApi($params, $login, $password);
         ob_end_clean();
-
+        $res['status'] = true;
         return $res;
     }
 
