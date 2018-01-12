@@ -35,38 +35,31 @@ class SendNotificationCommand extends BaseObject implements SelfHandlingCommand
                 ['<', 'expire', Carbon::today()->addDay($day+1)->toDateString()]
             )
             ->leftJoin(User::tableName(), User::tableName().'.id='.Payment::tableName().'.user_id')
-            ->select(Payment::tableName().".user_id, ".User::tableName().".email")
+            ->select(Payment::tableName().".user_id, ".User::tableName().".email, ".User::tableName().".telegram_id")
             ->asArray()->all();
+
+        $text = "Ваша подписка на сервис заканчивается через ". Utils::human_plural_form($day, ["день", "дня", "дней"]);
 
         foreach($payments as $user){
 
+            \Yii::$app->commandBus->handle(
+                new SendTelegramNotificationCommand(
+                    [
+                        'tid' => $user['telegram_id'],
+                        'text' => $text
+                    ]
+                )
+            );
 
-            $html = "
-                <div>
-                    <div>
-                        <p>Ваша подписка на сервис заканчивается через ". Utils::human_plural_form($day, ["день", "дня", "дней"]) .".</p>
-                    </div>
-                    <div>
-                    <br>
-                </div>
-                <div>
-                    С уважением,<br>
-                    Команда СлаваБот<br>
-                </div>
-                <div>
-                    <span class=\"wmi-callto\">+7 (495) 108-08-19</span>
-                </div>
-                <div>
-                    <a href=\"mailto:support@slavabot.ru\">support@slavabot.ru</a>
-                </div>
-            ";
-
-            $mail = \Yii::$app->mailer->compose()
-                ->setFrom(['noreply@slavabot.ru' => 'SlavaBot'])
-                ->setTo($user['email'])
-                ->setSubject('SlavaBot | Информирование об истечении оплаты')
-                ->setHtmlBody($html)
-                ->send();
+            \Yii::$app->commandBus->handle(
+                new SendEmailNotificationCommand(
+                    [
+                        'email' => $user['email'],
+                        'subject' => 'Информирование об истечении оплаты',
+                        'text' => $text
+                    ]
+                )
+            );
         }
     }
 }

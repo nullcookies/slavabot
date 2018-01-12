@@ -411,16 +411,12 @@ class User extends ActiveRecord implements IdentityInterface
 
     static function notification($day)
     {
-        $res = \Yii::$app->commandBus->handle(
-
+        return \Yii::$app->commandBus->handle(
             new SendNotificationCommand(
                 [
-                    'day' => $day,
+                    'day' => $day
                 ]
             )
-
         );
-
-        return $res;
     }
 }
