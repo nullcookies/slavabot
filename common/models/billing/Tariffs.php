@@ -41,6 +41,9 @@ class Tariffs extends ActiveRecord
             'current' => function(){
                 return User::currentTariff()->tariffValue->id == $this->id;
             },
+            'active' => function(){
+                return User::currentTariff();
+            },
             'expire' => function(){
                 if(User::currentTariff()->tariffValue->id == $this->id){
                     return User::expireToString();

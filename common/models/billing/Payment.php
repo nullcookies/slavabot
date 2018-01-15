@@ -53,6 +53,13 @@ class Payment extends ActiveRecord
 
                 return $dif;
             },
+            'active' => function(){
+                $td = (Carbon::parse($this->expire)->getTimestamp() - Carbon::now()->getTimestamp()) > 0;
+                return $td;
+            },
+            'payment_id' => function(){
+                return $this->id;
+            },
             'title' => function(){
                 return $this->tariffValue->title;
             }

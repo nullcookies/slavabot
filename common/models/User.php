@@ -368,6 +368,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $user = self::findByID(\Yii::$app->user->identity->id);
 
+
         return array(
             'id' => $user->id,
             'name' => $user->username,
@@ -401,7 +402,11 @@ class User extends ActiveRecord implements IdentityInterface
         }
 
         return $dif;
+    }
 
+    static function expired()
+    {
+        return true;
     }
 
     static function currentTariff()

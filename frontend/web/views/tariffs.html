@@ -51,9 +51,13 @@
                                     </div>
 
                                     <div class="package-footer" style="padding: 0px 0 0px;" ng-show="tariff.current">
-                                        <div class="alert alert-success" style="margin: 8px 0px 11px;">
+                                        <div class="alert alert-success" ng-show="tariff.active.active"style="margin: 8px 0px 11px;">
                                             <i class="fa fa-check-circle fa-fw fa-lg"></i>
-                                            Осталось {{tariff.expire}}
+                                            Осталось {{tariff.expire}} {{tariff.active.active}}
+                                        </div>
+                                        <div class="alert alert-danger" ng-show="!tariff.active.active"style="margin: 8px 0px 11px;">
+                                            <i class="fa fa-times fa-fw fa-lg"></i>
+                                            Окончен
                                         </div>
                                     </div>
                                 </div>

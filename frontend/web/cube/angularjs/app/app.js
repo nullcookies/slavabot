@@ -8,6 +8,7 @@ var app = angular.module('cubeWebApp', [
 	'angular-loading-bar',
 	'ngAnimate',
 	'easypiechart',
+    'ngCookies',
     'angularMoment',
     'ui.utils'
 ]);

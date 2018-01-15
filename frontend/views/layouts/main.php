@@ -66,8 +66,11 @@ AppAsset::register($this);
                     <ul class="nav navbar-nav pull-right">
 
                         <li class="dropdown profile-dropdown">
-                            <a href="#/tariffs" class=" fade in">
+                            <a href="#/tariffs" class=" fade in" ng-show="tariff.active">
                                 {{tariff.title}} : {{tariff.expire}}
+                            </a>
+                            <a href="#/tariffs" class=" fade in" ng-show="!tariff.active">
+                                {{tariff.title}} : окончен
                             </a>
                         </li>
 
