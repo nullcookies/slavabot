@@ -71,7 +71,7 @@ class PostingController extends Controller
 
     public function actionShedule()
     {
-        Logger::info('Запуск Posting/shedule', [], 'shedule');
+        //Logger::info('Запуск Posting/shedule', [], 'shedule');
         $this->postponedPost();
         $this->notification();
     }
@@ -84,7 +84,7 @@ class PostingController extends Controller
 
     protected function postponedPost()
     {
-        Logger::info('Отложенная публикация');
+        //Logger::info('Отложенная публикация');
 
         $posts = JobPost::find()->where(['status' => JobPost::JOB_STATUS_QUEUED])->andWhere([
             '<=',
