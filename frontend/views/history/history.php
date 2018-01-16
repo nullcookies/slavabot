@@ -168,9 +168,8 @@ use common\models\User;
                 </h4>
                 <div class="form-group scroll-block">
                     <div class="radio" style="margin-top: 25px;" ng-repeat="groupe in unprocessed">
-                        <input type="radio" name="optionsRadios" ng-model="userSelection.activeValueFB" value="{{groupe.id}}" id="optionsRadios{{groupe.id}}">
-                        <label for="optionsRadios{{groupe.id}}">
-                            <img src="{{groupe.photo_50}}" alt="" style="margin-top: -15px; border-radius: 100%;">
+                        <input type="radio" name="optionsRadios{{groupe.id}}" ng-model="userSelection.activeValueFB" value="{{groupe.id}}" id="fb_{{groupe.id}}">
+                        <label for="fb_{{groupe.id}}">
                             <span style="margin-left: 10px; display: block; float: right;">{{groupe.name}}</span>
                         </label>
                     </div>
@@ -268,6 +267,7 @@ use common\models\User;
                 console.log('click');
                 $('.active_save_btn').click();
             });
+
             if(!getCookie('modal')){
                 wizard.show();
                 setCookie('modal', true)
