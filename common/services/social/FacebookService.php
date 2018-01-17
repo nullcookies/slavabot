@@ -70,12 +70,11 @@ class FacebookService
             )
         );
 
-        self::setWebhooksAccess($fb, $res['data']['groups'][0]['access_token'], $res['data']['groups']['id']);
-
         $res['data']['groups'][] = array(
             'id' => $user['id'],
             'name' => 'Стена пользователя ' . $user['name'],
         );
+        //$res['data']['access'] = self::setWebhooksAccess($fb, $accessToken, $this->app_id);
 
         return $res;
     }
@@ -213,10 +212,12 @@ class FacebookService
         }
     }
 
-    public function setWebhooksAccess($fb, $accessToken, $page_id){
+    public function setWebhooksAccess($fb, $accessToken, $app_id){
+
         try {
+            // Returns a `Facebook\FacebookResponse` object
             $response = $fb->get(
-                '/'.$page_id.'/subscribed_apps',
+                '/'.$app_id.'/subscriptions',
                 $accessToken
             );
         } catch(Facebook\Exceptions\FacebookResponseException $e) {
