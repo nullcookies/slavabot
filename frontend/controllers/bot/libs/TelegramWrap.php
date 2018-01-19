@@ -51,12 +51,12 @@ class TelegramWrap
 
         //текст приветствия
         $str = "Добро пожаловать!\n";
-        $str .= "Команды:\n";
+        $str .= "Славабот поможет вам вести ваши аккаунты в соц.сетях.\n";
         //описание для email
-        $str .= sprintf("%s - %s.",
-            $this->config['buttons']['email']['command'],
-            $this->config['buttons']['email']['description']
-        );
+//        $str .= sprintf("%s - %s.",
+//            $this->config['buttons']['email']['command'],
+//            $this->config['buttons']['email']['description']
+//        );
         $arDate['text'] = $str;
 
         //кнопки
@@ -82,7 +82,7 @@ class TelegramWrap
     {
 
         //текст приглашения
-        $str = "Введите email аккаунта SlavaBot:\n";
+        $str = "Введите email аккаунта на сайте slavabot.ru:\n";
         $arDate['text'] = $str;
 
         //кнопки

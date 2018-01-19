@@ -186,6 +186,11 @@ class EmailCommand extends UserCommand
                 $this->conversation->stop();
                 try {
                     $result = Request::sendMessage($data);
+
+                    $data_post = $telConfig->getMainWindow($data, 'Разместите свой первый пост. ', []);
+                    $result = Request::sendMessage($data_post);
+
+
                 } catch (TelegramException $e) {
                     TelegramLog::error($e->getMessage());
                 }

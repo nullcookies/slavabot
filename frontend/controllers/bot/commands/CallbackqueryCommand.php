@@ -13,6 +13,7 @@ namespace Longman\TelegramBot\Commands\SystemCommands;
 use frontend\controllers\bot\libs\Logger;
 use Longman\TelegramBot\Commands\SystemCommand;
 use Longman\TelegramBot\Commands\UserCommands\CancelpostCommand;
+use Longman\TelegramBot\Commands\UserCommands\AddpostCommand;
 use Longman\TelegramBot\Commands\UserCommands\PostCommand;
 use Longman\TelegramBot\Commands\UserCommands\SendpostCommand;
 use Longman\TelegramBot\Commands\UserCommands\SettimeCommand;
@@ -51,6 +52,7 @@ class CallbackqueryCommand extends SystemCommand
         'post' => 'post',
         'sendpost' => 'sendpost',
         'cancelpost' => 'cancelpost',
+        'addpost' => 'addpost',
         'publicpost' => 'publicpost',
         'planpost' => 'planpost',
         'settime' => 'settime'
@@ -64,6 +66,8 @@ class CallbackqueryCommand extends SystemCommand
      */
     public function execute()
     {
+
+
         Logger::info(__METHOD__, []);
 
         $update = $this->getUpdate();
@@ -126,6 +130,12 @@ class CallbackqueryCommand extends SystemCommand
 
             if ($command == 'cancelpost') {
                 return (new CancelpostCommand($this->telegram,
+                    new Update(json_decode($this->update->toJson(), true))))->preExecute();
+
+            }
+
+            if ($command == 'addpost') {
+                return (new AddpostCommand($this->telegram,
                     new Update(json_decode($this->update->toJson(), true))))->preExecute();
 
             }

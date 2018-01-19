@@ -37,20 +37,30 @@ class StartCommand extends SystemCommand
         if ( $arRequest == false ) {
             //если пользователь не подключен
 
-            $data = $telConfig->getStartWindow($data);
+            $data_wellcome = $telConfig->getStartWindow($data);
+            $data_getEmail = $telConfig->getEmailWindow($data);
+            try {
+                Request::sendMessage($data_wellcome);
+                Request::sendMessage($data_getEmail);
+            } catch (TelegramException $e) {
+                Logger::error('StartCommand', [
+                    'message' => $e->getMessage()
+                ]);
+            }
 
         } else {
 
             $data = $telConfig->getMainWindow($data);
+
+            try {
+                Request::sendMessage($data);
+            } catch (TelegramException $e) {
+                Logger::error('StartCommand', [
+                    'message' => $e->getMessage()
+                ]);
+            }
         }
 
-        try {
-            return Request::sendMessage($data);
-        } catch (TelegramException $e) {
-            Logger::error('StartCommand', [
-                'message' => $e->getMessage()
-            ]);
-        }        // Send message!
 
     }
 }
