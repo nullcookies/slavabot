@@ -13,6 +13,8 @@ interface SocialJobs
     const FUNCTION_FB = 'sales_post_fb';
     const FUNCTION_IG = 'sales_post_ig';
 
+    const FUNCTION_DIALOGUES = 'social_dialogues';
+
     public function run(\Kicken\Gearman\Job\WorkerJob $job);
 
 }

@@ -14,6 +14,7 @@ use common\services\StaticConfig;
 use VkAuth;
 use Vk;
 use linslin\yii2\curl;
+use yii\helpers\ArrayHelper;
 
 
 class VkService
@@ -65,6 +66,8 @@ class VkService
     /**
      * Авторизуемся ВК через CURL. Если получилось, возвращаем access_token для standalone приложения.
      *
+     * для юзера
+     *
      * @param $login
      * @param $password
      * @return bool|string
@@ -84,6 +87,84 @@ class VkService
                 'response_type'=> 'token',
                 'scope'=> 'offline,wall,photos,friends,groups,messages,notifications',
                 'v'=> '5.28'
+            ];
+
+            $cook = '';
+
+            foreach($jar as $i => $elem){
+                $cook.= $elem['Name'].'='.$elem['Value'].'; ';
+            }
+
+            $curl = new curl\Curl();
+
+            $response = $curl
+                ->setPostParams($arrConnect)
+                ->setHeaders([
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                    'Accept' => 'application/json',
+                    'cookie' => $cook
+                ])
+                ->post('https://oauth.vk.com/authorize');
+
+            if(preg_match('/<form.*<\/form>/sU', $response, $matches)){
+                $iframe = array_shift($matches);
+                if(preg_match('/action=["\'].*["\']/U', $iframe, $width)){
+                    $widthValue = preg_replace('/(action=["\'])(.*)(["\'])/U', '${2}', $width);
+                    $width = array_shift($width);
+                    $widthValue = array_shift($widthValue);
+                    $response1 = $curl->setOption(CURLOPT_HEADER, true)->post($widthValue);
+                    $url = $curl->responseHeaders['Location'];
+
+                    $result = substr(strstr($url, '#'), 1, strlen($url));
+                    return $result;
+                }
+            }else{
+                $response = $curl
+                    ->setPostParams($arrConnect)
+                    ->setOption(CURLOPT_HEADER, true)
+                    ->setHeaders([
+                        'Content-Type' => 'application/x-www-form-urlencoded',
+                        'Accept' => 'application/json',
+                        'cookie' => $cook
+                    ])
+                    ->post('https://oauth.vk.com/authorize');
+
+                $response1 = $curl->setOption(CURLOPT_HEADER, true)->post($curl->responseHeaders['Location']);
+
+                $url = $curl->responseHeaders['Location'];
+                $result = substr(strstr($url, '#'), 1, strlen($url));
+                return $result;
+            }
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * Авторизуемся ВК через CURL. Если получилось, возвращаем access_token для standalone приложения.
+     *
+     * для групп
+     *
+     * @param $login
+     * @param $password
+     * @return bool|string
+     */
+
+    public function authVKGroups($login, $password, $groupIds){
+        $agent = new VkAuth\VkAuthAgent($login, $password);
+        $remixsid = $agent->getRemixsid();
+
+        if($remixsid){
+
+            $jar = $agent->getAuthorizedCookieJar()->toArray();
+
+            $arrConnect = [
+                'client_id'=> $this->app_id,
+                'group_ids' => implode(',', $groupIds),
+                'display' => 'mobile',
+                'response_type'=> 'token',
+                'scope'=> 'manage,messages,photos,docs',
+                'v'=> '5.71'
             ];
 
             $cook = '';
@@ -159,8 +240,29 @@ class VkService
         $groups = $v->api('groups.get', array(
             'user_id' => $config['user_id'],
             'extended' => 1,
-            'filter' => 'admin,editor,wall_id'
+            'filter' => 'admin'
         ));
+
+        if($groups['items']) {
+            $groupIds = ArrayHelper::getColumn($groups['items'], 'id');
+
+            $response = $this->authVKGroups($login, $password, $groupIds);
+
+            parse_str($response, $groups_params);
+
+            $groupsWithToken = [];
+            foreach ($groups['items'] as $group) {
+                $group_id = $group['id'];
+                if(isset($groups_params["access_token_$group_id"])) {
+                    $group['access_token'] = $groups_params["access_token_$group_id"];
+
+                    $groupsWithToken[] = $group;
+                }
+            }
+
+            $groups['items'] = $groupsWithToken;
+        }
+
 
         $user = $v->api('users.get', array(
             'user_ids' => (string)$config['user_id'],
@@ -182,12 +284,12 @@ class VkService
 
         $res['data']['groups'][] = array(
             'id' => $config['user_id'],
+            'access_token' => $config['access_token'],
             'name' => 'Стена пользователя ' . $res['data']['user_name'],
             'photo_50' => $user[0]['photo_50'],
             'photo_100' => $user[0]['photo_100'],
             'photo_200' => $user[0]['photo_200']
         );
-
 
         return $res;
     }

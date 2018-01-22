@@ -202,7 +202,8 @@ class V1Controller extends Controller
         }
     }
 
-    public function actionGetVkAccounts(){
+    public function actionGetVkAccounts()
+    {
         $accounts = RESTAccounts::getVk();
 
         if($accounts){

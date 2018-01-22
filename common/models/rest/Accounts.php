@@ -11,9 +11,6 @@ use common\models\User;
 
 class Accounts extends \yii\db\ActiveRecord
 {
-
-
-
     public static function tableName()
     {
         return 'social';
@@ -32,19 +29,28 @@ class Accounts extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
+
     public function fields()
     {
         return [
+            'user_id' => function(){
+                return $this->userValue->id;
+            },
             'telegram_id' => function(){
                 return $this->userValue->telegram_id;
             },
             'access_token' => function(){
                 return json_decode($this->data)->access_token;
+            },
+            'group_access_token' => function(){
+                $token = json_decode($this->data)->groups->access_token;
+                return $token;
             }
         ];
     }
 
-    public static function getVk(){
+    public static function getVk()
+    {
         $model = static::find()
             ->where(
                 [
@@ -54,6 +60,7 @@ class Accounts extends \yii\db\ActiveRecord
                 ]
             )
             ->all();
+
         return $model;
     }
 

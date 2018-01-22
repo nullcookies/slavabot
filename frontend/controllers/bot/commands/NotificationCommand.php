@@ -5,7 +5,7 @@
  * Date: 04.12.2017
  */
 
-namespace Longman\TelegramBot\Commands\UserCommands;
+namespace frontend\controllers\bot\commands;
 
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Request;
