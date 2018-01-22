@@ -31,7 +31,7 @@ app.config(['$routeProvider', function ($routeProvider) {
         .when("/potential", {
             templateUrl: "views/users.html",
             controller: "potentialCtrl",
-            title: 'Потенциальные клиенты',
+            title: 'Потенциальные клиенты'
         })
 		.when("/potential/:id", {
 			templateUrl: "views/filter.html",
@@ -66,6 +66,11 @@ app.config(['$routeProvider', function ($routeProvider) {
             templateUrl: "/social",
             controller: "socialCtrl",
             title: 'Соц.сети'
+        })
+        .when("/pages/notice", {
+            templateUrl: "views/notice.html",
+            controller: "noticeCtrl",
+            title: 'Уведомления'
         })
         .when("/history", {
             templateUrl: "/history",

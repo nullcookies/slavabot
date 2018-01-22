@@ -1311,6 +1311,25 @@ angular.module('cubeWebApp')
         //     $scope.setPage($scope.currentPage);
         // }, 5000);
 
+    })
+    .controller('noticeCtrl', function($scope, $http, $sce, $interval){
+
+        $scope.userNotice = '0';
+
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+                'X-CSRF-Token': getCSRF()
+            }
+        };
+
+        $scope.getNotifications = function(){
+            $http.post('/notification/notifications', {}, config).then(function success(response) {
+                console.log(response);
+                $scope.userNotice = response.data;
+            });
+        };
+        $scope.getNotifications();
     });
     app.filter('startFrom', function() {
         return function(input, start) {

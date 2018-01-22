@@ -137,7 +137,14 @@ AppAsset::register($this);
                                     <!--                                        </li>-->
                                     <!--                                    </ul>-->
                                 </li>
-                                <li class="header-nav__item" data-match-route="/pages/social"><a href="#/pages/social"><i class="fa fa-sliders"></i><span>Соц. сети</span></a></li>
+                                <li class="header-nav__item" data-match-route="/pages/social"><a
+                                            href="#/pages/social"><i
+                                                class="fa fa-sliders"></i><span>Соц. сети</span></a>
+                                </li>
+                                <li class="header-nav__item" data-match-route="/pages/notice"><a
+                                            href="#/pages/notice"><i
+                                                class="fa fa-bell-o"></i><span>Уведомления</span></a>
+                                </li>
 
                             </ul>
                         </div>

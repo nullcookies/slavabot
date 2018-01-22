@@ -1,0 +1,168 @@
+<div class="row" id="user-profile">
+    <div class="col-lg-9 col-md-8 col-sm-8">
+        <div class="main-box clearfix">
+            <div class="tabs-wrapper profile-tabs">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#tab-newsfeed" data-toggle="tab" aria-expanded="true">Newsfeed</a></li>
+                    <li class=""><a href="#tab-chat" data-toggle="tab" aria-expanded="false">Chat</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane fade active in" id="tab-newsfeed">
+
+                        <div id="newsfeed">
+                            <div ng-repeat="notice in notification" class="story">
+                                <div class="story-user">
+                                    <a href="#">
+                                        <img src="img/samples/robert-300.jpg" alt="">
+                                    </a>
+                                </div>
+
+                                <div class="story-content">
+                                    <header class="story-header">
+                                        <div class="story-author">
+                                            <a href="#" class="story-author-link">
+                                                {{userNotice}}
+                                            </a>
+                                            posted a status update
+                                        </div>
+                                        <div class="story-time">
+                                            <i class="fa fa-clock-o"></i> just now
+                                        </div>
+                                    </header>
+                                    <div class="story-inner-content">
+                                        Now that we know who you are, I know who I am. I'm not a mistake!
+                                        It all makes sense! In a comic, you know how you can tell who the
+                                        arch-villain's going to be? He's the exact opposite of the hero.
+                                        And most times they're friends, like you and me! I should've known
+                                        way back when... You know why, David? Because of the kids.
+                                        They called me Mr Glass.
+                                    </div>
+                                    <footer class="story-footer">
+                                        <a href="#" class="story-comments-link">
+                                            <i class="fa fa-comment fa-lg"></i> 8320 Comments
+                                        </a>
+                                        <a href="#" class="story-likes-link">
+                                            <i class="fa fa-heart fa-lg"></i> 82k Likes
+                                        </a>
+                                    </footer>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="tab-pane fade" id="tab-chat">
+                        <div class="conversation-wrapper">
+                            <div class="conversation-content">
+                                <div class="slimScrollDiv" style="position: relative; overflow: hidden; width: auto; height: 340px;"><div class="conversation-inner" style="overflow: hidden; width: auto; height: 340px;">
+
+                                    <div class="conversation-item item-left clearfix">
+                                        <div class="conversation-user">
+                                            <img src="img/samples/ryan.png" alt="">
+                                        </div>
+                                        <div class="conversation-body">
+                                            <div class="name">
+                                                Ryan Gossling
+                                            </div>
+                                            <div class="time hidden-xs">
+                                                September 21, 2013 18:28
+                                            </div>
+                                            <div class="text">
+                                                I don't think they tried to market it to the billionaire, spelunking,
+                                                base-jumping crowd.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="conversation-item item-right clearfix">
+                                        <div class="conversation-user">
+                                            <img src="img/samples/kunis.png" alt="">
+                                        </div>
+                                        <div class="conversation-body">
+                                            <div class="name">
+                                                Mila Kunis
+                                            </div>
+                                            <div class="time hidden-xs">
+                                                September 21, 2013 12:45
+                                            </div>
+                                            <div class="text">
+                                                Normally, both your asses would be dead as fucking fried chicken, but you
+                                                happen to pull this shit while I'm in a transitional period so I don't wanna
+                                                kill you, I wanna help you.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="conversation-item item-right clearfix">
+                                        <div class="conversation-user">
+                                            <img src="img/samples/kunis.png" alt="">
+                                        </div>
+                                        <div class="conversation-body">
+                                            <div class="name">
+                                                Mila Kunis
+                                            </div>
+                                            <div class="time hidden-xs">
+                                                September 21, 2013 12:45
+                                            </div>
+                                            <div class="text">
+                                                Normally, both your asses would be dead as fucking fried chicken, but you
+                                                happen to pull this shit while I'm in a transitional period so I don't wanna
+                                                kill you, I wanna help you.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="conversation-item item-left clearfix">
+                                        <div class="conversation-user">
+                                            <img src="img/samples/ryan.png" alt="">
+                                        </div>
+                                        <div class="conversation-body">
+                                            <div class="name">
+                                                Ryan Gossling
+                                            </div>
+                                            <div class="time hidden-xs">
+                                                September 21, 2013 18:28
+                                            </div>
+                                            <div class="text">
+                                                I don't think they tried to market it to the billionaire, spelunking,
+                                                base-jumping crowd.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="conversation-item item-right clearfix">
+                                        <div class="conversation-user">
+                                            <img src="img/samples/kunis.png" alt="">
+                                        </div>
+                                        <div class="conversation-body">
+                                            <div class="name">
+                                                Mila Kunis
+                                            </div>
+                                            <div class="time hidden-xs">
+                                                September 21, 2013 12:45
+                                            </div>
+                                            <div class="text">
+                                                Normally, both your asses would be dead as fucking fried chicken, but you
+                                                happen to pull this shit while I'm in a transitional period so I don't wanna
+                                                kill you, I wanna help you.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div><div class="slimScrollBar" style="background: rgb(0, 0, 0); width: 7px; position: absolute; top: 0px; opacity: 0.4; display: block; border-radius: 7px; z-index: 99; right: 1px;"></div><div class="slimScrollRail" style="width: 7px; height: 100%; position: absolute; top: 0px; display: none; border-radius: 7px; background: rgb(51, 51, 51); opacity: 0.2; z-index: 90; right: 1px;"></div></div>
+                            </div>
+                            <div class="conversation-new-message">
+                                <form>
+                                    <div class="form-group">
+                                        <textarea class="form-control" rows="2" placeholder="Enter your message..."></textarea>
+                                    </div>
+
+                                    <div class="clearfix">
+                                        <button type="submit" class="btn btn-success pull-right">Send message</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
