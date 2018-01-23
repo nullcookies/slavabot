@@ -208,6 +208,9 @@ class MessagesController extends Controller
 
             if(($loop % 10) == 0) {
                 echo $loop . PHP_EOL;
+
+                $this->renewConnections();
+
                 $this->saveLongPollParams();
 
                 $this->users = [];
@@ -227,6 +230,14 @@ class MessagesController extends Controller
         }
 
 
+    }
+
+    protected function renewConnections()
+    {
+        if (isset(\Yii::$app->db)) {
+            \Yii::$app->db->close();
+            \Yii::$app->db->open();
+        }
     }
 
     protected function saveLongPollParams()

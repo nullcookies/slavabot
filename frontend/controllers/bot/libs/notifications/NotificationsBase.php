@@ -9,7 +9,7 @@ namespace frontend\controllers\bot\libs\notifications;
 
 use frontend\controllers\bot\Bot;
 use frontend\controllers\bot\libs\SalesBotApi;
-use Longman\TelegramBot\Commands\UserCommands\NotificationCommand;
+use frontend\controllers\bot\commands\NotificationCommand;
 use Longman\TelegramBot\Exception\TelegramException;
 
 class NotificationsBase
@@ -26,9 +26,6 @@ class NotificationsBase
         $this->salesBot = new SalesBotApi();
     }
 
-    /**
-     * @return \Longman\TelegramBot\Commands\UserCommands\NotificationCommand
-     */
     protected function GetCommand()
     {
         $bot = new Bot();

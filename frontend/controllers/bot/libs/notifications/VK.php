@@ -29,7 +29,7 @@ class VK extends NotificationsBase
             foreach ($users as $user) {
 //                if($user['telegram_id'] != 45757136)
 //                    continue;
-
+                echo $user['user_id'] . PHP_EOL;
                 $this->GetNotifications([
                     'tid' => $user['telegram_id'],
                     'access_token' => $user['access_token']
@@ -137,7 +137,8 @@ class VK extends NotificationsBase
             }
 
         } catch (\Exception $e) {
-            Logger::error($e->getMessage());
+            echo $e->getMessage();
+            //Logger::error($e->getMessage());
         }
 
     }

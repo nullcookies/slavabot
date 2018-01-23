@@ -72,14 +72,14 @@ class PostingController extends Controller
     public function actionShedule()
     {
         //Logger::info('Запуск Posting/shedule', [], 'shedule');
-        $this->postponedPost();
+        //$this->postponedPost();
         $this->notification();
     }
 
     protected function notification()
     {
         $vk = new VK();
-//        $vk->Run();
+        $vk->Run();
     }
 
     protected function postponedPost()
