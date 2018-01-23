@@ -217,6 +217,37 @@ class TelegramWrap
         return $arDate;
     }
 
+    /**Выводим окно приветствия
+     *
+     * @param array $arDate
+     *
+     * @return array
+     */
+    public function getWelcomeWindow(array $arDate, $intro = 'Добро пожаловать. ', $buttons = ['post', 'menu', 'settings'])
+    {
+        $str = $intro;
+
+        $keyboardArray = array();
+
+        foreach($buttons as $btn){
+            $str .= sprintf("%s - %s.",
+                    $this->config['buttons'][$btn]['command'],
+                    $this->config['buttons'][$btn]['description']
+                ) . "\n";
+
+            $keyboardArray[] = ['text' => $this->config['buttons'][$btn]['label']];
+        }
+
+        $arDate['text'] = $str;
+
+        $keyboard = new Keyboard($keyboardArray);
+
+        $arDate['reply_markup'] = $keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
+
+
+        return $arDate;
+    }
+
     /**Окно отмены поста
      * @param array $arDate
      *

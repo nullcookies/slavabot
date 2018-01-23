@@ -27,49 +27,79 @@ class AddpostCommand extends UserCommand
         //подключаем обертку с настройками
         $telConfig = new TelegramWrap();
 
-        try {
+        //try {
 
-            $message = $this->getMessage() ?: $this->getCallbackQuery()->getMessage();
-            $chat = $message->getChat();
-            $user = $this->getMessage() ? $message->getFrom() : $this->getCallbackQuery()->getFrom();
+        $message = $this->getMessage() ?: $this->getCallbackQuery()->getMessage();
+        $chat = $message->getChat();
+        $user = $this->getMessage() ? $message->getFrom() : $this->getCallbackQuery()->getFrom();
 
-            $text = trim($message->getText(true));
+        $text = trim($message->getText(true));
 
-            $chat_id = $chat->getId();
-            $user_id = $user->getId();
+        $chat_id = $chat->getId();
+        $user_id = $user->getId();
+
+        $data = [
+            'chat_id' => $chat_id,
+            'user_id' => $user_id
+        ];
 
 
-            $data = [
+        $this->conversation = new Conversation($user_id, $chat_id, 'post');
+
+        file_put_contents(\Yii::getAlias('@frontend') . '/runtime/logs/cbb.log',
+            json_encode($this->conversation) . "\n", FILE_APPEND);
+
+        $notes = &$this->conversation->notes;
+        !is_array($notes) && $notes = [];
+        //cache data from the tracking session if any
+
+
+        $notes['state'] = 0;
+        $notes['stage'] = 'added';
+
+        $inline_keyboard = new InlineKeyboard([]);
+
+        $data['reply_markup'] = $inline_keyboard;
+
+        $this->changeFM($notes, $inline_keyboard, $user_id, $chat_id);
+
+        $this->conversation->update();
+
+        $data['text'] = 'Введите текст / Добавьте медиа:';
+
+        $notes['fm'] = Request::sendMessage($data);
+
+    }
+
+    private function changeFM($notes, $inline_keyboard, $user_id, $chat_id, $remove_kb = false)
+    {
+
+        $notes=json_decode(json_encode($notes),true);
+
+        $mid = $notes['fm']['result']['message_id'];
+        $mtext = $notes['fm']['result']['text'];
+
+        if (!$remove_kb) {
+            $data_edit = [
                 'chat_id' => $chat_id,
-                'user_id' => $user_id
+                'user_id' => $user_id,
+                'message_id' => $mid,
+                'text' => $mtext,
+                'reply_markup' => $inline_keyboard
             ];
+        } else {
+            $data_edit = [
+                'chat_id' => $chat_id,
+                'user_id' => $user_id,
+                'message_id' => $mid,
+                'text' => $mtext,
 
-
-            $this->conversation = new Conversation($user_id, $chat_id, 'post');
-
-            file_put_contents(\Yii::getAlias('@frontend') . '/runtime/logs/cbb.log',
-                json_encode($this->conversation) . "\n", FILE_APPEND);
-
-            $notes = &$this->conversation->notes;
-            !is_array($notes) && $notes = [];
-            //cache data from the tracking session if any
-            $state = 0;
-            if (isset($notes['state'])) {
-                $state = $notes['state'];
-            }
-
-            $notes['state'] = 1;
-
-            $this->conversation->update();
-
-            $data['text'] = 'Добавьте данные:';
-
-
-
-            return Request::sendMessage($data);
-        } catch (Longman\TelegramBot\Exception\TelegramException $e) {
-            //$this->conversation->cancel();
+            ];
         }
+
+        // Try to edit selected message.
+        $result = Request::editMessageText($data_edit);
+        return $result->getResult();
     }
 
 }

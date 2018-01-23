@@ -84,6 +84,7 @@ class CallbackqueryCommand extends SystemCommand
         $chat_id = $chat->getId();
         $user_id = $user->getId();
 
+
         Logger::info(__METHOD__, [
             'command' => $command,
             'data' => print_r($data, true)

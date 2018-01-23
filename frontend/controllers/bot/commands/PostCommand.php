@@ -4,14 +4,19 @@ namespace Longman\TelegramBot\Commands\UserCommands;
 
 use Carbon\Carbon;
 use common\models\User;
+use common\services\StaticConfig;
 use frontend\controllers\bot\libs\TelegramWrap;
 use frontend\controllers\bot\libs\Utils;
+use Longman\TelegramBot\Commands\SystemCommands\CallbackqueryCommand;
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Conversation;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
+use Longman\TelegramBot\Telegram;
 use Longman\TelegramBot\TelegramLog;
+use Longman\TelegramBot\Entities\Update;
+
 
 class PostCommand extends UserCommand
 {
@@ -20,7 +25,8 @@ class PostCommand extends UserCommand
     protected $usage = '/post';                    // Usage of your command
     protected $version = '1.0.0';
     protected $need_mysql = true;
-    protected $conversation;
+    public $conversation;
+//    public $telegram;
 
     public function execute()
     {
@@ -52,26 +58,35 @@ class PostCommand extends UserCommand
             $notes = &$this->conversation->notes;
             !is_array($notes) && $notes = [];
             //cache data from the tracking session if any
+
             $state = 0;
+
             if (isset($notes['state'])) {
                 $state = $notes['state'];
             }
 
             switch ($state) {
                 case 0:
-                    $notes['state'] = 1;
 
-                    if ($text === '' || $notes['Text'] == '' && !$message->getPhoto() && !$message->getVideo() && !$message->getAudio()) {
+                    if ($notes['stage'] != 'added' &&  ($text === '' || $notes['Text'] === '')  && !$message->getPhoto() && !$message->getVideo() && !$message->getAudio()) {
 
                         $notes['state'] = 0;
                         $notes['MsgId'] = $message->getMessageId();
+
+
                         $this->conversation->update();
 
-                        $data['text'] = 'Введите данные';
+                        $data['text'] = 'Введите данные: ';// . json_encode($this->conversation);
+
+
                         Request::sendMessage($data);
 
                         break;
                     }else{
+
+                        $notes['state'] = 1;
+                        $notes['stage'] = 'post';
+
                         if($text != ''){
                             $notes['Text'] = $text;
                         }
@@ -123,36 +138,131 @@ class PostCommand extends UserCommand
                             //$text = '';
                         }
 
+
                         $this->conversation->update();
 
                         //break;
                     }
-
-
                 case 1:
 
-                    $data['text'] = json_encode($this->conversation);
+                    $data['text'] = 'Выберите действие:';
 
                     $inline_keyboard = new InlineKeyboard([
-                        ['text' => 'Опубликовать', 'callback_data' => 'test'],
-                        ['text' => 'Запланировать', 'callback_data' => 'addpost'],
-                        ['text' => 'Добавить', 'callback_data' => 'post'],
+                        ['text' => 'Опубликовать', 'callback_data' => 'sendpost'],
+                        ['text' => 'Запланировать', 'callback_data' => 'planpost'],
+                        ['text' => 'Добавить', 'callback_data' => 'addpost'],
                         ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
                     ]);
 
                     $data['reply_markup'] = $inline_keyboard;
 
-                    Request::sendMessage($data);
+                    $notes['fm'] = Request::sendMessage($data);
+
+                    $this->changeFM($notes, $inline_keyboard, $user_id, $chat_id);
+
+                    $this->conversation->update();
+                    break;
+                case 3:
+                    Request::deleteMessage([
+                        'chat_id' => $chat_id,
+                        'message_id' => $notes['fm']['result']['message_id'],
+                    ]);
+
+                    $inline_keyboard = new InlineKeyboard([
+                        ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
+                    ]);
+
+                    $this->changeFM($notes, $inline_keyboard, $user_id, $chat_id, true);
+                    $notes['MsgId'] = $message->getMessageId();
+
+                    //часовой пояс пользователя
+
+                    /** @var User $user */
+                    $user = User::findOne([
+                        'telegram_id' => $user_id,
+                    ]);
+
+                    //по умолчанию ставим
+                    $timeZone = 'Europe/Moscow';
+                    if ($user) {
+                        $timeZone = $user->timezone;
+                    }
+
+                    $data['text'] = "Введите время публикации.\nНапример: " . Carbon::now()->timezone($timeZone)->addHour()->format('d.m.Y H:i');
+
+                    $data['reply_markup'] = $inline_keyboard;
+                    $notes['state'] = 4;
+                    $notes['fm'] = Request::sendMessage($data);
+                    $this->conversation->update();
 
                     break;
-                case 2:
+                case 4:
+                    $inline_keyboard = new InlineKeyboard([
+                        ['text' => 'Опубликовать сейчас', 'callback_data' => 'sendpost'],
+                        ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
+                    ]);
 
-                    $data['text'] = 'Case 2:'.json_encode($message);
+                    $notes['MsgId'] = $message->getMessageId();
 
-                    Request::sendMessage($data);
-                    break;
+
+                    if (!self::IsDate($text)) {
+                        $data['text'] = "Не верный формат: " . $text;
+                    } else {
+
+                        //часовой пояс пользователя
+
+                        /** @var User $user */
+                        $user = User::findOne([
+                            'telegram_id' => $user_id,
+                        ]);
+
+                        //по умолчанию ставим
+                        $timeZone = 'Europe/Moscow';
+                        if ($user) {
+                            $timeZone = $user->timezone;
+                        }
+
+                        $notes['state'] = 5;
+                        $notes['schedule_dt'] = Carbon::parse($text,
+                            $timeZone)->setTimezone('Europe/London')->toDateTimeString();
+                        //Carbon::parse($text)->timezone($timeZone)->timezone('Europe/London')->toDateTimeString();
+
+                        $this->conversation->update();
+                        $inline_keyboard = new InlineKeyboard([
+                            ['text' => 'Опубликовать', 'callback_data' => 'sendpost'],
+                            ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
+                        ]);
+
+                        Carbon::setLocale('ru');
+                        $td = Carbon::now()->timezone($timeZone)->diff(\Carbon\Carbon::parse($text, $timeZone));
+
+                        $dif = "";
+
+                        if ($td->y > 0) {
+                            $dif .= Utils::human_plural_form($td->y, ["год", "года", "лет"]) . " ";
+                        }
+                        if ($td->m > 0) {
+                            $dif .= Utils::human_plural_form($td->m, ["месяц", "месяц", "месяцев"]) . " ";
+                        }
+                        if ($td->d > 0) {
+                            $dif .= Utils::human_plural_form($td->d, ["день", "дня", "дней"]) . " ";
+                        }
+                        if ($td->h > 0) {
+                            $dif .= Utils::human_plural_form($td->h, ["час", "часа", "часов"]) . " ";
+                        }
+                        if ($td->i > 0) {
+                            $dif .= Utils::human_plural_form($td->i, ["минуту", "минуты", "минут"]) . " ";
+                        }
+                        if ($td->s > 0) {
+                            $dif .= Utils::human_plural_form($td->s, ["секунду", "секунды", "секунд"]);
+                        }
+
+                        $data['text'] = "Ваш пост будет опубликован через " . $dif;
+
+                        return (new SendpostCommand($this->telegram,
+                            new Update(json_decode($this->update->toJson(), true))))->executeNow($data['text']);
+                    }
             }
-
 //            switch ($state) {
 //                case 0:
 //                    $notes['state'] = 1;
@@ -408,8 +518,6 @@ class PostCommand extends UserCommand
 //                    $this->conversation->update();
 //                    break;
 //            }
-
-
         } catch (TelegramException $e) {
             TelegramLog::error($e->getMessage());
         }

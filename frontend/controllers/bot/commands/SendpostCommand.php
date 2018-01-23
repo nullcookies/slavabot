@@ -24,7 +24,8 @@ class SendpostCommand extends UserCommand
 
     public function execute()
     {
-        \frontend\controllers\bot\libs\Logger::info(__METHOD__);
+        //\frontend\controllers\bot\libs\Logger::info(__METHOD__);
+
 
         $cb = $this->getUpdate()->getCallbackQuery();            // Get Message object
         $user = $cb->getFrom();
@@ -53,6 +54,35 @@ class SendpostCommand extends UserCommand
         $this->conversation->stop();
     }
 
+    public function executeNow($text){
+        //\frontend\controllers\bot\libs\Logger::info(__METHOD__);
+
+        $chat_id = $this->getMessage()->getFrom()->getId();
+        $user_id = $this->getMessage()->getFrom()->getId();
+
+        $this->conversation = new Conversation($user_id, $chat_id, 'post');
+        $notes = &$this->conversation->notes;
+
+        $this->prepareVkJob($notes, $user_id);
+        $this->prepareFbJob($notes, $user_id);
+        $this->prepareIgJob($notes, $user_id);
+
+        $mid = $notes['fm']['result']['message_id'];
+        $mtext = $notes['state'] != 5 ? "В ближайшее время пoст появится в соц. сетях." : $text;
+        $data_edit = [
+            'chat_id' => $chat_id,
+            'user_id' => $user_id,
+            'message_id' => $mid,
+            'text' => $mtext,
+
+        ];
+        Request::sendMessage($data_edit);
+
+        $this->conversation->stop();
+
+    }
+
+
     /**
      * @param $notes
      * @param $user_id
@@ -60,6 +90,7 @@ class SendpostCommand extends UserCommand
      */
     public function prepareVkJob($notes, $user_id)
     {
+
         \frontend\controllers\bot\libs\Logger::info('Подготовка данных для ВК', [
             'method' => __METHOD__,
             'notes' => $notes,
@@ -155,6 +186,8 @@ class SendpostCommand extends UserCommand
             $job = $client->submitBackgroundJob(SocialJobs::FUNCTION_VK, json_encode($arr));
 
             return $job;
+        }else{
+            return 'no wall id';
         }
 
     }
@@ -247,6 +280,8 @@ class SendpostCommand extends UserCommand
             $job = $client->submitBackgroundJob(SocialJobs::FUNCTION_FB, json_encode($arr));
 
             return $job;
+        }else{
+            return 'no wall id';
         }
 
     }
