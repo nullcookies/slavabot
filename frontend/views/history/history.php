@@ -264,7 +264,6 @@ use common\models\User;
             });
 
             $(".wizard-next").on('click', function(){
-                console.log('click');
                 $('.active_save_btn').click();
             });
 
@@ -272,7 +271,6 @@ use common\models\User;
                 wizard.show();
                 setCookie('modal', true)
             }
-
         });
     </script>
     <?

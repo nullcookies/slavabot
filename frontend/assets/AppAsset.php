@@ -41,6 +41,7 @@ class AppAsset extends AssetBundle
         '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js',
         '//cdnjs.cloudflare.com/ajax/libs/angular-moment/0.9.0/angular-moment.min.js',
         '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/locales.js',
+        '/cube/angularjs/js/angular-cookies.min.js',
         '/cube/angularjs/js/angular-route.min.js',
         '/cube/angularjs/js/angular-animate.js',
         '/cube/angularjs/js/loading-bar.js',

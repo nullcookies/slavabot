@@ -41,15 +41,7 @@ class UserConfig extends Model
 
     public function getUserData()
     {
-        $user = self::findModel(\Yii::$app->user->identity->id);
-
-        return array(
-            'id' => $user->id,
-            'name' => $user->username,
-            'email' => $user->email,
-            'phone' => $user->phone,
-            'telegram' => $user->telegram_id > 0 ? true : false
-        );
+        return User::getUser();
     }
 
     public function save()

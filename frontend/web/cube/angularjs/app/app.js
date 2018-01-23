@@ -8,6 +8,7 @@ var app = angular.module('cubeWebApp', [
 	'angular-loading-bar',
 	'ngAnimate',
 	'easypiechart',
+    'ngCookies',
     'angularMoment',
     'ui.utils'
 ]);
@@ -57,6 +58,11 @@ app.config(['$routeProvider', function ($routeProvider) {
             templateUrl: "views/help.html",
             controller: "helpCtrl",
             title: 'Помощь'
+        })
+        .when("/tariffs", {
+            templateUrl: "views/tariffs.html",
+            controller: "tariffsCtrl",
+            title: 'Тарифы'
         })
         .when("/error/owner", {
             templateUrl: "views/errors/owner.html",

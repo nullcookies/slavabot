@@ -23,6 +23,42 @@ function checkArray($arr, $param, $value){
     return $status;
 }
 
+function setCookie(name, value, options) {
+    options = options || {};
+
+    var expires = options.expires;
+
+    if (typeof expires == "number" && expires) {
+        var d = new Date();
+        d.setTime(d.getTime() + expires * 1000);
+        expires = options.expires = d;
+    }
+    if (expires && expires.toUTCString) {
+        options.expires = expires.toUTCString();
+    }
+
+    value = encodeURIComponent(value);
+
+    var updatedCookie = name + "=" + value;
+
+    for (var propName in options) {
+        updatedCookie += "; " + propName;
+        var propValue = options[propName];
+        if (propValue !== true) {
+            updatedCookie += "=" + propValue;
+        }
+    }
+
+    document.cookie = updatedCookie;
+}
+
+function getCookie(name) {
+    var matches = document.cookie.match(new RegExp(
+        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+    ));
+    return matches ? decodeURIComponent(matches[1]) : false;
+}
+
 angular.module('cubeWebApp')
     .controller('dashboardCtrl', function ($scope, $http, $sce, $interval) {
         var config = {
@@ -51,8 +87,6 @@ angular.module('cubeWebApp')
         $scope.fbGroupBox = false;
         $scope.fbAuthBox = true;
         $scope.fbFinish = false;
-
-
 
         $scope.InstaSave = function(){
             $scope.data = {
@@ -191,14 +225,11 @@ angular.module('cubeWebApp')
 
             }
         }
-
-        // Сохранение аккаунтов конец
-
-
     })
+    .controller('header', function ($scope, $http, $interval, $location) {
 
-    .controller('header', function ($scope, $http, $interval) {
         $scope.telegramStatus = false;
+
         var config = {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
@@ -208,15 +239,23 @@ angular.module('cubeWebApp')
 
         $scope.getUserData = function(){
             $http.post('/system/main-data', {}, config).then(function success(response) {
+                $scope.tariff = response.data.user.tariff;
                 $scope.telegramStatus = response.data.user.telegram;
                 $scope.UserName = response.data.user.name;
+
+                // Единоразовый редирект на страницу тарифов, после окончания оплаченного периода
+
+                if(!$scope.tariff.active && !getCookie('payment_' +  $scope.tariff.payment_id)){
+                    setCookie('payment_' +  $scope.tariff.payment_id, true);
+                    $location.path('/tariffs');
+                }
+
             });
         };
 
         $scope.Timer = $interval(function () {
             $scope.getUserData()
         }, 5000);
-
 
         $scope.getUserData();
     })
@@ -1310,6 +1349,26 @@ angular.module('cubeWebApp')
         //     $scope.setPlannedPage($scope.currentPage);
         //     $scope.setPage($scope.currentPage);
         // }, 5000);
+
+    })
+    .controller('tariffsCtrl', function($scope, $http, $sce, $interval){
+        $scope.tariffs = [];
+
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+                'X-CSRF-Token': getCSRF()
+            }
+        };
+
+        $scope.getTariffs = function(){
+            $http.post('/billing/tariffs', [], config).then(function success(response) {
+                console.log(response);
+                $scope.tariffs = response.data;
+            });
+        };
+
+        $scope.getTariffs();
 
     });
     app.filter('startFrom', function() {
