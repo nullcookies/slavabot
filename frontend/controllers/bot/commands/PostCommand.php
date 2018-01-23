@@ -20,16 +20,17 @@ use Longman\TelegramBot\Entities\Update;
 
 class PostCommand extends UserCommand
 {
-    protected $name = 'post';                      // Your command's name
+    protected $name = 'post';                               // Your command's name
     protected $description = 'Post to the soccial network'; // Your command description
-    protected $usage = '/post';                    // Usage of your command
+    protected $usage = '/post';                             // Usage of your command
     protected $version = '1.0.0';
     protected $need_mysql = true;
     public $conversation;
 //    public $telegram;
 
-    public function execute()
+    public function execute($new=false, $intro_text='')
     {
+
         //подключаем обертку с настройками
         $telConfig = new TelegramWrap();
 
@@ -48,7 +49,13 @@ class PostCommand extends UserCommand
             'user_id' => $user_id
         ];
 
+
+
         try {
+
+            /**
+             * Инициируем новый/загружаем текущий разговор
+             */
 
             $this->conversation = new Conversation($user_id, $chat_id, $this->getName());
 
@@ -61,14 +68,26 @@ class PostCommand extends UserCommand
 
             $state = 0;
 
+            // Восстанавливаем этап разговора
+
             if (isset($notes['state'])) {
                 $state = $notes['state'];
             }
 
+            if($new){
+                $data['text'] = $intro_text;
+                Request::sendMessage($data);
+            }
+
             switch ($state) {
                 case 0:
+                    /**
+                     * Первый этап ввода сообщения.
+                     * Проверяем на входящие данные, если они отсутсвуют, то ожидаем их.
+                     * Если данные пришли, то сохраняем.
+                     */
 
-                    if ($notes['stage'] != 'added' &&  ($text === '' || $notes['Text'] === '')  && !$message->getPhoto() && !$message->getVideo() && !$message->getAudio()) {
+                    if ($new || $notes['stage'] != 'added' &&  ($text === '' || $notes['Text'] === '')  && !$message->getPhoto() && !$message->getVideo() && !$message->getAudio()) {
 
                         $notes['state'] = 0;
                         $notes['MsgId'] = $message->getMessageId();
@@ -76,10 +95,10 @@ class PostCommand extends UserCommand
 
                         $this->conversation->update();
 
-                        $data['text'] = 'Введите данные: ';// . json_encode($this->conversation);
-
-
-                        Request::sendMessage($data);
+//                        $data['text'] = 'Введите данные: ';
+//
+//
+//                        Request::sendMessage($data);
 
                         break;
                     }else{
@@ -87,11 +106,11 @@ class PostCommand extends UserCommand
                         $notes['state'] = 1;
                         $notes['stage'] = 'post';
 
-                        if($text != ''){
+                        if($text != '' && ($notes['Text']==='' || !isset($notes['Text']))){
                             $notes['Text'] = $text;
                         }
 
-                        if ($message->getPhoto()) {
+                        if ($message->getPhoto() && ($notes['Photo']==='' || !isset($notes['Photo']))) {
                             $photos = $message->getPhoto();
 
                             $photo = end($photos);
@@ -107,7 +126,7 @@ class PostCommand extends UserCommand
 
                             //$text = '';
                         }
-                        if ($message->getVideo()) {
+                        if ($message->getVideo() && ($notes['Video']==='' || !isset($notes['Video']))) {
                             $video = $message->getVideo();
 
 
@@ -122,7 +141,7 @@ class PostCommand extends UserCommand
 
                             //$text = '';
                         }
-                        if ($message->getAudio()) {
+                        if ($message->getAudio() && ($notes['Audio']==='' || !isset($notes['Audio']))) {
                             $audio = $message->getAudio();
 
 
@@ -141,18 +160,36 @@ class PostCommand extends UserCommand
 
                         $this->conversation->update();
 
-                        //break;
                     }
+
+
                 case 1:
+                    /**
+                     * Второй этап: в случае поступления данных выводим доступные действия.
+                     * Проверяем наличие текста/медиа и позволяем добавить недостающий контент
+                     */
 
                     $data['text'] = 'Выберите действие:';
 
-                    $inline_keyboard = new InlineKeyboard([
-                        ['text' => 'Опубликовать', 'callback_data' => 'sendpost'],
-                        ['text' => 'Запланировать', 'callback_data' => 'planpost'],
-                        ['text' => 'Добавить', 'callback_data' => 'addpost'],
-                        ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
-                    ]);
+                    // Проверяем на возможность добавления в пост текста/медиа
+
+                    if(!isset($notes['Text']) || !isset($notes['Photo'])){
+                        $buttonsArray = [
+                            ['text' => 'Опубликовать', 'callback_data' => 'sendpost'],
+                            ['text' => 'Запланировать', 'callback_data' => 'planpost'],
+                            ['text' => 'Добавить', 'callback_data' => 'addpost'],
+                            ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
+                        ];
+                    }else{
+                        $buttonsArray = [
+                            ['text' => 'Опубликовать', 'callback_data' => 'sendpost'],
+                            ['text' => 'Запланировать', 'callback_data' => 'planpost'],
+                            ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
+                        ];
+                    }
+
+
+                    $inline_keyboard = new InlineKeyboard($buttonsArray);
 
                     $data['reply_markup'] = $inline_keyboard;
 
@@ -163,6 +200,11 @@ class PostCommand extends UserCommand
                     $this->conversation->update();
                     break;
                 case 3:
+
+                    /**
+                     * Отложенная публикация. Запрашиваем у пользователя желаемое время публикации.
+                     */
+
                     Request::deleteMessage([
                         'chat_id' => $chat_id,
                         'message_id' => $notes['fm']['result']['message_id'],
@@ -197,10 +239,10 @@ class PostCommand extends UserCommand
 
                     break;
                 case 4:
-                    $inline_keyboard = new InlineKeyboard([
-                        ['text' => 'Опубликовать сейчас', 'callback_data' => 'sendpost'],
-                        ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
-                    ]);
+                    /**
+                     * Обработка введенного пользователем времени публикации.
+                     * Если данные корректны, отправляем пост в очередь на публикацию.
+                     */
 
                     $notes['MsgId'] = $message->getMessageId();
 

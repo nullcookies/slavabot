@@ -163,12 +163,17 @@ class StartCommand extends SystemCommand
                     // no break
                     case 2:
                         $this->conversation->update();
+
                         $data = $telConfig->getWelcomeWindow($data, 'Аккаунт успешно подключен. ', []);
+
                         $this->conversation->stop();
+
                         Request::sendMessage($data);
+
                         $data_post = $telConfig->getWelcomeWindow($data, 'Разместите свой первый пост через Славабот ', []);
 
                         Request::sendMessage($data_post);
+
                         break;
                 }
             } catch (TelegramException $e) {

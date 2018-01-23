@@ -217,13 +217,14 @@ class TelegramWrap
         return $arDate;
     }
 
-    /**Выводим окно приветствия
+    /**
+     * Выводим окно приветствия
      *
      * @param array $arDate
      *
      * @return array
      */
-    public function getWelcomeWindow(array $arDate, $intro = 'Добро пожаловать. ', $buttons = ['post', 'menu', 'settings'])
+    public function getWelcomeWindow(array $arDate, $intro = 'Добро пожаловать. ', $buttons = [])
     {
         $str = $intro;
 
