@@ -32,20 +32,39 @@ class Accounts extends \yii\db\ActiveRecord
 
     public function fields()
     {
+        $data = json_decode($this->data);
+
         return [
+            'id',
             'user_id' => function(){
                 return $this->userValue->id;
             },
             'telegram_id' => function(){
                 return $this->userValue->telegram_id;
             },
-            'access_token' => function(){
-                return json_decode($this->data)->access_token;
+            'access_token' => function() use ($data) {
+                return $data->access_token;
             },
-            'group_access_token' => function(){
-                $token = json_decode($this->data)->groups->access_token;
+            'group_id' => function() use ($data) {
+                $token = $data->groups->id;
                 return $token;
-            }
+            },
+            'group_access_token' => function() use ($data) {
+                $token = $data->groups->access_token;
+                return $token;
+            },
+            'ts' => function() use ($data) {
+                $token = isset($data->groups->ts)? $data->groups->ts: null;
+                return $token;
+            },
+            'key' => function() use ($data) {
+                $token = isset($data->groups->key)? $data->groups->key: null;
+                return $token;
+            },
+            'server' => function() use ($data) {
+                $token = isset($data->groups->server)? $data->groups->server: null;
+                return $token;
+            },
         ];
     }
 

@@ -20,7 +20,10 @@ class m180118_120259_table_messages extends Migration
             'social' => $this->string()->notNull(),
             'type' => $this->string()->notNull(),
             'peer_id' => $this->bigInteger()->notNull(),
-            'peer_title' => $this->string()->notNull(),
+            'message_id' => $this->bigInteger()->notNull(),
+            'text' => $this->text()->notNull(),
+            'direction' => $this->integer(1)->notNull(),
+            'edited' => $this->integer(1)->notNull()->defaultValue(0),
             'message' => $this->text()->notNull(),
             'created_at' => $this->timestamp()
         ]);

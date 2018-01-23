@@ -2,7 +2,6 @@
 
 namespace common\models;
 
-use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 
 /**
@@ -13,7 +12,10 @@ use yii\db\ActiveRecord;
  * @property string $social
  * @property string $type
  * @property integer $peer_id
- * @property string $peer_title
+ * @property integer $message_id
+ * @property integer $edited
+ * @property integer $direction
+ * @property string $text
  * @property string $message
  * @property integer $created_at
  */
@@ -21,9 +23,12 @@ class SocialDialogues extends ActiveRecord
 {
     const SOCIAL_VK = "VK"; // Вконтакте
     const SOCIAL_FB = "FB"; // facebook
-    const SOCIAL_IG = "IG";   // instagram
+    const SOCIAL_IG = "IG"; // instagram
 
     const TYPE_MESSAGE = 'message';
+
+    const DIRECTION_INBOX = 1;
+    const DIRECTION_OUTBOX = 2;
 
     /**
      * @inheritdoc
@@ -39,9 +44,9 @@ class SocialDialogues extends ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'peer_id', 'peer_title', 'type', 'social', 'message'], 'required'],
-            [['user_id', 'peer_id'], 'integer'],
-            [['message', 'peer_title', 'type'], 'string'],
+            [['user_id', 'peer_id', 'text', 'type', 'social', 'message'], 'required'],
+            [['user_id', 'peer_id', 'message_id', 'edited', 'direction'], 'integer'],
+            [['message', 'text', 'type'], 'string'],
             [['social'], 'string', 'max' => 2],
             [['created_at'], 'safe']
         ];
@@ -56,7 +61,10 @@ class SocialDialogues extends ActiveRecord
             'id' => 'ID',
             'user_id' => 'User ID',
             'peer_id' => 'Peer ID',
-            'peer_title' => 'Peer Title',
+            'text' => 'Text',
+            'message_id' => 'Message ID',
+            'edited' => 'Edited',
+            'direction' => 'Direction',
             'social' => 'Social',
             'type' => 'Type',
             'message' => 'Message',
@@ -69,56 +77,88 @@ class SocialDialogues extends ActiveRecord
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
 
-    public static function saveMessage($userId, $social, $type, $message)
+    public function getPeer()
     {
-        var_dump($message);
+        return $this->hasOne(SocialDialoguesPeer::className(), [
+            'social' => 'social',
+            'peer_id' => 'peer_id'
+        ]);
+    }
 
-        $model = new static();
+    public static function saveMessage($userId, $social, $type, array $message)
+    {
+        //новое сообщение
+        if(isset($message[0]) && $message[0] == 4) {
+            return static::newMessage($userId, $social, $type, $message);
+        }
+        //редактированное сообщение
+        if(isset($message[0]) && $message[0] == 5) {
+            return static::editedMessage($userId, $social, $type, $message);
+        }
+
+        return false;
+    }
+
+    public static function newMessage($userId, $social, $type, array $message)
+    {
+        $model = new static;
         $model->user_id = $userId;
         $model->social = $social;
         $model->type = $type;
-
+        $model->direction = $model->getDirection($message[2]);
         $model->peer_id = $message[3];
-        $model->peer_title = $model->getPeer($message);
+        $model->message_id = $message[1];
+        $model->text = $message[5];
 
         $model->message = json_encode($message);
-        $model->created_at = time();
 
-        if(!$model->save()) {
+        if(!$model->save(false)) {
             var_dump($model->errors);
         }
 
         return $model;
     }
 
-    public function getPeer($update)
+    public static function editedMessage($userId, $social, $type, array $message)
     {
-        $peerId = $update[3];
+        $model = static::find()
+            ->andWhere([
+                'user_id' => $userId,
+                'social' => $social,
+                'type' => $type,
+                'peer_id' => $message[3],
+                'message_id' => $message[1],
+            ])
+            ->one();
 
-        $vk = new \frontend\controllers\bot\libs\Vk([]);
+        if($model) {
+            $model->text = $message[5];
+            $model->message = json_encode($message);
+            $model->edited = 1;
 
-        $name = '';
-        if($peerId < 0) {
-            //от группы
-            $group = $vk->api('groups.getById', [
-                'group_ids' => [abs($peerId)]
-            ]);
+            if(!$model->save(false)) {
+                var_dump($model->errors);
+            }
 
-            $name = $group[0]['name']."\n";
-        } elseif($peerId > 2000000000) {
-            //из беседы
-
-        } else {
-            //от пользователя
-            $user = $vk->api('users.get', [
-                'user_ids' => $peerId,
-                'name_case' => 'gen'
-            ]);
-
-            $name = $user[0]['first_name'].' '.$user[0]['last_name']."\n";
+            return $model;
         }
 
-        return $name;
+        return false;
+    }
+
+    public function getDirection($flags)
+    {
+        $summands = [];
+        foreach([1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 65536] as $number) {
+            if ($flags & $number) {
+                $summands[] = $number;
+            }
+        }
+        if(in_array(2, $summands)) {
+            return static::DIRECTION_OUTBOX;
+        }
+
+        return static::DIRECTION_INBOX;
     }
 
     public function parseVkMessage()
