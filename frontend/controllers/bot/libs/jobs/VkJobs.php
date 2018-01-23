@@ -13,6 +13,7 @@ use frontend\controllers\bot\libs\Files;
 use frontend\controllers\bot\libs\Logger;
 use frontend\controllers\bot\libs\SalesBotApi;
 use frontend\controllers\bot\libs\SocialNetworks;
+use Longman\TelegramBot\Request;
 use Vk;
 
 class VkJobs implements SocialJobs
@@ -127,6 +128,11 @@ class VkJobs implements SocialJobs
                 $arParam = ['data' => json_encode($jobPost->getAttributes()), 'type' => SocialNetworks::VK, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
             }
+
+            $notes['response_data']['text'] = 'Тест ВК';
+
+
+            Request::sendMessage($notes['response_data']);
 
 
             Logger::info('Публикация ВК завершена');

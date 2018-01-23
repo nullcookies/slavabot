@@ -36,12 +36,28 @@ class SendpostCommand extends UserCommand
         $this->conversation = new Conversation($user_id, $chat_id, 'post');
         $notes = &$this->conversation->notes;
 
-        $this->prepareVkJob($notes, $user_id);
-        $this->prepareFbJob($notes, $user_id);
-        $this->prepareIgJob($notes, $user_id);
-
         $mid = $notes['fm']['result']['message_id'];
-        $mtext = $notes['state'] != 5 ? "В ближайшее время пoст появится в соц. сетях." : $notes['fm']['result']['text'];
+
+        $responseData = [
+            'chat_id' => $chat_id,
+            'user_id' => $user_id,
+            'message_id' => $mid,
+        ];
+
+        $res = [
+            'vk' => $this->prepareVkJob($notes, $user_id, $responseData),
+            'facebook' => $this->prepareFbJob($notes, $user_id, $responseData),
+            'instagram' => $this->prepareIgJob($notes, $user_id, $responseData)
+        ];
+
+        $mtext = "Публикую:\n";
+
+        foreach($res as $post){
+            if($post['status']){
+                $mtext .= $post['ru_name'].": ...\n";
+            }
+        }
+
         $data_edit = [
             'chat_id' => $chat_id,
             'user_id' => $user_id,
@@ -63,12 +79,16 @@ class SendpostCommand extends UserCommand
         $this->conversation = new Conversation($user_id, $chat_id, 'post');
         $notes = &$this->conversation->notes;
 
-        $this->prepareVkJob($notes, $user_id);
-        $this->prepareFbJob($notes, $user_id);
-        $this->prepareIgJob($notes, $user_id);
+        $res = [
+            'vk' => $this->prepareVkJob($notes, $user_id),
+            'facebook' => $this->prepareFbJob($notes, $user_id),
+            'instagram' => $this->prepareIgJob($notes, $user_id)
+        ];
+
 
         $mid = $notes['fm']['result']['message_id'];
-        $mtext = $notes['state'] != 5 ? "В ближайшее время пoст появится в соц. сетях." : $text;
+        $mtext = $notes['state'] != 5 ?  json_encode($res) : $text ;
+
         $data_edit = [
             'chat_id' => $chat_id,
             'user_id' => $user_id,
@@ -88,7 +108,7 @@ class SendpostCommand extends UserCommand
      * @param $user_id
      * @return string
      */
-    public function prepareVkJob($notes, $user_id)
+    public function prepareVkJob($notes, $user_id, $responseData = [])
     {
 
         \frontend\controllers\bot\libs\Logger::info('Подготовка данных для ВК', [
@@ -181,13 +201,25 @@ class SendpostCommand extends UserCommand
 
                 return 'cron';
             }
+            $arr['response_data'] = $responseData;
 
             $client = new \Kicken\Gearman\Client('127.0.0.1:4730');
             $job = $client->submitBackgroundJob(SocialJobs::FUNCTION_VK, json_encode($arr));
 
-            return $job;
+            return [
+                'ru_name' => 'Вконтакте',
+                'status' => true,
+                'code' => 200,
+                'message' => $job
+            ];
+
         }else{
-            return 'no wall id';
+            return [
+                'ru_name' => 'Вконтакте',
+                'status' => false,
+                'code' => 404,
+                'message' => 'no account found'
+            ];
         }
 
     }
@@ -279,9 +311,20 @@ class SendpostCommand extends UserCommand
             $client = new \Kicken\Gearman\Client('127.0.0.1:4730');
             $job = $client->submitBackgroundJob(SocialJobs::FUNCTION_FB, json_encode($arr));
 
-            return $job;
+            return [
+                'ru_name' => 'Facebook',
+                'status' => true,
+                'code' => 200,
+                'message' => $job
+            ];
+
         }else{
-            return 'no wall id';
+            return [
+                'ru_name' => 'Facebook',
+                'status' => false,
+                'code' => 404,
+                'message' => 'no account found'
+            ];
         }
 
     }
@@ -298,7 +341,11 @@ class SendpostCommand extends UserCommand
         $access = $this->getSocialCredentials(SocialNetworks::IG);
 
         if (!$user && !$access) {
-            return false;
+            return [
+                'status' => false,
+                'code' => 404,
+                'message' => 'no account found'
+            ];
         }
 
         $post = new Post();
@@ -368,7 +415,14 @@ class SendpostCommand extends UserCommand
         $client = new \Kicken\Gearman\Client('127.0.0.1:4730');
         $job = $client->submitBackgroundJob(SocialJobs::FUNCTION_IG, json_encode($arr));
 
-        return $job;
+        //return $job;
+
+        return [
+            'ru_name' => 'Instagram',
+            'status' => true,
+            'code' => 200,
+            'message' => $job
+        ];
 
     }
 
