@@ -101,6 +101,10 @@ class SocialDialogues extends ActiveRecord
 
     public static function newMessage($userId, $social, $type, array $message)
     {
+        if($model = static::findMessage($userId, $social, $type, $message)) {
+            return $model;
+        }
+
         $model = new static;
         $model->user_id = $userId;
         $model->social = $social;
@@ -121,15 +125,7 @@ class SocialDialogues extends ActiveRecord
 
     public static function editedMessage($userId, $social, $type, array $message)
     {
-        $model = static::find()
-            ->andWhere([
-                'user_id' => $userId,
-                'social' => $social,
-                'type' => $type,
-                'peer_id' => $message[3],
-                'message_id' => $message[1],
-            ])
-            ->one();
+        $model = static::findMessage($userId, $social, $type, $message);
 
         if($model) {
             $model->text = $message[5];
@@ -146,6 +142,19 @@ class SocialDialogues extends ActiveRecord
         return false;
     }
 
+    public static function findMessage($userId, $social, $type, array $message)
+    {
+        return static::find()
+            ->andWhere([
+                'user_id' => $userId,
+                'social' => $social,
+                'type' => $type,
+                'peer_id' => $message[3],
+                'message_id' => $message[1],
+            ])
+            ->one();
+    }
+
     public function getDirection($flags)
     {
         $summands = [];
@@ -159,25 +168,6 @@ class SocialDialogues extends ActiveRecord
         }
 
         return static::DIRECTION_INBOX;
-    }
-
-    public function parseVkMessage()
-    {
-        $update = $this->message;
-
-        $message = 'message_id: '.$update[1]."\n";
-        $message .= 'flags: '.$update[2]."\n";
-
-        $message .= 'peer_id: '.$update[3]."\n";
-
-        $message .= $this->getPeer($update);
-
-        $message .= 'timestamp: '.$update[4]."\n";
-        $message .= 'text: '.$update[5]."\n";
-
-        $message .= $this->getAttachments($update);
-
-        return $message;
     }
 
     protected function getAttachments($update)

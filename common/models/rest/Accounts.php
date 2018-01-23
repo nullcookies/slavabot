@@ -83,4 +83,45 @@ class Accounts extends \yii\db\ActiveRecord
         return $model;
     }
 
+    public static function getVkById($id)
+    {
+        $model = static::find()
+            ->where(
+                [
+                    'id' => $id,
+                    'type' => 'vkontakte',
+                    'status' => 1,
+                    'processed' => 1
+                ]
+            )
+            ->one();
+
+        return $model;
+    }
+
+    /**
+     * Проверяет актуальность данных аккаунта
+     */
+    public function checkAccount($telegram_id, $group_id, $group_access_token)
+    {
+        //поменяли телеграм
+        //поменяли группу
+        //сменился групповой ключ доступа
+
+        $data = json_decode($this->data);
+
+        if($data->groups->id != $group_id) {
+            return false;
+        }
+
+        $result = ['telegram_id' => $telegram_id, 'group_access_token' => $group_access_token];
+        if($this->userValue->telegram_id != $telegram_id) {
+            $result['telegram_id'] = $this->userValue->telegram_id;
+        }
+        if($data->groups->access_token != $group_access_token) {
+            $result['group_access_token'] = $data->groups->access_token;
+        }
+
+        return $result;
+    }
 }

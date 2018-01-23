@@ -9,6 +9,7 @@
 namespace frontend\controllers\bot\libs\jobs;
 
 
+use common\models\rest\Accounts;
 use common\models\SocialDialogues;
 use common\models\SocialDialoguesPeer;
 use frontend\controllers\bot\Bot;
@@ -19,43 +20,79 @@ class DialoguesJobs implements SocialJobs
 {
     public function run(\Kicken\Gearman\Job\WorkerJob $job)
     {
-        $workloadJson = $job->getWorkload();
-        $workload = json_decode($workloadJson);
+        try {
+            $workloadJson = $job->getWorkload();
+            $workload = json_decode($workloadJson);
 
-        var_dump($workload);
+            var_dump($workload);
 
-        $user_id = ArrayHelper::getValue($workload, 'user_id');
-        $update = ArrayHelper::getValue($workload, 'update');
-        $telegram_id = ArrayHelper::getValue($workload, 'telegram_id');
-        $group_access_token = ArrayHelper::getValue($workload, 'group_access_token');
+            $account_id = ArrayHelper::getValue($workload, 'id');
+            $group_id = ArrayHelper::getValue($workload, 'group_id');
+            $user_id = ArrayHelper::getValue($workload, 'user_id');
+            $update = ArrayHelper::getValue($workload, 'update');
+            $telegram_id = ArrayHelper::getValue($workload, 'telegram_id');
+            $group_access_token = ArrayHelper::getValue($workload, 'group_access_token');
 
-        $text = ArrayHelper::getValue($update, 5);
-        $peer_id = ArrayHelper::getValue($update, 3);
+            $text = ArrayHelper::getValue($update, 5);
+            $peer_id = ArrayHelper::getValue($update, 3);
 
-        $message = SocialDialogues::saveMessage(
-            $user_id,
-            SocialDialogues::SOCIAL_VK,
-            SocialDialogues::TYPE_MESSAGE,
-            $update
-        );
+            /**
+             * @var Accounts $account
+             */
+            $correctedAccount = false;
+            if($account = Accounts::getVkById($account_id)) {
+                if($correctedAccount = $account->checkAccount($telegram_id, $group_id, $group_access_token)) {
+                    var_dump($correctedAccount);
+                    $telegram_id = $correctedAccount['telegram_id'];
+                    $group_access_token = $correctedAccount['group_access_token'];
+                }
+            }
 
-        $peer = SocialDialoguesPeer::savePeer(SocialDialogues::SOCIAL_VK, $peer_id, $group_access_token);
+            if($correctedAccount && !$model = SocialDialogues::findMessage($user_id, SocialDialogues::SOCIAL_VK, SocialDialogues::TYPE_MESSAGE, $update)) {
+                $message = SocialDialogues::saveMessage(
+                    $user_id,
+                    SocialDialogues::SOCIAL_VK,
+                    SocialDialogues::TYPE_MESSAGE,
+                    $update
+                );
+
+                $peerType = SocialDialoguesPeer::getVkPeerType($peer_id);
+                $peer = SocialDialoguesPeer::savePeer(SocialDialogues::SOCIAL_VK, $peerType, $peer_id, $group_access_token);
+                $title = $peer->title;
+                if($peerType == SocialDialoguesPeer::TYPE_CHAT) {
+                    $from_peer_id = ArrayHelper::getValue(ArrayHelper::getValue($update, 6), 'from');
+                    $fromPeerType = SocialDialoguesPeer::getVkPeerType($from_peer_id);
+                    $peerUser = SocialDialoguesPeer::savePeer(SocialDialogues::SOCIAL_VK, $fromPeerType, $from_peer_id, $group_access_token);
+                    $title .= '->'.$peerUser->title;
+                }
+
+                echo 'saved' . PHP_EOL;
+
+                $bot = new Bot();
+                $telegram = $bot->GetTelegram();
+                $command = new NotificationCommand($telegram);
+                $command->prepareParams([
+                    'tid' => $telegram_id,
+                    'message' => $title.': '.$text
+                ]);
+                $command->execute();
+
+                echo 'sended' . PHP_EOL;
+
+            } else {
+                if($correctedAccount) {
+                    echo 'double' . PHP_EOL;
+                } else {
+                    echo 'incorrect account' . PHP_EOL;
+                }
 
 
+            }
 
-        echo 'saved' . PHP_EOL;
-
-        $bot = new Bot();
-        $telegram = $bot->GetTelegram();
-        $command = new NotificationCommand($telegram);
-        $command->prepareParams([
-            'tid' => $telegram_id,
-            'message' => $peer->title.': '.$text
-        ]);
-        $command->execute();
-
-        echo 'sended' . PHP_EOL;
-
-        $job->sendComplete();
+            $job->sendComplete();
+        } catch (\Exception $e) {
+            $job->sendFail();
+            echo $e->getMessage();
+        }
     }
 }

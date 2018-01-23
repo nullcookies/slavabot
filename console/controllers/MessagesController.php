@@ -80,9 +80,6 @@ class MessagesController extends Controller
     {
         $users = \common\models\rest\Accounts::getVk();
 
-        echo 'raw users: ' . PHP_EOL;
-        var_dump($users);
-
         if($users) {
             foreach ($users as $user) {
                 $user = $user->toArray();
@@ -312,7 +309,9 @@ class MessagesController extends Controller
         var_dump($this->servers[$index]);
 
         $workload['update'] = $update;
+        $workload['id'] = $this->servers[$index]['id'];
         $workload['user_id'] = $this->servers[$index]['user_id'];
+        $workload['group_id'] = $this->servers[$index]['group_id'];
         $workload['telegram_id'] = $this->servers[$index]['telegram_id'];
         $workload['group_access_token'] = $this->servers[$index]['group_access_token'];
 

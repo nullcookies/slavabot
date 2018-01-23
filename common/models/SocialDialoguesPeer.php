@@ -23,7 +23,7 @@ class SocialDialoguesPeer extends \yii\db\ActiveRecord
 
     const TYPE_USER = 'user';
     const TYPE_GROUP = 'group';
-    const TYPE_DIALOG = 'dialog';
+    const TYPE_CHAT = 'chat';
 
     /**
      * @inheritdoc
@@ -63,10 +63,8 @@ class SocialDialoguesPeer extends \yii\db\ActiveRecord
         ];
     }
 
-    public static function savePeer($social, $peerId, $group_access_token)
+    public static function savePeer($social, $type, $peerId, $group_access_token)
     {
-        $type = static::getVkPeerType($peerId);
-
         $model = static::find()
             ->andWhere(['social' => $social, 'type' => $type, 'peer_id' => $peerId])
             ->one();
@@ -96,7 +94,7 @@ class SocialDialoguesPeer extends \yii\db\ActiveRecord
             $type = static::TYPE_GROUP;
         } elseif($peerId > 2000000000) {
             //из беседы
-            $type = static::TYPE_DIALOG;
+            $type = static::TYPE_CHAT;
         } else {
             //от пользователя
             $type = static::TYPE_USER;
@@ -121,22 +119,30 @@ class SocialDialoguesPeer extends \yii\db\ActiveRecord
             ]);
 
             $name = $group[0]['name'];
-            $avatar = $group[0]['photo_200'];
+            $avatar = $group[0]['photo_100'];
         } elseif($peerId > 2000000000) {
             //из беседы
+            $chatId = $peerId - 2000000000;
+            $chat = $vk->api('messages.getChat', [
+                'chat_id' => $chatId,
+                'fields' => 'photo_100',
+                'lang' => 0
+            ]);
 
+            $name = $chat[0]['title'];
+            $avatar = $chat[0]['photo_100'];
         } else {
             //от пользователя
             $user = $vk->api('users.get', [
                 'user_ids' => $peerId,
-                'fields' => 'photo_max',
+                'fields' => 'photo_100',
                 'lang' => 0
             ]);
 
             var_dump($user[0]);
 
             $name = $user[0]['first_name'].' '.$user[0]['last_name'];
-            $avatar = $user[0]['photo_max'];
+            $avatar = $user[0]['photo_100'];
         }
 
 
