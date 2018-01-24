@@ -14,6 +14,8 @@ use frontend\controllers\bot\libs\Files;
 use frontend\controllers\bot\libs\Logger;
 use frontend\controllers\bot\libs\SalesBotApi;
 use frontend\controllers\bot\libs\SocialNetworks;
+use common\commands\command\EditTelegramNotificationCommand;
+
 
 class IGJobs implements SocialJobs
 {
@@ -112,6 +114,18 @@ class IGJobs implements SocialJobs
                 //отправляем в api
                 $arParam = ['data' => json_encode($post->toArray()), 'type' => SocialNetworks::IG, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
+
+                try{
+                    \Yii::$app->commandBus->handle(
+                        new EditTelegramNotificationCommand(
+                            [
+                                'data' => $notes['response_data']
+                            ]
+                        )
+                    );
+                }catch (\Exception $e){
+                    Logger::error($e->getMessage());
+                }
             }
 
 

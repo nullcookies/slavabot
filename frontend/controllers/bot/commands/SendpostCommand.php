@@ -41,22 +41,10 @@ class SendpostCommand extends UserCommand
         $responseData = [
             'chat_id' => $chat_id,
             'user_id' => $user_id,
-            'message_id' => $mid,
-        ];
-
-        $res = [
-            'vk' => $this->prepareVkJob($notes, $user_id, $responseData),
-            'facebook' => $this->prepareFbJob($notes, $user_id, $responseData),
-            'instagram' => $this->prepareIgJob($notes, $user_id, $responseData)
         ];
 
         $mtext = "Публикую:\n";
 
-        foreach($res as $post){
-            if($post['status']){
-                $mtext .= $post['ru_name'].": ...\n";
-            }
-        }
 
         $data_edit = [
             'chat_id' => $chat_id,
@@ -67,7 +55,19 @@ class SendpostCommand extends UserCommand
         ];
         Request::editMessageText($data_edit);
 
-        $this->conversation->stop();
+        try{
+            $this->prepareVkJob($notes, $user_id, $responseData);
+            $this->prepareFbJob($notes, $user_id, $responseData);
+            $this->prepareIgJob($notes, $user_id, $responseData);
+
+            $this->conversation->stop();
+        }catch (\Exception $e){
+
+            $data_edit['text'] = 'Ошибка: '.$e->getMessage();
+            Request::editMessageText($data_edit);
+
+        }
+
     }
 
     public function executeNow($text){
@@ -201,10 +201,22 @@ class SendpostCommand extends UserCommand
 
                 return 'cron';
             }
-            $arr['response_data'] = $responseData;
+
+            $responseData['text'] = "Вконтакте - ...\n";
+
+            $response = [
+                'chat_id' => $responseData['chat_id'],
+                'user_id' => $responseData['user_id'],
+                'message_id' => json_decode(Request::sendMessage($responseData), true)['result']['message_id'],
+                'text' => "Вконтакте - готово\n"
+            ];
+
+            $arr['response_data'] = $response;
 
             $client = new \Kicken\Gearman\Client('127.0.0.1:4730');
             $job = $client->submitBackgroundJob(SocialJobs::FUNCTION_VK, json_encode($arr));
+
+
 
             return [
                 'ru_name' => 'Вконтакте',
@@ -229,7 +241,7 @@ class SendpostCommand extends UserCommand
      * @param $user_id
      * @return string
      */
-    public function prepareFbJob($notes, $user_id)
+    public function prepareFbJob($notes, $user_id, $responseData)
     {
 
         $user = $this->getUserCredentialsBySocial($user_id, SocialNetworks::FB);
@@ -308,6 +320,18 @@ class SendpostCommand extends UserCommand
 
             }
 
+            $responseData['text'] = "Facebook - ...\n";
+
+            $response = [
+                'chat_id' => $responseData['chat_id'],
+                'user_id' => $responseData['user_id'],
+                'message_id' => json_decode(Request::sendMessage($responseData), true)['result']['message_id'],
+                'text' => "Facebook - готово\n"
+            ];
+
+            $arr['response_data'] = $response;
+
+
             $client = new \Kicken\Gearman\Client('127.0.0.1:4730');
             $job = $client->submitBackgroundJob(SocialJobs::FUNCTION_FB, json_encode($arr));
 
@@ -334,7 +358,7 @@ class SendpostCommand extends UserCommand
      * @param $user_id
      * @return string
      */
-    public function prepareIgJob($notes, $user_id)
+    public function prepareIgJob($notes, $user_id, $responseData)
     {
 
         $user = $this->getUserCredentialsBySocial($user_id, SocialNetworks::IG);
@@ -411,6 +435,24 @@ class SendpostCommand extends UserCommand
             return 'cron';
 
         }
+
+        if(isset($notes['Photo']) && !empty($notes['Photo'])){
+            $responseData['text'] = "Instagram - ...\n";
+            $success_text = "Instagram - готово\n";
+        }else{
+            $responseData['text'] = "Instagram - отсутствует фото\n";
+            $success_text = $responseData['text'];
+        }
+
+
+        $response = [
+            'chat_id' => $responseData['chat_id'],
+            'user_id' => $responseData['user_id'],
+            'message_id' => json_decode(Request::sendMessage($responseData), true)['result']['message_id'],
+            'text' => $success_text
+        ];
+
+        $arr['response_data'] = $response;
 
         $client = new \Kicken\Gearman\Client('127.0.0.1:4730');
         $job = $client->submitBackgroundJob(SocialJobs::FUNCTION_IG, json_encode($arr));

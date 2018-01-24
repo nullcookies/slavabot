@@ -7,13 +7,13 @@
 
 namespace frontend\controllers\bot\libs\jobs;
 
+use common\commands\command\EditTelegramNotificationCommand;
 use common\models\JobPost;
 use common\models\Post;
 use frontend\controllers\bot\libs\Files;
 use frontend\controllers\bot\libs\Logger;
 use frontend\controllers\bot\libs\SalesBotApi;
 use frontend\controllers\bot\libs\SocialNetworks;
-use Longman\TelegramBot\Request;
 use Vk;
 
 class VkJobs implements SocialJobs
@@ -111,6 +111,18 @@ class VkJobs implements SocialJobs
                 //отправляем в api
                 $arParam = ['data' => json_encode($post->getAttributes()), 'type' => SocialNetworks::VK, 'tid' => 0];
                 var_dump($SalesBot->newEvent($arParam));
+
+                try{
+                    \Yii::$app->commandBus->handle(
+                        new EditTelegramNotificationCommand(
+                            [
+                                'data' => $notes['response_data']
+                            ]
+                        )
+                    );
+                }catch (\Exception $e){
+                    Logger::error($e->getMessage());
+                }
             }
 
             /** @var JobPost $jobPost */
@@ -128,11 +140,6 @@ class VkJobs implements SocialJobs
                 $arParam = ['data' => json_encode($jobPost->getAttributes()), 'type' => SocialNetworks::VK, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
             }
-
-            $notes['response_data']['text'] = 'Тест ВК';
-
-
-            Request::sendMessage($notes['response_data']);
 
 
             Logger::info('Публикация ВК завершена');
