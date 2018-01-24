@@ -114,7 +114,11 @@ class Accounts extends \yii\db\ActiveRecord
             return false;
         }
 
-        $result = ['telegram_id' => $telegram_id, 'group_access_token' => $group_access_token];
+        $result = [
+            'telegram_id' => $telegram_id,
+            'access_token' => $data->access_token,
+            'group_access_token' => $group_access_token
+        ];
         if($this->userValue->telegram_id != $telegram_id) {
             $result['telegram_id'] = $this->userValue->telegram_id;
         }

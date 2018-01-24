@@ -45,15 +45,18 @@ class DialoguesJobs implements SocialJobs
                     var_dump($correctedAccount);
                     $telegram_id = $correctedAccount['telegram_id'];
                     $group_access_token = $correctedAccount['group_access_token'];
+                    $access_token = $correctedAccount['access_token'];
                 }
             }
 
-            if($correctedAccount && !$model = SocialDialogues::findMessage($user_id, SocialDialogues::SOCIAL_VK, SocialDialogues::TYPE_MESSAGE, $update)) {
+            if($correctedAccount && !$model = SocialDialogues::findDoubleMessage($user_id, SocialDialogues::SOCIAL_VK, SocialDialogues::TYPE_MESSAGE, $update)) {
                 $message = SocialDialogues::saveMessage(
                     $user_id,
                     SocialDialogues::SOCIAL_VK,
                     SocialDialogues::TYPE_MESSAGE,
-                    $update
+                    $update,
+                    $group_access_token,
+                    $access_token
                 );
 
                 $peerType = SocialDialoguesPeer::getVkPeerType($peer_id);
