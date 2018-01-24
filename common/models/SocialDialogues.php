@@ -1,7 +1,8 @@
 <?php
 
 namespace common\models;
-
+use common\models\SocialDialoguesPeer;
+use common\models\User;
 use yii\db\ActiveRecord;
 
 /**
@@ -72,18 +73,29 @@ class SocialDialogues extends ActiveRecord
         ];
     }
 
-    public function getUserValue()
+    public function getDataUser()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
 
-    public function getPeer()
+    public function getDataPeer()
     {
         return $this->hasOne(SocialDialoguesPeer::className(), [
             'social' => 'social',
-            'peer_id' => 'peer_id'
+            'peer_id' => 'peer_id',
         ]);
     }
+    public function fields()
+    {
+        return [
+            'id',
+            'social',
+            'peer' =>'dataPeer',
+            'message'=>'text',
+            'created_at',
+        ];
+    }
+
 
     public static function saveMessage($userId, $social, $type, array $message)
     {

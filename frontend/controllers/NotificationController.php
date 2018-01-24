@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\models\Notification;
 use common\models\SocialDialogues;
+use common\models\SocialDialoguesPeer;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -68,5 +69,6 @@ class NotificationController extends Controller
         $model = SocialDialogues::find()->all();
         return $model;
     }
+
 
 }

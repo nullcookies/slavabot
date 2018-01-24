@@ -13,7 +13,7 @@
                             <div ng-repeat="notification in userNotifications" class="story">
                                 <div class="story-user">
                                     <a href="#">
-                                        <img src="img/samples/robert-300.jpg" alt="">
+                                        <img src="{{notification.peer.avatar}}" alt="">
                                     </a>
                                 </div>
 
@@ -21,7 +21,7 @@
                                     <header class="story-header">
                                         <div class="story-author">
                                             <a href="#" class="story-author-link">
-                                                {{notification.peer_title}}
+                                                {{notification.peer.title}}
                                             </a>
                                             posted a status update
                                         </div>
@@ -31,7 +31,7 @@
                                         </div>
                                     </header>
                                     <div class="story-inner-content">
-                                        {{notification.text}}
+                                        {{notification.message}}
                                     </div>
                                 </div>
                             </div>
