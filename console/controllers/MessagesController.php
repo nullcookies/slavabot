@@ -8,18 +8,14 @@
 
 namespace console\controllers;
 
+use common\models\Accounts;
 use frontend\controllers\bot\libs\jobs\SocialJobs;
-use frontend\controllers\bot\libs\SalesBotApi;
 use Yii;
 use yii\console\Controller;
+use yii\helpers\ArrayHelper;
 
 class MessagesController extends Controller
 {
-    /**
-     * @var SalesBotApi
-     */
-    protected $salesBot;
-
     /**
      * @var \GuzzleHttp\Client
      */
@@ -36,9 +32,12 @@ class MessagesController extends Controller
 
     public function init()
     {
-        set_time_limit(300);
+        set_time_limit(0);
     }
 
+    /**
+     * Запуск воркера
+     */
     public function actionWorker()
     {
         $worker = new \Kicken\Gearman\Worker('127.0.0.1:4730');
@@ -50,20 +49,16 @@ class MessagesController extends Controller
             ->work();
     }
 
+    /**
+     * Запуск основного цикла long-poll запросов
+     */
     public function actionVk()
     {
-        $this->salesBot = new SalesBotApi();
-
-        //for($i = 0; $i < 200; $i++) {
-            $this->getUsers();
-        //}
-
         $this->guzzleClient = new \GuzzleHttp\Client();
 
-        //$command = sprintf('php -f yii %s > /dev/null 2>&1 &', 'messages/worker');
-        //echo shell_exec($command);
-
         $this->gearmanClient = new \Kicken\Gearman\Client('127.0.0.1:4730');
+
+        $this->getUsers();
 
         $this->getServers();
 
@@ -72,17 +67,29 @@ class MessagesController extends Controller
             Yii::$app->end();
         }
 
+        echo 'users: ' . PHP_EOL;
+        var_dump($this->users);
+
+        echo 'servers: ' . PHP_EOL;
+        var_dump($this->servers);
+
         $this->pool();
     }
 
     protected function getUsers()
     {
-        $users = $this->salesBot->getVkAccounts();
+        $users = \common\models\rest\Accounts::getVk();
 
         if($users) {
             foreach ($users as $user) {
+                $user = $user->toArray();
                 if(!empty($user['telegram_id'] && !empty($user['group_access_token']))) {
-                    $this->users[] = $user;
+                    if(empty($user['ts']) || empty($user['key']) || empty($user['server'])) {
+                        $this->users[] = $user;
+                    } else {
+                        $this->servers[] = $user;
+                    }
+
                 }
             }
         } else {
@@ -90,42 +97,42 @@ class MessagesController extends Controller
             Yii::$app->end();
         }
 
-        if(empty($this->users)) {
+        if(empty($this->users) && empty($this->servers)) {
             echo 'Нет пользователей c подключенными аккаунтами' . PHP_EOL;
             Yii::$app->end();
         }
-
-        var_dump($this->users);
     }
 
     protected function getServers()
     {
-        $count = count($this->users);
+        if($this->users) {
+            $count = count($this->users);
 
-        $requests = function ($total) {
-            for ($i = 0; $i < $total; $i++) {
-                $access_token = $this->users[$i]['group_access_token'];
-                $uri = "https://api.vk.com/method/messages.getLongPollServer?access_token={$access_token}&v=5.69";
-                yield new \GuzzleHttp\Psr7\Request('GET', $uri);
-            }
-        };
+            $requests = function ($total) {
+                for ($i = 0; $i < $total; $i++) {
+                    $access_token = $this->users[$i]['group_access_token'];
+                    $uri = "https://api.vk.com/method/messages.getLongPollServer?access_token={$access_token}&v=5.69";
+                    yield new \GuzzleHttp\Psr7\Request('GET', $uri);
+                }
+            };
 
-        $pool = new \GuzzleHttp\Pool($this->guzzleClient, $requests($count), [
-            'concurrency' => $count,
-            'fulfilled' => function ($response, $index) {
-                // this is delivered each successful response
-                $this->serverResponse($response, $index);
-            },
-            'rejected' => function ($reason, $index) {
-                // this is delivered each failed request
-            },
-        ]);
+            $pool = new \GuzzleHttp\Pool($this->guzzleClient, $requests($count), [
+                'concurrency' => $count,
+                'fulfilled' => function ($response, $index) {
+                    // this is delivered each successful response
+                    $this->serverResponse($response, $index);
+                },
+                'rejected' => function ($reason, $index) {
+                    // this is delivered each failed request
+                },
+            ]);
 
-        // Initiate the transfers and create a promise
-        $promise = $pool->promise();
+            // Initiate the transfers and create a promise
+            $promise = $pool->promise();
 
-        // Force the pool of requests to complete.
-        $promise->wait();
+            // Force the pool of requests to complete.
+            $promise->wait();
+        }
     }
 
     protected function serverResponse(\GuzzleHttp\Psr7\Response $response, $index)
@@ -143,6 +150,8 @@ class MessagesController extends Controller
 
     protected function updateServer($index)
     {
+        echo 'update#'.$index.PHP_EOL;
+
         $access_token = $this->servers[$index]['group_access_token'];
 
         $options = [
@@ -151,17 +160,21 @@ class MessagesController extends Controller
 
         $vk = new \frontend\controllers\bot\libs\Vk($options);
 
-        $this->servers[$index] = $vk->api('messages.getLongPollServer', [
+        $server = $vk->api('messages.getLongPollServer', [
             'access_token' => $access_token
         ]);
+
+        $this->servers[$index]['ts'] = $server['ts'];
+        $this->servers[$index]['key'] = $server['key'];
+        $this->servers[$index]['server'] = $server['server'];
     }
 
     protected function pool()
     {
-        $count = count($this->servers);
-
         $loop = 0;
-        while ($loop < 20) {
+        while (true) {
+
+            $count = count($this->servers);
 
             $requests = function ($total) {
                 for ($i = 0; $i < $total; $i++) {
@@ -192,8 +205,60 @@ class MessagesController extends Controller
             $promise->wait();
 
             $loop++;
+
+            if(($loop % 10) == 0) {
+                echo $loop . PHP_EOL;
+
+                $this->renewConnections();
+
+                $this->saveLongPollParams();
+
+                $this->users = [];
+
+                $this->servers = [];
+
+                $this->getUsers();
+
+                $this->getServers();
+
+                echo 'updated users: ' . PHP_EOL;
+                var_dump($this->users);
+
+                echo 'updated servers: ' . PHP_EOL;
+                var_dump($this->servers);
+            }
         }
 
+
+    }
+
+    protected function renewConnections()
+    {
+        if (isset(\Yii::$app->db)) {
+            \Yii::$app->db->close();
+            \Yii::$app->db->open();
+        }
+    }
+
+    protected function saveLongPollParams()
+    {
+        if($accounts = Accounts::findAll(ArrayHelper::getColumn($this->servers, 'id'))) {
+            $servers = ArrayHelper::index($this->servers, 'id');
+            foreach ($accounts as $account) {
+                $server = $servers[$account->id];
+                $data = json_decode($account->data, true);
+                if($data['groups']['id'] == $server['group_id']) {
+                    $data['groups']['ts'] = $server['ts'];
+                    $data['groups']['key'] = $server['key'];
+                    $data['groups']['server'] = $server['server'];
+                }
+                $data = json_encode($data);
+                $account->data = $data;
+                if(!$account->save(false)) {
+                    var_dump($account->errors);
+                }
+            }
+        }
     }
 
     protected function poolResponse(\GuzzleHttp\Psr7\Response $response, $index)
@@ -206,8 +271,12 @@ class MessagesController extends Controller
 
         if($content->updates) {
             foreach ($content->updates as $update) {
+                //проверим, что это сообщение
+                if(isset($update[0]) && ($update[0] == 4 || $update[0] == 5)) {
+                    $this->sendToTelegram($update, $index);
+                }
                 //проверим, что это сообщение и оно входящее
-                if(isset($update[0]) && $update[0] == 4 && isset($update[2])) {
+                /*if(isset($update[0]) && $update[0] == 4 && isset($update[2])) {
                     $flag = $update[2];
                     $summands = [];
                     foreach([1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 65536] as $number) {
@@ -218,7 +287,7 @@ class MessagesController extends Controller
                     if(!in_array(2, $summands)) {
                         $this->sendToTelegram($update, $index);
                     }
-                }
+                }*/
             }
         }
 
@@ -242,18 +311,22 @@ class MessagesController extends Controller
         }
     }
 
-    protected function sendToTelegram($update, $index)
+    protected function sendToTelegram(array $update, $index)
     {
         var_dump($update);
 
-        $workload['update'] = $update;
-        $workload['user_id'] = $this->servers[$index]['user_id'];
-        $workload['telegram_id'] = $this->servers[$index]['telegram_id'];
+        echo 'index: ' . $index . PHP_EOL;
 
-        //$client = new \Kicken\Gearman\Client('127.0.0.1:4730');
-        //$job = $client->submitBackgroundJob(SocialJobs::FUNCTION_DIALOGUES, \GuzzleHttp\json_encode($update));
+        var_dump($this->servers[$index]);
+
+        $workload['update'] = $update;
+        $workload['id'] = $this->servers[$index]['id'];
+        $workload['user_id'] = $this->servers[$index]['user_id'];
+        $workload['group_id'] = $this->servers[$index]['group_id'];
+        $workload['telegram_id'] = $this->servers[$index]['telegram_id'];
+        $workload['group_access_token'] = $this->servers[$index]['group_access_token'];
+
         $job = $this->gearmanClient
-            ->submitBackgroundJob(SocialJobs::FUNCTION_DIALOGUES, json_encode($workload));
-        //echo $job;
+            ->submitBackgroundJob(SocialJobs::FUNCTION_DIALOGUES, \GuzzleHttp\json_encode($workload));
     }
 }

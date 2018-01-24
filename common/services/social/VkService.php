@@ -232,7 +232,7 @@ class VkService
             'client_id' => $this->app_id,
             'user_id' => $params['user_id'],
             'access_token' => $params['access_token'],
-            'scope' => 'offline, stats, photo_100,wall,groups,photos,video'
+            'scope' => 'offline,stats,photo_100,wall,groups,photos,video,notifications'
         );
 
         $v = new Vk($config);
