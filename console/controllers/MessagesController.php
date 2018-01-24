@@ -172,7 +172,7 @@ class MessagesController extends Controller
     protected function pool()
     {
         $loop = 0;
-        while (true) {
+        while ($loop < 10) {
 
             $count = count($this->servers);
 
@@ -206,7 +206,7 @@ class MessagesController extends Controller
 
             $loop++;
 
-            if(($loop % 10) == 0) {
+            /*if(($loop % 10) == 0) {
                 echo $loop . PHP_EOL;
 
                 $this->renewConnections();
@@ -226,10 +226,10 @@ class MessagesController extends Controller
 
                 echo 'updated servers: ' . PHP_EOL;
                 var_dump($this->servers);
-            }
+            }*/
         }
 
-
+        $this->saveLongPollParams();
     }
 
     protected function renewConnections()
