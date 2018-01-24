@@ -1316,6 +1316,7 @@ angular.module('cubeWebApp')
 
         $scope.userNotifications = [];
         $scope.notificationMessage = [];
+        moment.locale('ru');
 
         var config = {
             headers: {
@@ -1331,7 +1332,25 @@ angular.module('cubeWebApp')
             });
         };
         $scope.getNotifications();
-    });
+    })
+    // .controller('userNoticeCtrl', function($scope, $http, $sce, $interval){
+    //     var config = {
+    //         headers: {
+    //             'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+    //             'X-CSRF-Token': getCSRF()
+    //         }
+    //     };
+    //
+    //     $scope.getNotificationsForUser = function(){
+    //         $http.post('/notification/user-notifications', {}, config).then(function success(response) {
+    //             console.log(response);
+    //             // $scope.thisUserNotifications = response.data;
+    //             console.log($scope.thisUserNotifications);
+    //         });
+    //     };
+    //     $scope.getNotificationsForUser();
+    // });
+
     app.filter('startFrom', function() {
         return function(input, start) {
             start = +start; //parse to int

@@ -4,6 +4,8 @@ namespace common\models;
 use common\models\SocialDialoguesPeer;
 use common\models\User;
 use yii\db\ActiveRecord;
+use Carbon\Carbon;
+
 
 /**
  * This is the model class for table "social_dialogues".
@@ -93,7 +95,7 @@ class SocialDialogues extends ActiveRecord
             'social',
             'peer' =>'dataPeer',
             'message'=>'text',
-            'created_at',
+            'created_at'
         ];
     }
 

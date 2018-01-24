@@ -48,7 +48,8 @@ class NotificationController extends Controller
             [
                 'class'   => \yii\filters\ContentNegotiator::className(),
                 'only'    => [
-                    'notifications'
+                    'notifications',
+                    'user-notifications'
                 ],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
@@ -65,6 +66,12 @@ class NotificationController extends Controller
      */
 
     public function actionNotifications()
+    {
+        $model = SocialDialogues::find()->all();
+        return $model;
+    }
+
+    public function actionUserNotifications()
     {
         $model = SocialDialogues::find()->all();
         return $model;
