@@ -1314,7 +1314,8 @@ angular.module('cubeWebApp')
     })
     .controller('noticeCtrl', function($scope, $http, $sce, $interval){
 
-        $scope.userNotice = '0';
+        $scope.userNotifications = [];
+        $scope.notificationMessage = [];
 
         var config = {
             headers: {
@@ -1325,8 +1326,8 @@ angular.module('cubeWebApp')
 
         $scope.getNotifications = function(){
             $http.post('/notification/notifications', {}, config).then(function success(response) {
-                console.log(response);
-                $scope.userNotice = response.data;
+                $scope.userNotifications = response.data;
+                console.log($scope.userNotifications);
             });
         };
         $scope.getNotifications();
