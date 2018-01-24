@@ -59,7 +59,7 @@ class VK extends NotificationsBase
                 'filters' => 'mentions,comments',
                 'start_time' => $startTime
             ]);
-//            var_dump($res);
+            //var_dump($res);
 
             if (isset($res['count']) && $res['count'] > 0) {
 

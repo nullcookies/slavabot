@@ -47,20 +47,20 @@ class Notification extends ActiveRecord
     {
         static $a = [];
 
-        if(!isset($a[$this->uid])) {
+        if(!isset($a[$this->internal_uid])) {
             $a = [];
 
-            $sql = 'select hash from table_notifications where created_at>now()-interval 1 HOUR';
+            $sql = 'select hash from table_notifications where created_at > now()-interval 1 HOUR';
             $items = \Yii::$app->db->createCommand($sql)->queryAll();
 
             foreach ($items as $item) {
-                $a[$this->uid][$item['hash']] = true;
+                $a[$this->internal_uid][$item['hash']] = true;
             }
 
         }
 
-        if(isset($a[$this->uid])) {
-            return $a[$this->uid];
+        if(isset($a[$this->internal_uid])) {
+            return $a[$this->internal_uid];
         }
         else {
             return false;
