@@ -28,7 +28,8 @@ return [
                     'unset',
                     'hook',
                     'get-user-email',
-                    'clear-telegram'
+                    'clear-telegram',
+                    'vk'
                 ],
                 'allow' => true,
                 'roles' => ['?'],

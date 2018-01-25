@@ -83,6 +83,8 @@ class DialoguesJobs implements SocialJobs
 
                 echo 'saved' . PHP_EOL;
 
+
+
                 $bot = new Bot();
                 $telegram = $bot->GetTelegram();
                 $command = new NotificationCommand($telegram);
@@ -105,6 +107,8 @@ class DialoguesJobs implements SocialJobs
             }
 
             $job->sendComplete();
+
+
         } catch (\Exception $e) {
             $job->sendFail();
             echo $e->getMessage();

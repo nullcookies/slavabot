@@ -217,39 +217,29 @@ class SocialDialogues extends ActiveRecord
         $i = 0;
         while($attachIsset == true) {
             ++$i;
-            $attachCount = "attach{$i}";
-            $typeName = $attachCount . '_type';
+            $attachCounter = "attach{$i}";
+            $typeName = $attachCounter . '_type';
             if(isset($attachments->$typeName)) {
 
                 if($attachments->$typeName == 'photo') {
-                    $attachesArray['photo'][] = $attachments->$attachCount;
+                    $attachesArray['photo'][] = $attachments->$attachCounter;
                 }
                 if($attachments->$typeName == 'video') {
-                    $attachesArray['video'][] = $attachments->$attachCount;
+                    $attachesArray['video'][] = $attachments->$attachCounter;
                 }
                 if($attachments->$typeName == 'audio') {
-                    $attachesArray['audio'][] = $attachments->$attachCount;
+                    $attachesArray['audio'][] = $attachments->$attachCounter;
                 }
                 if($attachments->$typeName == 'doc') {
-                    $attachesArray['doc'][] = $attachments->$attachCount;
+                    $attachesArray['doc'][] = $attachments->$attachCounter;
                 }
                 if($attachments->$typeName == 'wall') {
-                    $attachesArray['wall'][] = $attachments->$attachCount;
-                }
-                if($attachments->$typeName == 'sticker') {
-                    $attachesArray['sticker'][$i]['id'] = $attachments->$attachCount;
-                    $attachesArray['sticker'][$i]['product_id'] = $attachments->$attachCount.'_product_id';
+                    $attachesArray['wall'][] = $attachments->$attachCounter;
                 }
                 if($attachments->$typeName == 'link') {
-                    $attachesArray['link'][$i]['id'] = $attachments->$attachCount;
-                    $attachesArray['link'][$i]['photo'] = $attachments->$attachCount.'_photo';
-                    $attachesArray['link'][$i]['title'] = $attachments->$attachCount.'_title';
-                    $attachesArray['link'][$i]['desc'] = $attachments->$attachCount.'_desc';
-                    $attachesArray['link'][$i]['url'] = $attachments->$attachCount.'_url';
+                    $attachesArray['link'][] = $attachments->{$attachCounter.'_url'};
                 }
-                if($attachments->$typeName == 'money') {
-                    $attachesArray['money'][$i]['id'] = $attachments->$attachCount;
-                }
+                //sticker, money - не найдены методы в vk api
             } else {
                 $attachIsset = false;
             }
