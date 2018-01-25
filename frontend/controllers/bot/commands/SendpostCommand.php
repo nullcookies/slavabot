@@ -13,6 +13,8 @@ use frontend\controllers\bot\libs\SocialNetworks;
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Conversation;
 use Longman\TelegramBot\Request;
+use Longman\TelegramBot\Entities\Update;
+
 
 class SendpostCommand extends UserCommand
 {
@@ -24,7 +26,8 @@ class SendpostCommand extends UserCommand
 
     public function execute()
     {
-        \frontend\controllers\bot\libs\Logger::info(__METHOD__);
+        //\frontend\controllers\bot\libs\Logger::info(__METHOD__);
+
 
         $cb = $this->getUpdate()->getCallbackQuery();            // Get Message object
         $user = $cb->getFrom();
@@ -35,12 +38,16 @@ class SendpostCommand extends UserCommand
         $this->conversation = new Conversation($user_id, $chat_id, 'post');
         $notes = &$this->conversation->notes;
 
-        $this->prepareVkJob($notes, $user_id);
-        $this->prepareFbJob($notes, $user_id);
-        $this->prepareIgJob($notes, $user_id);
-
         $mid = $notes['fm']['result']['message_id'];
-        $mtext = $notes['state'] != 5 ? "В ближайшее время пoст появится в соц. сетях." : $notes['fm']['result']['text'];
+
+        $responseData = [
+            'chat_id' => $chat_id,
+            'user_id' => $user_id,
+        ];
+
+        $mtext = "Публикую:\n";
+
+
         $data_edit = [
             'chat_id' => $chat_id,
             'user_id' => $user_id,
@@ -50,16 +57,66 @@ class SendpostCommand extends UserCommand
         ];
         Request::editMessageText($data_edit);
 
-        $this->conversation->stop();
+        try{
+            $this->prepareVkJob($notes, $user_id, $responseData);
+            $this->prepareFbJob($notes, $user_id, $responseData);
+            $this->prepareIgJob($notes, $user_id, $responseData);
+
+            $this->conversation->stop();
+        }catch (\Exception $e){
+
+            $data_edit['text'] = 'Ошибка: '.$e->getMessage();
+            Request::editMessageText($data_edit);
+
+        }
+        return (new PostCommand($this->telegram,
+            new Update(json_decode($this->update->toJson(), true))))->execute(true, '');
+
     }
+
+    public function executeNow($text){
+        //\frontend\controllers\bot\libs\Logger::info(__METHOD__);
+
+        $chat_id = $this->getMessage()->getFrom()->getId();
+        $user_id = $this->getMessage()->getFrom()->getId();
+
+        $this->conversation = new Conversation($user_id, $chat_id, 'post');
+        $notes = &$this->conversation->notes;
+
+        $res = [
+            'vk' => $this->prepareVkJob($notes, $user_id),
+            'facebook' => $this->prepareFbJob($notes, $user_id),
+            'instagram' => $this->prepareIgJob($notes, $user_id)
+        ];
+
+
+        $mid = $notes['fm']['result']['message_id'];
+        $mtext = $notes['state'] != 5 ?  json_encode($res) : $text ;
+
+        $data_edit = [
+            'chat_id' => $chat_id,
+            'user_id' => $user_id,
+            'message_id' => $mid,
+            'text' => $mtext,
+
+        ];
+        Request::sendMessage($data_edit);
+
+        $this->conversation->stop();
+        return (new PostCommand($this->telegram,
+            new Update(json_decode($this->update->toJson(), true))))->execute(true, '');
+
+    }
+
 
     /**
      * @param $notes
      * @param $user_id
      * @return string
      */
-    public function prepareVkJob($notes, $user_id)
+    public function prepareVkJob($notes, $user_id, $responseData = [])
     {
+
         \frontend\controllers\bot\libs\Logger::info('Подготовка данных для ВК', [
             'method' => __METHOD__,
             'notes' => $notes,
@@ -151,10 +208,36 @@ class SendpostCommand extends UserCommand
                 return 'cron';
             }
 
+            $responseData['text'] = "Вконтакте - ...\n";
+
+            $response = [
+                'chat_id' => $responseData['chat_id'],
+                'user_id' => $responseData['user_id'],
+                'message_id' => json_decode(Request::sendMessage($responseData), true)['result']['message_id'],
+                'text' => "Вконтакте - готово\n"
+            ];
+
+            $arr['response_data'] = $response;
+
             $client = new \Kicken\Gearman\Client('127.0.0.1:4730');
             $job = $client->submitBackgroundJob(SocialJobs::FUNCTION_VK, json_encode($arr));
 
-            return $job;
+
+
+            return [
+                'ru_name' => 'Вконтакте',
+                'status' => true,
+                'code' => 200,
+                'message' => $job
+            ];
+
+        }else{
+            return [
+                'ru_name' => 'Вконтакте',
+                'status' => false,
+                'code' => 404,
+                'message' => 'no account found'
+            ];
         }
 
     }
@@ -164,7 +247,7 @@ class SendpostCommand extends UserCommand
      * @param $user_id
      * @return string
      */
-    public function prepareFbJob($notes, $user_id)
+    public function prepareFbJob($notes, $user_id, $responseData)
     {
 
         $user = $this->getUserCredentialsBySocial($user_id, SocialNetworks::FB);
@@ -243,10 +326,35 @@ class SendpostCommand extends UserCommand
 
             }
 
+            $responseData['text'] = "Facebook - ...\n";
+
+            $response = [
+                'chat_id' => $responseData['chat_id'],
+                'user_id' => $responseData['user_id'],
+                'message_id' => json_decode(Request::sendMessage($responseData), true)['result']['message_id'],
+                'text' => "Facebook - готово\n"
+            ];
+
+            $arr['response_data'] = $response;
+
+
             $client = new \Kicken\Gearman\Client('127.0.0.1:4730');
             $job = $client->submitBackgroundJob(SocialJobs::FUNCTION_FB, json_encode($arr));
 
-            return $job;
+            return [
+                'ru_name' => 'Facebook',
+                'status' => true,
+                'code' => 200,
+                'message' => $job
+            ];
+
+        }else{
+            return [
+                'ru_name' => 'Facebook',
+                'status' => false,
+                'code' => 404,
+                'message' => 'no account found'
+            ];
         }
 
     }
@@ -256,14 +364,18 @@ class SendpostCommand extends UserCommand
      * @param $user_id
      * @return string
      */
-    public function prepareIgJob($notes, $user_id)
+    public function prepareIgJob($notes, $user_id, $responseData)
     {
 
         $user = $this->getUserCredentialsBySocial($user_id, SocialNetworks::IG);
         $access = $this->getSocialCredentials(SocialNetworks::IG);
 
         if (!$user && !$access) {
-            return false;
+            return [
+                'status' => false,
+                'code' => 404,
+                'message' => 'no account found'
+            ];
         }
 
         $post = new Post();
@@ -330,10 +442,35 @@ class SendpostCommand extends UserCommand
 
         }
 
+        if(isset($notes['Photo']) && !empty($notes['Photo'])){
+            $responseData['text'] = "Instagram - ...\n";
+            $success_text = "Instagram - готово\n";
+        }else{
+            $responseData['text'] = "Instagram - отсутствует фото\n";
+            $success_text = $responseData['text'];
+        }
+
+
+        $response = [
+            'chat_id' => $responseData['chat_id'],
+            'user_id' => $responseData['user_id'],
+            'message_id' => json_decode(Request::sendMessage($responseData), true)['result']['message_id'],
+            'text' => $success_text
+        ];
+
+        $arr['response_data'] = $response;
+
         $client = new \Kicken\Gearman\Client('127.0.0.1:4730');
         $job = $client->submitBackgroundJob(SocialJobs::FUNCTION_IG, json_encode($arr));
 
-        return $job;
+        //return $job;
+
+        return [
+            'ru_name' => 'Instagram',
+            'status' => true,
+            'code' => 200,
+            'message' => $job
+        ];
 
     }
 

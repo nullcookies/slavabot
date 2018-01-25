@@ -16,6 +16,7 @@ use frontend\models\PasswordConfig;
 use common\models\Webhooks;
 use yii\web\Response;
 use yii\helpers\Url;
+use common\models\billing\Payment;
 
 
 /**
@@ -231,6 +232,8 @@ class SiteController extends Controller
         $model = new SignupForm();
         if ($model->load(Yii::$app->request->post())) {
             if ($user = $model->signup()) {
+
+                Payment::initDefaultTariff($user->id);
 
                 return Yii::$app->response->redirect(Url::to(['site/signup', 'success' => true]));
             }

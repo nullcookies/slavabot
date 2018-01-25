@@ -28,7 +28,8 @@ return [
                     'unset',
                     'hook',
                     'get-user-email',
-                    'clear-telegram'
+                    'clear-telegram',
+                    'facebook-webhooks'
                 ],
                 'allow' => true,
                 'roles' => ['?'],

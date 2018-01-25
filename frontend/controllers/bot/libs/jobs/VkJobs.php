@@ -7,6 +7,7 @@
 
 namespace frontend\controllers\bot\libs\jobs;
 
+use common\commands\command\EditTelegramNotificationCommand;
 use common\models\JobPost;
 use common\models\Post;
 use frontend\controllers\bot\libs\Files;
@@ -110,6 +111,18 @@ class VkJobs implements SocialJobs
                 //отправляем в api
                 $arParam = ['data' => json_encode($post->getAttributes()), 'type' => SocialNetworks::VK, 'tid' => 0];
                 var_dump($SalesBot->newEvent($arParam));
+
+                try{
+                    \Yii::$app->commandBus->handle(
+                        new EditTelegramNotificationCommand(
+                            [
+                                'data' => $notes['response_data']
+                            ]
+                        )
+                    );
+                }catch (\Exception $e){
+                    Logger::error($e->getMessage());
+                }
             }
 
             /** @var JobPost $jobPost */

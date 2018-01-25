@@ -39,6 +39,8 @@ class SocialController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'vk-auth' => ['post'],
+                    'facebook-webhooks' => ['post'],
+
                 ],
             ],
             [
@@ -51,7 +53,8 @@ class SocialController extends Controller
                     'remove',
                     'update-process',
                     'vk-auth',
-                    'check-instagram'
+                    'check-instagram',
+                    'facebook-webhooks'
                     ],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
@@ -252,6 +255,31 @@ class SocialController extends Controller
             $type = \Yii::$app->request->post()['type'];
         }
         return Accounts::getUnprocessedAccounts($type);
+    }
+
+    public function beforeAction($action)
+    {
+
+        $this->enableCsrfValidation = false;
+        return parent::beforeAction($action);
+    }
+
+    public function actionFacebookWebhooks(){
+        $this->enableCsrfValidation = false;
+        $challenge = $_REQUEST['hub_challenge'];
+        $verify_token = $_REQUEST['hub_verify_token'];
+
+        if ($verify_token === 'test') {
+            echo $challenge;
+        }
+        $input = file_get_contents('php://input'); //json_decode(file_get_contents('php://input'), true);
+
+        $file = 'test.txt';
+        $current = file_get_contents($file);
+
+        $current .= $input."\n";
+        file_put_contents($file, $current);
+
     }
 
 

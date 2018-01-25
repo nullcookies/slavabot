@@ -9,6 +9,7 @@ use frontend\controllers\bot\libs\TelegramWrap;
 
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Conversation;
+use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\TelegramLog;
@@ -181,14 +182,15 @@ class EmailCommand extends UserCommand
             case 2:
                 $this->conversation->update();
 
-                $data = $telConfig->getMainWindow($data, 'Аккаунт успешно подключен. ', ['post', 'settings']);
+                $data = $telConfig->getWelcomeWindow($data, 'Аккаунт успешно подключен.', []);
 
                 $this->conversation->stop();
-                try {
-                    $result = Request::sendMessage($data);
-                } catch (TelegramException $e) {
-                    TelegramLog::error($e->getMessage());
-                }
+
+                Request::sendMessage($data);
+
+                return (new PostCommand($this->telegram,
+                    new Update(json_decode($this->update->toJson(), true))))->execute(true, 'Разместите свой первый пост через Славабот ');
+
                 break;
         }
         return $result;

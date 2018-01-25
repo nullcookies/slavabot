@@ -11,11 +11,18 @@
 namespace Longman\TelegramBot\Commands\SystemCommands;
 
 use frontend\controllers\bot\libs\Logger;
+use GuzzleHttp\Exception\RequestException;
 use Longman\TelegramBot\Commands\SystemCommand;
+use Longman\TelegramBot\Commands\UserCommands\AccountCommand;
 use Longman\TelegramBot\Commands\UserCommands\CancelpostCommand;
+use Longman\TelegramBot\Commands\UserCommands\AddpostCommand;
+use Longman\TelegramBot\Commands\UserCommands\RollbackCommand;
 use Longman\TelegramBot\Commands\UserCommands\PostCommand;
 use Longman\TelegramBot\Commands\UserCommands\SendpostCommand;
 use Longman\TelegramBot\Commands\UserCommands\SettimeCommand;
+use Longman\TelegramBot\Commands\UserCommands\SettingsCommand;
+use Longman\TelegramBot\Commands\UserCommands\ClearCommand;
+use Longman\TelegramBot\Commands\UserCommands\TimeCommand;
 use Longman\TelegramBot\Conversation;
 use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Request;
@@ -51,9 +58,11 @@ class CallbackqueryCommand extends SystemCommand
         'post' => 'post',
         'sendpost' => 'sendpost',
         'cancelpost' => 'cancelpost',
+        'addpost' => 'addpost',
         'publicpost' => 'publicpost',
         'planpost' => 'planpost',
-        'settime' => 'settime'
+        'settime' => 'settime',
+        'rollback' => 'rollback',
     ];
 
     /**
@@ -64,6 +73,8 @@ class CallbackqueryCommand extends SystemCommand
      */
     public function execute()
     {
+
+
         Logger::info(__METHOD__, []);
 
         $update = $this->getUpdate();
@@ -80,10 +91,31 @@ class CallbackqueryCommand extends SystemCommand
         $chat_id = $chat->getId();
         $user_id = $user->getId();
 
+
         Logger::info(__METHOD__, [
             'command' => $command,
             'data' => print_r($data, true)
         ]);
+
+
+        if ($command == '/account') {
+            return (new AccountCommand($this->telegram,
+                new Update(json_decode($this->update->toJson(), true))))->preExecute();
+        }
+        if ($command == '/settings') {
+            return (new SettingsCommand($this->telegram,
+                new Update(json_decode($this->update->toJson(), true))))->preExecute();
+        }
+        if ($command == '/clear') {
+            return (new ClearCommand($this->telegram,
+                new Update(json_decode($this->update->toJson(), true))))->preExecute();
+        }
+        if($command == '/time'){
+
+            return (new TimeCommand($this->telegram,
+                new Update(json_decode($this->update->toJson(), true))))->preExecute();
+        }
+
 
         if ($command == 'publicpost') {
             $this->conversation = new Conversation($user_id, $chat_id, 'post');
@@ -130,14 +162,21 @@ class CallbackqueryCommand extends SystemCommand
 
             }
 
+            if ($command == 'addpost') {
+                return (new AddpostCommand($this->telegram,
+                    new Update(json_decode($this->update->toJson(), true))))->preExecute();
+
+            }
+
         } else {
             $data = [];
             $data['callback_query_id'] = $callback_query->getId();
-            $data['text'] = 'Invalid request!' . $command;
+            $data['text'] = 'Invalid request! ' . $command;
             $data['show_alert'] = true;
+            Request::answerCallbackQuery($data);
         }
 
-        return Request::answerCallbackQuery($data);
+        //return Request::answerCallbackQuery($data);
 
 
     }
