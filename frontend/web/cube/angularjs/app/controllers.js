@@ -1312,7 +1312,7 @@ angular.module('cubeWebApp')
         // }, 5000);
 
     })
-    .controller('noticeCtrl', function($scope, $http, $sce, $interval){
+    .controller('notificationCtrl', function($scope, $http, $sce, $interval){
 
         $scope.userNotifications = [];
         $scope.notificationMessage = [];
@@ -1333,22 +1333,29 @@ angular.module('cubeWebApp')
         };
         $scope.getNotifications();
     })
-    .controller('userNoticeCtrl', function($scope, $http, $sce, $interval, $routeParams){
-        var config = {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
-                'X-CSRF-Token': getCSRF()
-            }
-        };
-
+    .controller('userNotificationCtrl', function($scope, $http, $sce, $interval, $routeParams){
         console.log($routeParams["id"]);
-        // $scope.getNotificationsForUser = function(){
-        //     $http.post('/notification/user-notifications', {}, config).then(function success(response) {
-        //         console.log(response);
-        //         console.log($scope.thisUserNotifications);
-        //     });
-        // };
-        // $scope.getNotificationsForUser();
+        $scope.getNotificationsForUser = function(){
+            moment.locale('ru');
+
+
+            var data = $.param({'id' : $routeParams["id"]});
+            var config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+                    'X-CSRF-Token': getCSRF()
+                }
+            };
+
+            $http.post('/notification/user-notifications', data, config).then(function success(response) {
+                $scope.data = response.data[0];
+                $scope.userNotification = $scope.data.notification;
+                $scope.userAvatar = $scope.data.avatar;
+                $scope.userName = $scope.data.title;
+                console.log($scope.data.notification);
+            });
+        };
+        $scope.getNotificationsForUser();
     });
 
     app.filter('startFrom', function() {

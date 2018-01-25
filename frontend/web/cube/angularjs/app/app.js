@@ -69,12 +69,12 @@ app.config(['$routeProvider', function ($routeProvider) {
         })
         .when("/pages/notice", {
             templateUrl: "views/notice.html",
-            controller: "noticeCtrl",
+            controller: "notificationCtrl",
             title: 'Уведомления'
         })
         .when("/pages/notice/:id", {
             templateUrl: "views/user-notice.html",
-            controller: "userNoticeCtrl",
+            controller: "userNotificationCtrl",
             title: 'Уведомления пользователя'
         })
         .when("/history", {

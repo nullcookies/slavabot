@@ -73,7 +73,10 @@ class NotificationController extends Controller
 
     public function actionUserNotifications()
     {
-        $model = SocialDialogues::find()->all();
+        $id = Yii::$app->request->post('id');
+        $model = SocialDialoguesPeer::find()
+                                    ->where(['id'=> $id])
+                                    ->all();
         return $model;
     }
 
