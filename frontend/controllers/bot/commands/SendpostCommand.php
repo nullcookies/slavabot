@@ -13,6 +13,8 @@ use frontend\controllers\bot\libs\SocialNetworks;
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Conversation;
 use Longman\TelegramBot\Request;
+use Longman\TelegramBot\Entities\Update;
+
 
 class SendpostCommand extends UserCommand
 {
@@ -67,6 +69,8 @@ class SendpostCommand extends UserCommand
             Request::editMessageText($data_edit);
 
         }
+        return (new PostCommand($this->telegram,
+            new Update(json_decode($this->update->toJson(), true))))->execute(true, '');
 
     }
 
@@ -99,6 +103,8 @@ class SendpostCommand extends UserCommand
         Request::sendMessage($data_edit);
 
         $this->conversation->stop();
+        return (new PostCommand($this->telegram,
+            new Update(json_decode($this->update->toJson(), true))))->execute(true, '');
 
     }
 

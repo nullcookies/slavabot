@@ -12,6 +12,9 @@ use common\models\User;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\TelegramLog;
+use Longman\TelegramBot\Entities\Update;
+
+
 
 class AddpostCommand extends UserCommand
 {
@@ -57,18 +60,27 @@ class AddpostCommand extends UserCommand
         $notes['state'] = 0;
         $notes['stage'] = 'added';
 
-        $inline_keyboard = new InlineKeyboard([]);
+        Request::deleteMessage([
+            'chat_id' => $chat_id,
+            'message_id' => $notes['fm']['result']['message_id'],
+        ]);
 
-        $data['reply_markup'] = $inline_keyboard;
+        $inline_keyboard = new InlineKeyboard([
+            ['text' => 'Отмена', 'callback_data' => 'post'],
+        ]);
+
+        $data['text'] = 'Добавьте медиа:';
+
+        if(!isset($notes['Text'])){
+            $data['text'] = 'Введите текст';
+        }
+        $data['reply_markup'] = $inline_keyboard->setOneTimeKeyboard(true);
+
+        $notes['fm'] = Request::sendMessage($data);
 
         $this->changeFM($notes, $inline_keyboard, $user_id, $chat_id);
 
         $this->conversation->update();
-
-        $data['text'] = 'Введите текст / Добавьте медиа:';
-
-        $notes['fm'] = Request::sendMessage($data);
-
     }
 
     private function changeFM($notes, $inline_keyboard, $user_id, $chat_id, $remove_kb = false)

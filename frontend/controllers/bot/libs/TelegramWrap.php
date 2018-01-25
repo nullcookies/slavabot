@@ -9,7 +9,9 @@
 namespace frontend\controllers\bot\libs;
 
 use common\services\StaticConfig;
+use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\Keyboard;
+use Longman\TelegramBot\Request;
 
 /**
  * Class TelegramWrap
@@ -72,7 +74,8 @@ class TelegramWrap
     }
 
 
-    /**Вывод окна запроса email
+    /**
+     * Вывод окна запроса email
      *
      * @param array $arDate
      *
@@ -137,7 +140,8 @@ class TelegramWrap
     }
 
 
-    /**Окно ввода кода
+    /**
+     * Окно ввода кода
      *
      * @param array $arDate
      *
@@ -186,7 +190,8 @@ class TelegramWrap
     }
 
 
-    /**Выводим главное меню
+    /**
+     * Выводим главное меню
      *
      * @param array $arDate
      *
@@ -194,16 +199,11 @@ class TelegramWrap
      */
     public function getMainWindow(array $arDate, $intro = 'Добро пожаловать. ', $buttons = ['post', 'menu', 'settings'])
     {
-        $str = $intro."Выберите ваше действие:\n";
+        $str = $intro."\n";
 
         $keyboardArray = array();
 
         foreach($buttons as $btn){
-            $str .= sprintf("%s - %s.",
-                    $this->config['buttons'][$btn]['command'],
-                    $this->config['buttons'][$btn]['description']
-                ) . "\n";
-
             $keyboardArray[] = ['text' => $this->config['buttons'][$btn]['label']];
         }
 
@@ -249,7 +249,8 @@ class TelegramWrap
         return $arDate;
     }
 
-    /**Окно отмены поста
+    /**
+     * Окно отмены поста
      * @param array $arDate
      *
      * @return array
@@ -275,33 +276,62 @@ class TelegramWrap
     }
 
 
-    /*
+    /**
      * Окно настроек
+     *
+     * @param array $arDate - основные данные для отправки, а именно user_id и chat_id
+     * @param string $intro - текст приветствия раздела
+     * @param array $current - настройки
      */
-    public function getSettingsWindow(array $arDate)
-    {
 
-        //текст
-        $str = "Настройки публикации:\n";
-        $str .= sprintf("%s - %s.",
-                $this->config['buttons']['time']['command'],
-                $this->config['buttons']['time']['description']
-            ) . "\n";
-        $str .= sprintf("%s - %s.",
-                $this->config['buttons']['account']['command'],
-                $this->config['buttons']['account']['description']
-            ) . "\n";
+    public function getSettingsWindow(array $arDate, $intro="Текущие настройки:", $current=[])
+    {
+        /**
+         *  Выводим интро и основную клавиатуру раздела.
+         */
+
+        $str = $intro."\n";
         $arDate['text'] = $str;
 
-        //кнопки
         $arDate = $this->getSettingsKeyboard($arDate);
 
-        return $arDate;
+        Request::sendMessage($arDate);
+
+        /**
+         *  Очищаем текст и вторым сообщением выводим значение поступивших текущих настроек
+         *  И инлайн-клавиатуру для перехода в них.
+         *
+         *  Два сообщения отправляем из-за того, что за раз можно отправить только одну клавиатуру.
+         */
+
+        $str = "";
+        $arDate['text'] = "";
+
+        $inline_keyboard = new InlineKeyboard([]);
+        $inline_keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
+
+        foreach($current as $setting){
+
+            $str .= "- ".$setting['title'].": ".$setting['value']."\n";
+
+            $inline_keyboard->addRow(
+                [
+                    'text' => $this->config['buttons'][$setting['command']]['label'],
+                    'callback_data' => $this->config['buttons'][$setting['command']]['command']
+                ]
+            );
+
+        }
+
+        $arDate['reply_markup'] = $inline_keyboard;
+        $arDate['text'] = $str;
+
+        Request::sendMessage($arDate);
     }
 
 
-    /*
-     * Клавиатура для настроек
+    /**
+     * Основная клавиатура для настроек
      */
     public function getSettingsKeyboard(array $arDate)
     {
@@ -309,13 +339,10 @@ class TelegramWrap
         //кнопки
         $keyboard = new Keyboard(
             [
-                ['text' => $this->config['buttons']['time']['label']],
-                ['text' => $this->config['buttons']['account']['label']],
-                ['text' => $this->config['buttons']['menu']['label']],
+                ['text' => $this->config['buttons']['rollback_main']['label']]
             ]
         );
         $arDate['reply_markup'] = $keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
-
 
         return $arDate;
     }
@@ -327,10 +354,16 @@ class TelegramWrap
     {
 
         //кнопки
-        $keyboard = new Keyboard(
+        $keyboard = new InlineKeyboard(
             [
-                ['text' => $this->config['buttons']['clear']['label']],
-                ['text' => $this->config['buttons']['menu']['label']],
+                [
+                    'text' => $this->config['buttons']['clear']['label'],
+                    'callback_data' => $this->config['buttons']['clear']['command']
+                ],
+                [
+                    'text' => "Отмена",
+                    'callback_data' => $this->config['buttons']['settings']['command']
+                ],
             ]
         );
         $arDate['reply_markup'] = $keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);

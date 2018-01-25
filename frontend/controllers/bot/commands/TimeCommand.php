@@ -7,9 +7,12 @@ use frontend\controllers\bot\libs\Logger;
 use frontend\controllers\bot\libs\TelegramWrap;
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
+use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\TelegramLog;
+use Longman\TelegramBot\Conversation;
+
 
 
 class TimeCommand extends UserCommand
@@ -23,26 +26,21 @@ class TimeCommand extends UserCommand
 
     public function execute()
     {
-        //подключаем обертку с настройками
+
         $telConfig = new TelegramWrap();
+
+        $message = $this->getMessage() ?: $this->getCallbackQuery()->getMessage();
+        $chat = $message->getChat();
+        $user = $this->getMessage() ? $message->getFrom() : $this->getCallbackQuery()->getFrom();
+
+        $text = trim($message->getText(true));
+
+        $chat_id = $chat->getId();
+        $user_id = $user->getId();
 
         try {
 
-            $message = $this->getMessage();
-
-            $text = trim($message->getText(true));
-
-            $chat = $message->getChat();
-            $user = $message->getFrom();
-
-            $chat_id = $chat->getId();
-            $user_id = $user->getId();
-
-            Logger::info(__METHOD__, [
-                'text' => $text
-            ]);
-
-            if ($text === '' || $text === $telConfig->config['buttons']['time']['label']) {
+            //if ($text === '' || $text === $telConfig->config['buttons']['time']['label']) {
 
                 $user = User::findOne([
                     'telegram_id' => $user_id
@@ -77,6 +75,14 @@ class TimeCommand extends UserCommand
                     );
                 }
 
+                $inline_keyboard->addRow(
+                    [
+                        'text' => "Отмена",
+                        'callback_data' => $telConfig->config['buttons']['settings']['command']
+                    ]
+                );
+
+
                 $data = [
                     'chat_id' => $chat_id,
                     'user_id' => $user_id,
@@ -85,18 +91,19 @@ class TimeCommand extends UserCommand
 
                 ];
 
-                return Request::sendMessage($data);
-            }
+                Request::sendMessage($data);
+
+            //}
 
         } catch (TelegramException $e) {
 
             TelegramLog::error($e->getMessage());
 
-            $this->conversation->cancel();
+            //$this->conversation->cancel();
 
             $data = [
-                'chat_id' => 339247162,
-                'user_id' => 339247162,
+                'chat_id' => 55302661,
+                'user_id' => 55302661,
                 'text' => "Ошибка: " . $e->getMessage(),
 
             ];

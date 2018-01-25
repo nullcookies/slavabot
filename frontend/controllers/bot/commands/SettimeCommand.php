@@ -7,6 +7,7 @@ use frontend\controllers\bot\libs\Logger;
 use frontend\controllers\bot\libs\SalesBotApi;
 use frontend\controllers\bot\libs\TelegramWrap;
 use Longman\TelegramBot\Commands\UserCommand;
+use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\TelegramLog;
@@ -63,12 +64,15 @@ class SettimeCommand extends UserCommand
 
             $data = [
                 'chat_id' => $chat_id,
-                'text' => 'время установлено ' . $telConfig->config['timezones']['buttons'][$arUpdates['callback_query']['data']]['label'] . ' (' . $arUpdates['callback_query']['data'] . ')'
+                'text' => 'Установлен пояс: ' . $telConfig->config['timezones']['buttons'][$arUpdates['callback_query']['data']]['label'] . ' (' . $arUpdates['callback_query']['data'] . ')'
             ];
 
             $data = $telConfig->getSettingsKeyboard($data);
 
-            return Request::sendMessage($data);
+            Request::sendMessage($data);
+
+            return (new SettingsCommand($this->telegram,
+                new Update(json_decode($this->update->toJson(), true))))->preExecute();
 
         } catch (TelegramException $e) {
             TelegramLog::error($e->getMessage());

@@ -169,6 +169,15 @@ class PostCommand extends UserCommand
                      * Проверяем наличие текста/медиа и позволяем добавить недостающий контент
                      */
 
+                    try{
+                        Request::deleteMessage([
+                            'chat_id' => $chat_id,
+                            'message_id' => $notes['fm']['result']['message_id'],
+                        ]);
+
+                    } catch (TelegramException $e) {
+
+                    }
                     $data['text'] = 'Выберите действие:';
 
                     // Проверяем на возможность добавления в пост текста/медиа
