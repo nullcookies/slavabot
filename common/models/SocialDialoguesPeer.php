@@ -63,7 +63,7 @@ class SocialDialoguesPeer extends \yii\db\ActiveRecord
         ];
     }
 
-    public static function savePeer($social, $type, $peerId, $group_access_token)
+    public static function savePeer($social, $type, $peerId, $group_access_token, $access_token)
     {
         $model = static::find()
             ->andWhere(['social' => $social, 'type' => $type, 'peer_id' => $peerId])
@@ -76,7 +76,7 @@ class SocialDialoguesPeer extends \yii\db\ActiveRecord
             $model->peer_id = $peerId;
         }
 
-        $peer = $model->getVkPeer($peerId, $group_access_token);
+        $peer = $model->getVkPeer($peerId, $group_access_token, $access_token);
         $model->title = $peer['title'];
         $model->avatar = $peer['avatar'];
 
@@ -103,7 +103,7 @@ class SocialDialoguesPeer extends \yii\db\ActiveRecord
         return $type;
     }
 
-    public function getVkPeer($peerId, $group_access_token)
+    public function getVkPeer($peerId, $group_access_token, $access_token)
     {
         $name = '';
         $avatar = '';
@@ -122,8 +122,11 @@ class SocialDialoguesPeer extends \yii\db\ActiveRecord
             $avatar = $group[0]['photo_100'];
         } elseif($peerId > 2000000000) {
             //из беседы
+            $vkUser = new \frontend\controllers\bot\libs\Vk([
+                'access_token' => $access_token
+            ]);
             $chatId = $peerId - 2000000000;
-            $chat = $vk->api('messages.getChat', [
+            $chat = $vkUser->api('messages.getChat', [
                 'chat_id' => $chatId,
                 'fields' => 'photo_100',
                 'lang' => 0

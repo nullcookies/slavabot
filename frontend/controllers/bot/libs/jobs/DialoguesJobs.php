@@ -60,12 +60,24 @@ class DialoguesJobs implements SocialJobs
                 );
 
                 $peerType = SocialDialoguesPeer::getVkPeerType($peer_id);
-                $peer = SocialDialoguesPeer::savePeer(SocialDialogues::SOCIAL_VK, $peerType, $peer_id, $group_access_token);
+                $peer = SocialDialoguesPeer::savePeer(
+                    SocialDialogues::SOCIAL_VK,
+                    $peerType,
+                    $peer_id,
+                    $group_access_token,
+                    $access_token
+                );
                 $title = $peer->title;
                 if($peerType == SocialDialoguesPeer::TYPE_CHAT) {
                     $from_peer_id = ArrayHelper::getValue(ArrayHelper::getValue($update, 6), 'from');
                     $fromPeerType = SocialDialoguesPeer::getVkPeerType($from_peer_id);
-                    $peerUser = SocialDialoguesPeer::savePeer(SocialDialogues::SOCIAL_VK, $fromPeerType, $from_peer_id, $group_access_token);
+                    $peerUser = SocialDialoguesPeer::savePeer(
+                        SocialDialogues::SOCIAL_VK,
+                        $fromPeerType,
+                        $from_peer_id,
+                        $group_access_token,
+                        $access_token
+                    );
                     $title .= '->'.$peerUser->title;
                 }
 
