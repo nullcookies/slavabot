@@ -95,7 +95,8 @@ class SocialDialogues extends ActiveRecord
             'social',
             'peer' =>'dataPeer',
             'message'=>'text',
-            'created_at'
+            'created_at',
+            'type'
         ];
     }
 

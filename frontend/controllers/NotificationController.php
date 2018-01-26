@@ -6,6 +6,7 @@ use common\models\Notification;
 use common\models\SocialDialogues;
 use common\models\SocialDialoguesPeer;
 use Yii;
+use yii\db\Expression;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
@@ -67,17 +68,29 @@ class NotificationController extends Controller
 
     public function actionNotifications()
     {
-        $model = SocialDialogues::find()->all();
-        return $model;
+    $subQuery = SocialDialogues::find()
+            ->select(new Expression('max(sd.id)'))
+            ->from(['sd' => SocialDialogues::tableName()])
+            ->where(
+                ['and',
+                    ['sd.peer_id' => new Expression('social_dialogues.peer_id')],
+                    ['user_id' => \Yii::$app->user->identity->id]
+                ]);
+
+        $query = SocialDialogues::find()
+            ->where(['in', 'id', $subQuery])
+            ->orderBy(['id' => SORT_DESC]);
+        $models = $query->all();
+
+        return $models;
+
     }
 
     public function actionUserNotifications()
     {
-        $id = Yii::$app->request->post('id');
-        $model = SocialDialoguesPeer::find()
-                                    ->where(['id'=> $id])
-                                    ->all();
-        return $model;
+        return SocialDialoguesPeer::find()
+            ->where(['id'=> Yii::$app->request->post('id')])
+            ->all();
     }
 
 
