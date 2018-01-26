@@ -115,7 +115,8 @@ class SocialDialogues extends ActiveRecord
         $model->message_id = $message[1];
         $model->text = $message[5];
         $model->message = json_encode($message);
-        $model->attaches = json_encode($model->getAttachments($message, $group_access_token, $access_token));
+        $attaches = $model->getAttachments($message, $group_access_token, $access_token);
+        $model->attaches = !empty($attaches)? json_encode($attaches): null;
 
         if(!$model->save(false)) {
             var_dump($model->errors);
@@ -142,7 +143,8 @@ class SocialDialogues extends ActiveRecord
         if($model) {
             $model->text = $message[5];
             $model->message = json_encode($message);
-            $model->attaches = json_encode($model->getAttachments($message, $group_access_token, $access_token));
+            $attaches = $model->getAttachments($message, $group_access_token, $access_token);
+            $model->attaches = !empty($attaches)? json_encode($attaches): null;
             $model->edited = 1;
 
             if(!$model->save(false)) {
@@ -212,7 +214,7 @@ class SocialDialogues extends ActiveRecord
     {
         $attachments = $update[6];
 
-        $attachesArray = [];
+        $attachesArray = null;
         $attachIsset = true;
         $i = 0;
         while($attachIsset == true) {
@@ -227,27 +229,21 @@ class SocialDialogues extends ActiveRecord
                 if($attachments->$typeName == 'video') {
                     $attachesArray['video'][] = $attachments->$attachCounter;
                 }
-                if($attachments->$typeName == 'audio') {
-                    $attachesArray['audio'][] = $attachments->$attachCounter;
-                }
                 if($attachments->$typeName == 'doc') {
                     $attachesArray['doc'][] = $attachments->$attachCounter;
                 }
-                if($attachments->$typeName == 'wall') {
-                    $attachesArray['wall'][] = $attachments->$attachCounter;
-                }
                 if($attachments->$typeName == 'link') {
-                    $attachesArray['link'][] = $attachments->{$attachCounter.'_url'};
+                    $attachesArray['urls'][] = $attachments->{$attachCounter.'_url'};
                 }
-                //sticker, money - не найдены методы в vk api
+                //wall, audio, sticker, money - не найдены методы в vk api
             } else {
                 $attachIsset = false;
             }
         }
 
         if($update[6]->geo) {
-            $attachesArray['geo']['geo'] = $update[6]->geo;
-            $attachesArray['geo']['geo_provider'] = $update[6]->geo_provider;
+            $attachesArray['geo'] = $update[6]->geo;
+            //$attachesArray['geo']['geo_provider'] = $update[6]->geo_provider;
         }
 
         if($attachesArray) {
@@ -261,7 +257,12 @@ class SocialDialogues extends ActiveRecord
                         'lang' => 0
                     ]);
 
-                    $attachesArray['photo'] = $attaches;
+                    if($attaches) {
+                        foreach($attaches as $attach) {
+                            $attachesArray['urls'][] = $attach['photo_604'];
+                        }
+                    }
+
                 } catch (\frontend\controllers\bot\libs\VkException $e) {
                     echo $e->getMessage();
                 }
@@ -273,7 +274,11 @@ class SocialDialogues extends ActiveRecord
                         'lang' => 0
                     ]);
 
-                    $attachesArray['video'] = $attaches;
+                    if($attaches['items']) {
+                        foreach($attaches['items'] as $attach) {
+                            $attachesArray['urls'][] = $attach['player'];
+                        }
+                    }
                 } catch (\frontend\controllers\bot\libs\VkException $e) {
                     echo $e->getMessage();
                 }
@@ -285,7 +290,11 @@ class SocialDialogues extends ActiveRecord
                         'lang' => 0
                     ]);
 
-                    $attachesArray['doc'] = $attaches;
+                    if($attaches) {
+                        foreach($attaches as $attach) {
+                            $attachesArray['urls'][] = $attach['url'];
+                        }
+                    }
                 } catch (\frontend\controllers\bot\libs\VkException $e) {
                     echo $e->getMessage();
                 }
@@ -293,5 +302,27 @@ class SocialDialogues extends ActiveRecord
         }
 
         return $attachesArray;
+    }
+
+    public function getMessageForSend()
+    {
+        $message = $this->text;
+
+        if(!empty($this->attaches)) {
+            $attaches = json_decode($this->attaches);
+
+            echo 'attaches: '.PHP_EOL;
+            var_dump($attaches);
+
+            if($attaches->urls) {
+                foreach ($attaches->urls as $url) {
+                    $message .= "\n".$url;
+                }
+
+            }
+
+        }
+
+        return $message;
     }
 }
