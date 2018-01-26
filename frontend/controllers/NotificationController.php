@@ -6,6 +6,7 @@ use common\models\Notification;
 use common\models\SocialDialogues;
 use common\models\SocialDialoguesPeer;
 use Yii;
+use yii\data\Pagination;
 use yii\db\Expression;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -68,7 +69,13 @@ class NotificationController extends Controller
 
     public function actionNotifications()
     {
-    $subQuery = SocialDialogues::find()
+        $page = 0;
+
+        if(Yii::$app->request->post()){
+            $page = Yii::$app->request->post()['page'];
+        }
+
+        $subQuery = SocialDialogues::find()
             ->select(new Expression('max(sd.id)'))
             ->from(['sd' => SocialDialogues::tableName()])
             ->where(
@@ -80,9 +87,31 @@ class NotificationController extends Controller
         $query = SocialDialogues::find()
             ->where(['in', 'id', $subQuery])
             ->orderBy(['id' => SORT_DESC]);
-        $models = $query->all();
 
-        return $models;
+        //$models = $query->all();
+
+        $countQuery = clone $query;
+
+        $pages = new Pagination(
+            [
+                'totalCount' => $countQuery->count(),
+                'pageSize' => 10,
+                'page' => ($page > 0 ? $page : 0 )
+            ]
+        );
+
+        $pages->pageSizeParam = false;
+
+        $models = $query->offset($pages->offset)
+            ->limit($pages->limit)
+            ->all();
+
+        return [
+            'notifications'  =>  $models,
+            'pages'     => $pages,
+        ];
+
+        //return $models;
 
     }
 

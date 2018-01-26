@@ -1357,6 +1357,42 @@ angular.module('cubeWebApp')
         $scope.notificationMessage = [];
         moment.locale('ru');
 
+        // Пагинация
+
+        $scope.numberOfPages = 0; // Количество страниц
+        $scope.currentPage = 0;   // Текущая страница
+        $scope.pageSize = 10;     // Количество элементов на странице
+
+        $scope.disabledBack = function() {
+            if($scope.currentPage == 0){
+                return false;
+            }else{
+                $scope.currentPage = $scope.currentPage-1
+                $scope.setPage($scope.currentPage);
+            }
+        };
+
+        $scope.paginationBlock = function(n){
+            if($scope.currentPage < 4 && n < 7){
+                return true;
+            }else{
+                if($scope.currentPage >  n + 3 || $scope.currentPage <  n - 3){
+                    return false;
+                }else{
+                    return true;
+                }
+            }
+        };
+
+        $scope.disabledNext = function() {
+            if($scope.currentPage >= $scope.numberOfPages - 1){
+                return false;
+            }else{
+                $scope.currentPage = $scope.currentPage+1
+                $scope.setPage($scope.currentPage);
+            }
+        };
+
         var config = {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
@@ -1364,13 +1400,24 @@ angular.module('cubeWebApp')
             }
         };
 
-        $scope.getNotifications = function(){
-            $http.post('/notification/notifications', {}, config).then(function success(response) {
-                $scope.userNotifications = response.data;
-                console.log($scope.userNotifications);
+        $scope.getNotifications = function($data){
+
+            $data = $data || [];
+
+            $http.post('/notification/notifications', $data, config).then(function success(response) {
+                $scope.userNotifications = response.data.notifications;
+                $scope.pages = response.data.pages;
+                $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
+                console.log($scope.numberOfPages);
             });
         };
-        $scope.getNotifications();
+
+        $scope.setPage = function(n){
+            $scope.getNotifications($.param({'page' : n}));
+            $scope.currentPage = n;
+        };
+
+        $scope.setPage($scope.currentPage);
     })
     .controller('userNotificationCtrl', function($scope, $http, $sce, $interval, $routeParams){
         console.log($routeParams["id"]);
