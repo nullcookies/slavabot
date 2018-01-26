@@ -22,18 +22,45 @@ class V1Controller extends Controller
             'access' => [
                 'class' => AccessControl::className(),
                 'only' => [
-                    'vk'
+                    'new-event'
                 ],
                 'rules' => [
+                    [
+                        'actions' => [],
+                        'allow' => true,
+                        'roles' => ['?'],
+                    ],
                     [
                         'actions' => [
                             'vk'
                         ],
                         'allow' => true,
-                        'roles' => ['?'],
+                        'roles' => ['@'],
                     ],
                 ],
             ],
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'new-event' => ['post']
+                ],
+            ],
+//
+//            'access' => [
+//                'class' => AccessControl::className(),
+//                'only' => [
+//                    'vk'
+//                ],
+//                'rules' => [
+//                    [
+//                        'actions' => [
+//                            'vk'
+//                        ],
+//                        'allow' => true,
+//                        'roles' => ['?'],
+//                    ],
+//                ],
+//            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [

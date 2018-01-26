@@ -49,7 +49,7 @@ class SocialDialoguesPeer extends ActiveRecord
             'id',
             'created_at',
             'avatar',
-            //'peer_id',
+            'peer_id',
             'title',
             'notification' => 'dataNotifications',
         ];

@@ -55,9 +55,11 @@ class AppAsset extends AssetBundle
         '/cube/components/flot-orderBars/js/jquery.flot.orderBars.js',
         '/cube/components/flot/jquery.flot.threshold.js',
         '/cube/components/flot-axislabels/jquery.flot.axislabels.js',
+        '/cube/angularjs/js/jquery-slimscroll/jquery.slimscroll.min.js',
         '/cube/angularjs/app/app.js',
         '/cube/angularjs/app/directives.js',
         '/cube/angularjs/app/controllers.js',
+
     ];
     public $depends = [
         'yii\web\YiiAsset',

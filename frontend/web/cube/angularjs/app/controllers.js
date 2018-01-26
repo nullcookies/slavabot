@@ -1408,7 +1408,6 @@ angular.module('cubeWebApp')
                 $scope.userNotifications = response.data.notifications;
                 $scope.pages = response.data.pages;
                 $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
-                console.log($scope.numberOfPages);
             });
         };
 
@@ -1417,31 +1416,58 @@ angular.module('cubeWebApp')
             $scope.currentPage = n;
         };
 
-        $scope.setPage($scope.currentPage);
+        $scope.Timer = $interval(function () {
+            $scope.setPage($scope.currentPage);
+        }, 1000);
     })
     .controller('userNotificationCtrl', function($scope, $http, $sce, $interval, $routeParams){
         console.log($routeParams["id"]);
+
+        $scope.message = '';
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+                'X-CSRF-Token': getCSRF()
+            }
+        };
         $scope.getNotificationsForUser = function(){
             moment.locale('ru');
 
 
             var data = $.param({'id' : $routeParams["id"]});
-            var config = {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
-                    'X-CSRF-Token': getCSRF()
-                }
-            };
+
 
             $http.post('/notification/user-notifications', data, config).then(function success(response) {
-                $scope.data = response.data[0];
+                $scope.data = response.data.peer[0];
                 $scope.userNotification = $scope.data.notification;
                 $scope.userAvatar = $scope.data.avatar;
                 $scope.userName = $scope.data.title;
-                console.log($scope.data.notification);
+                $scope.user_id = response.data.user;
+                $scope.peer_id = $scope.data.peer_id;
+                document.getElementById('refresh').click();
+
             });
         };
+
+
+
+        $scope.sendMessage = function(){
+            $data = $.param({'user_id' : $scope.user_id, 'peer_id' : $scope.peer_id, 'message': $scope.message});
+
+            $http.post('/rest/send/v1/vk', $data, config).then(function success(response) {
+                console.log(response.data);
+                $scope.message = '';
+
+            });
+        };
+
         $scope.getNotificationsForUser();
+
+        $scope.Timer = $interval(function () {
+            $scope.getNotificationsForUser();
+        }, 1000);
+
+
     })
     .controller('tariffsCtrl', function($scope, $http, $sce, $interval){
         $scope.tariffs = [];
