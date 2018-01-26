@@ -11,6 +11,8 @@ use common\models\User;
 
 class Accounts extends \yii\db\ActiveRecord
 {
+    const TYPE_VK = 'vkontakte';
+
     public static function tableName()
     {
         return 'social';
@@ -90,6 +92,22 @@ class Accounts extends \yii\db\ActiveRecord
                 [
                     'id' => $id,
                     'type' => 'vkontakte',
+                    'status' => 1,
+                    'processed' => 1
+                ]
+            )
+            ->one();
+
+        return $model;
+    }
+
+    public static function getByUserId($userId, $type)
+    {
+        $model = static::find()
+            ->where(
+                [
+                    'user_id' => $userId,
+                    'type' => $type,
                     'status' => 1,
                     'processed' => 1
                 ]

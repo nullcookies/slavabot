@@ -29,6 +29,7 @@ return [
                     'hook',
                     'get-user-email',
                     'clear-telegram',
+                    'vk',
                     'facebook-webhooks'
                 ],
                 'allow' => true,

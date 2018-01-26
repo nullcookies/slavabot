@@ -30,11 +30,6 @@ class MessagesController extends Controller
 
     public $servers = [];
 
-    public function init()
-    {
-        set_time_limit(0);
-    }
-
     /**
      * Запуск воркера
      */
@@ -43,6 +38,7 @@ class MessagesController extends Controller
         $worker = new \Kicken\Gearman\Worker('127.0.0.1:4730');
         $worker
             ->registerFunction(SocialJobs::FUNCTION_DIALOGUES, function (\Kicken\Gearman\Job\WorkerJob $job) {
+                $this->renewConnections();
                 $dJobs = new \frontend\controllers\bot\libs\jobs\DialoguesJobs();
                 $dJobs->run($job);
             })
@@ -54,6 +50,8 @@ class MessagesController extends Controller
      */
     public function actionVk()
     {
+        set_time_limit(0);
+
         $this->guzzleClient = new \GuzzleHttp\Client();
 
         $this->gearmanClient = new \Kicken\Gearman\Client('127.0.0.1:4730');
@@ -124,6 +122,8 @@ class MessagesController extends Controller
                 },
                 'rejected' => function ($reason, $index) {
                     // this is delivered each failed request
+                    echo 'servers rejected: '.PHP_EOL;
+                    var_dump($reason);
                 },
             ]);
 
@@ -138,6 +138,9 @@ class MessagesController extends Controller
     protected function serverResponse(\GuzzleHttp\Psr7\Response $response, $index)
     {
         $server = \GuzzleHttp\json_decode($response->getBody()->getContents());
+
+        echo 'serverResponse: '.PHP_EOL;
+        var_dump($server);
 
         if($server->response) {
             $serverResult = $this->users[$index];
@@ -235,6 +238,7 @@ class MessagesController extends Controller
     protected function renewConnections()
     {
         if (isset(\Yii::$app->db)) {
+            echo 'Renew connection'.PHP_EOL;
             \Yii::$app->db->close();
             \Yii::$app->db->open();
         }
