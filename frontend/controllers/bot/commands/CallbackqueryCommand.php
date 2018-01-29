@@ -13,6 +13,7 @@ namespace Longman\TelegramBot\Commands\SystemCommands;
 use frontend\controllers\bot\libs\Logger;
 use GuzzleHttp\Exception\RequestException;
 use Longman\TelegramBot\Commands\SystemCommand;
+use Longman\TelegramBot\Commands\UserCommands\NotificationCommand;
 use Longman\TelegramBot\Commands\UserCommands\AccountCommand;
 use Longman\TelegramBot\Commands\UserCommands\CancelpostCommand;
 use Longman\TelegramBot\Commands\UserCommands\AddpostCommand;
@@ -83,7 +84,10 @@ class CallbackqueryCommand extends SystemCommand
         $data = $callback_query->getData();
 
         $command = explode('_', $data);
+        $param = $command[1];
         $command = $command[0];
+
+
 
         $cb = $this->getUpdate()->getCallbackQuery();            // Get Message object
         $user = $cb->getFrom();
@@ -97,6 +101,18 @@ class CallbackqueryCommand extends SystemCommand
             'data' => print_r($data, true)
         ]);
 
+        if ($command == 'answer') {
+
+            $this->conversation = new Conversation($user_id, $chat_id, 'notification');
+            $notes = &$this->conversation->notes;
+            $notes['state'] = 1;
+            $notes['debug'] = true;
+            $this->conversation->update();
+
+            return (new NotificationCommand($this->telegram,
+                new Update(json_decode($this->update->toJson(), true))))->execute($param);
+
+        }
 
         if ($command == '/account') {
             return (new AccountCommand($this->telegram,

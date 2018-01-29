@@ -84,11 +84,14 @@ class V1Controller extends Controller
         return parent::beforeAction($action);
     }
 
-    public function actionVk()
+    public static function actionVk($user_id = '', $peer_id = '', $message = '')
     {
-        $user_id = Yii::$app->request->post('user_id');
-        $peer_id = Yii::$app->request->post('peer_id');
-        $message = Yii::$app->request->post('message');
+        if($user_id == ''){
+            $user_id = Yii::$app->request->post('user_id');
+            $peer_id = Yii::$app->request->post('peer_id');
+            $message = Yii::$app->request->post('message');
+        }
+
 
         if(!$account = Accounts::getByUserId($user_id, Accounts::TYPE_VK)) {
             throw new \InvalidArgumentException('Аккаунт не найден');

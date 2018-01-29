@@ -340,4 +340,5 @@ class SocialDialogues extends ActiveRecord
 
         return $message;
     }
+
 }

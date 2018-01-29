@@ -95,9 +95,9 @@ class PostCommand extends UserCommand
 
                         $this->conversation->update();
 
-//                        $data['text'] = 'Введите данные: ';
-//
-//
+                        //$data['text'] = 'Введите данные: ';
+
+
 //                        Request::sendMessage($data);
 
                         break;

@@ -176,4 +176,11 @@ class SocialDialoguesPeer extends ActiveRecord
 
         return $result;
     }
+
+    public static function getPeerByID($peerId){
+        $peer = static::find()
+            ->where(['peer_id' => $peerId])
+            ->one();
+        return $peer->title;
+    }
 }
