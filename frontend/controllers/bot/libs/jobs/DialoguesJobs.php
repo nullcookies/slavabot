@@ -90,7 +90,7 @@ class DialoguesJobs implements SocialJobs
                 $command = new NotificationCommand($telegram);
                 $command->prepareParams([
                     'tid' => $telegram_id,
-                    'message' => $title.': '.$text
+                    'message' => $title.': '.$message->getMessageForSend()
                 ]);
                 $command->execute();
 

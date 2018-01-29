@@ -85,7 +85,7 @@ class VkService
                 'client_id'=> $this->app_id,
                 'display' => 'mobile',
                 'response_type'=> 'token',
-                'scope'=> 'offline,wall,photos,friends,groups,messages,notifications',
+                'scope'=> 'offline,wall,photos,video,docs,friends,groups,messages,notifications',
                 'v'=> '5.28'
             ];
 
