@@ -65,7 +65,7 @@ class MainCommand extends UserCommand
 
             }
 
-            $data = $telConfig->getMainWindow($data, 'Создайте пост:', ['settings']);
+            $data = $telConfig->getMainWindow($data, 'Отправьте сообщение для публикации', ['settings']);
 
             Request::sendMessage($data);
 

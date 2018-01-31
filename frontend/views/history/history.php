@@ -70,6 +70,7 @@ use common\models\User;
 
 
 <?if(Yii::$app->user->identity['authorized']==0){?>
+
     <div class="wizard" id="satellite-wizard" ng-controller='dashboardCtrl' data-title="Мастер настройки">
 
         <!-- Step 1 Name & FQDN -->
@@ -187,7 +188,7 @@ use common\models\User;
         </div>
         <div class="wizard-card" data-cardname="tlgcard">
             <h3>Подключение Telegram</h3>
-            <p>Подключитесь к <a href="<?=\common\services\StaticConfig::botUrl()?>" target="_blank">Славаботу</a> в Telegram.
+            <p>Перейдите по ссылке в Telegram и подключитесь к <a href="<?=\common\services\StaticConfig::botUrl()?>" target="_blank">Славаботу</a>
 
             </p>
         </div>

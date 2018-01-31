@@ -170,7 +170,7 @@ class StartCommand extends SystemCommand
 
                         Request::sendMessage($data);
 
-                        $data_post = $telConfig->getWelcomeWindow($data, 'Разместите свой первый пост через Славабот ', []);
+                        $data_post = $telConfig->getWelcomeWindow($data, 'Разместите свой первый пост через Славабот ', ['settings']);
 
                         Request::sendMessage($data_post);
 

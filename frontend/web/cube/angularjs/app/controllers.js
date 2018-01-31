@@ -139,7 +139,6 @@ angular.module('cubeWebApp')
                     $scope.fbGroupBox = true;
                     $scope.fbAuthBox = false;
 
-                    console.log($scope.unprocessed);
 
                     $scope.userSelection.activeValueFB = $scope.unprocessed[0].id;
                 }
@@ -192,7 +191,6 @@ angular.module('cubeWebApp')
 
             if(checkData($scope.vkLogin, 9) && checkData($scope.vkPassword, 2)){
                 $http.post('/social/vk-auth', $.param($scope.data), config).then(function success(response) {
-                    console.log(response);
 
                     if(response.data.status){
 
@@ -249,6 +247,7 @@ angular.module('cubeWebApp')
                     setCookie('payment_' +  $scope.tariff.payment_id, true);
                     $location.path('/tariffs');
                 }
+
 
             });
         };
@@ -588,7 +587,6 @@ angular.module('cubeWebApp')
         }, 10000);
 })
     .controller('detailCtrl', function($scope, $http, $routeParams, $sce,$location){
-        console.log($location.path());
         $scope.webhook = [];
         $scope.sce = $sce;
         moment.locale('ru');
@@ -604,7 +602,6 @@ angular.module('cubeWebApp')
             $http.post('/potential/detail', data, config).then(function success(response) {
                 $scope.user = response.data.user;
                 $scope.webhook = response.data.webhooks.webhooks;
-                console.log($scope.webhook);
             });
         };
 
@@ -834,12 +831,9 @@ angular.module('cubeWebApp')
 
         $http.post('/site/user/', [], config).then(function success(response) {
             if (response) {
-                console.log(response);
                 $scope.timezone = response.data.timezone;
                 $scope.username = response.data.username;
                 $scope.phone = response.data.phone;
-            } else {
-                console.log('error');
             }
         });
 
@@ -869,12 +863,10 @@ angular.module('cubeWebApp')
 
         $scope.savePassword = function() {
 
-            console.log('Try to save new password');
 
             if(!checkData($scope.password, 2)){
                 $scope.passwordError = true;
 
-                console.log('Old password error');
 
                 return false;
             }
@@ -882,7 +874,6 @@ angular.module('cubeWebApp')
             if(!checkData($scope.new_password, 3)){
                 $scope.new_passwordError = true;
 
-                console.log('New password error');
 
                 return false;
             }
@@ -890,7 +881,6 @@ angular.module('cubeWebApp')
             if($scope.new_password!=$scope.new_password_repeat){
                 $scope.new_password_repeatError = true;
 
-                console.log('New password repeat error');
 
                 return false;
             }
@@ -976,7 +966,6 @@ angular.module('cubeWebApp')
         $scope.getAccounts = function() {
             $http.post('/social/accounts', [], config).then(function success(response) {
                 $scope.accounts = response.data;
-                console.log($scope.accounts);
                 $scope.available = {
                     'instagram' : true,
                     'facebook' : true,
@@ -985,8 +974,6 @@ angular.module('cubeWebApp')
                 for (key in $scope.accounts) {
                     $scope.available[$scope.accounts[key].type] = false;
                 }
-                console.log();
-                console.log($scope.available);
             });
         }
 
@@ -1000,8 +987,6 @@ angular.module('cubeWebApp')
                         document.getElementById('closeConfirmModal').click();
                     }
                 });
-            }else{
-                console.log('ID error!');
             }
 
         };
@@ -1026,7 +1011,6 @@ angular.module('cubeWebApp')
 
             document.getElementById('instagram').click();
 
-            console.log($account);
         };
 
         $scope.VKRefresh = function($account) {
@@ -1069,7 +1053,6 @@ angular.module('cubeWebApp')
             if(checkData($scope.vkLogin, 9) && checkData($scope.vkPassword, 2)){
                 $http.post('/social/vk-auth', $.param($scope.data), config).then(function success(response) {
 
-                    console.log(response);
 
                     if(response.data.status){
                         $scope.vkError = false;
@@ -1250,10 +1233,8 @@ angular.module('cubeWebApp')
 
         $scope.getList = function($data){
             $data = $data || [];
-            console.log($data);
             $http.post('/history/get-list', $data, config).then(function success(response) {
                 $scope.history = response.data.history;
-                console.log($scope.history);
                 $scope.pages = response.data.pages;
                 $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
             });
@@ -1264,7 +1245,6 @@ angular.module('cubeWebApp')
             $data = $data || [];
             $http.post('/history/get-planned', $data, config).then(function success(response) {
                 $scope.planned = response.data.history;
-                console.log($scope.planned);
                 $scope.plannedPages = response.data.pages;
                 $scope.plannedNumberOfPages = $scope.plannedPages.totalCount / $scope.pageSize;
             });
@@ -1421,7 +1401,6 @@ angular.module('cubeWebApp')
         }, 1000);
     })
     .controller('userNotificationCtrl', function($scope, $http, $sce, $interval, $routeParams){
-        console.log($routeParams["id"]);
 
         $scope.message = '';
         var config = {
@@ -1455,7 +1434,6 @@ angular.module('cubeWebApp')
             $data = $.param({'user_id' : $scope.user_id, 'peer_id' : $scope.peer_id, 'message': $scope.message});
 
             $http.post('/rest/send/v1/vk', $data, config).then(function success(response) {
-                console.log(response.data);
                 $scope.message = '';
 
             });
@@ -1481,7 +1459,6 @@ angular.module('cubeWebApp')
 
         $scope.getTariffs = function(){
             $http.post('/billing/tariffs', [], config).then(function success(response) {
-                console.log(response);
                 $scope.tariffs = response.data;
             });
         };

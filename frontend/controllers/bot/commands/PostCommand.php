@@ -11,6 +11,7 @@ use Longman\TelegramBot\Commands\SystemCommands\CallbackqueryCommand;
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Conversation;
 use Longman\TelegramBot\Entities\InlineKeyboard;
+use Longman\TelegramBot\Entities\Keyboard;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
@@ -49,7 +50,23 @@ class PostCommand extends UserCommand
             'user_id' => $user_id
         ];
 
+        if($new){
 
+            $data['text'] = $intro_text;
+
+            $keyboard = new Keyboard(
+                [
+                    [
+                        'text' => $telConfig->config['buttons']['settings']['label'],
+                        'callback_data' => $telConfig->config['buttons']['clear']['command']
+                    ]
+                ]
+            );
+
+            $data['reply_markup'] = $keyboard->setResizeKeyboard(true);
+
+            Request::sendMessage($data);
+        }
 
         try {
 
@@ -72,11 +89,6 @@ class PostCommand extends UserCommand
 
             if (isset($notes['state'])) {
                 $state = $notes['state'];
-            }
-
-            if($new){
-                $data['text'] = $intro_text;
-                Request::sendMessage($data);
             }
 
             switch ($state) {
