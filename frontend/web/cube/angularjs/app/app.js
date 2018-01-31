@@ -98,6 +98,16 @@ app.config(['$routeProvider', function ($routeProvider) {
             controller: "postsCtrl",
             title: 'Посты и комментарии'
         })
+        .when("/payment/:id", {
+            templateUrl: "views/payment.html",
+            controller: "paymentCtrl",
+            title: 'Оплата тарифа'
+        })
+        .when("/pay/:id", {
+            templateUrl: "views/payment.html",
+            controller: "paymentCtrl",
+            title: 'Оплата тарифа'
+        })
         .when("/error-404", {
             templateUrl: "views/error404.html",
             title: 'Страница не найдена!'

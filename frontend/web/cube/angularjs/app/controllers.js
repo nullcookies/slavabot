@@ -1465,7 +1465,59 @@ angular.module('cubeWebApp')
 
         $scope.getTariffs();
 
-    });
+    })
+    .controller('paymentCtrl', function($scope, $http, $sce, $routeParams){
+        $scope.tariff = [];
+        $scope.pay = false;
+        $scope.payMarkUp = '';
+        $scope.count = 3;
+        $scope.sce = $sce;
+
+
+        var data = $.param({'id' : $routeParams["id"]});
+
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+                'X-CSRF-Token': getCSRF()
+            }
+        };
+
+        $scope.getTariffs = function(){
+            $http.post('/billing/tariffs/get', data, config).then(function success(response) {
+                $scope.tariff = response.data;
+
+                console.log($scope.tariff);
+            });
+        };
+
+        $scope.submit = function(){
+            $http.post(
+                '/billing/order',
+                $.param(
+                    {
+                        'id' : $scope.tariff.id,
+                        'count':$scope.count}
+                        ),
+                config
+            ).then(function success(response) {
+                $http.post(
+                    '/payment',
+                    $.param(
+                        {
+                            'order' : response.data.order_id
+                        }
+                    ),
+                    config
+                ).then(function success(response) {
+                    $scope.pay = true;
+                    $scope.payMarkUp = response.data;
+                });
+            });
+        };
+
+        $scope.getTariffs();
+    })
 
     app.filter('startFrom', function() {
         return function(input, start) {

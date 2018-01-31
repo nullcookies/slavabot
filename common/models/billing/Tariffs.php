@@ -63,6 +63,14 @@ class Tariffs extends ActiveRecord
             ->all();
     }
 
+    static function getTariffByID($id)
+    {
+        return self::find()
+            ->where(['active' => 1])
+            ->andWhere(['id'=>$id])
+            ->one();
+    }
+
 
 
 }

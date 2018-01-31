@@ -424,4 +424,16 @@ class User extends ActiveRecord implements IdentityInterface
             )
         );
     }
+
+    public static function getCustomerPhone(){
+        return \Yii::$app->user->identity->phone;
+    }
+
+    public static function getCustomerEmail(){
+        return \Yii::$app->user->identity->email;
+    }
+
+    public static function getCustomerId(){
+        return \Yii::$app->user->identity->id;
+    }
 }

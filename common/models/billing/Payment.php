@@ -28,6 +28,7 @@ class Payment extends ActiveRecord
 
     public function fields(){
         return [
+            'order_id'=>'id',
             'id' => function(){
                 return $this->tariffValue->id;
             },
@@ -88,7 +89,41 @@ class Payment extends ActiveRecord
         $elem->active = 1;
 
         $elem->save();
-
     }
 
+    static function newOrder($user, $tariff, $count)
+    {
+        $elem = new Payment();
+        $tariffInfo = Tariffs::getTariffByID($tariff);
+
+        $elem->user_id = $user;
+        $elem->tariff_id = $tariffInfo->id;
+
+        $elem->begin = Carbon::now()->format('Y-m-d H:i');
+        $elem->expire = Carbon::now()->addDay($count * 30)->format('Y-m-d H:i');
+        $elem->active = 0;
+
+        $elem->totalPrice = $tariffInfo->cost * $count;
+
+        if($elem->save()){
+            return $elem;
+        }else{
+            return false;
+        }
+    }
+
+    public static function getOrderByID($id){
+        return self::find()
+            ->andWhere(['id'=>$id])
+            ->one();
+    }
+
+    public function getTotalPrice(){
+
+        return number_format($this->totalPrice, 2, '.', '');
+    }
+
+    public function getId(){
+        return $this->id;
+    }
 }

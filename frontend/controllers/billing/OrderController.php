@@ -1,6 +1,7 @@
 <?php
 namespace frontend\controllers\billing;
 
+use common\models\billing\Payment;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\web\BadRequestHttpException;
@@ -11,7 +12,7 @@ use yii\web\Response;
 use common\models\billing\Tariffs;
 
 
-class TariffsController extends Controller
+class OrderController extends Controller
 {
     public function behaviors()
     {
@@ -34,13 +35,11 @@ class TariffsController extends Controller
             ],
             'verbs' => [
                 'class' => VerbFilter::className(),
-                'actions' => [
-                    'index' => ['post'],
-                ],
+                'actions' => [],
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['index', 'get'],
+                'only' => ['index'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -50,10 +49,10 @@ class TariffsController extends Controller
 
     public function actionIndex()
     {
-        return Tariffs::getList();
-    }
+        $tariff = Yii::$app->request->post('id');
+        $count = Yii::$app->request->post('count');
+        $user = \Yii::$app->user->identity->id;
 
-    public function actionGet(){
-        return Tariffs::getTariffByID(Yii::$app->request->post('id'));
+        return Payment::newOrder($user, $tariff, $count);
     }
 }
