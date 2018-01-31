@@ -65,14 +65,14 @@ AppAsset::register($this);
                 <div class="nav-no-collapse pull-right" id="header-nav" ng-controller="header">
                     <ul class="nav navbar-nav pull-right">
 
-                        <li class="dropdown profile-dropdown">
-                            <a href="#/tariffs" class=" fade in" ng-show="tariff.active">
-                                {{tariff.title}} : {{tariff.expire}}
-                            </a>
-                            <a href="#/tariffs" class=" fade in" ng-show="!tariff.active">
-                                {{tariff.title}} : окончен
-                            </a>
-                        </li>
+<!--                        <li class="dropdown profile-dropdown">-->
+<!--                            <a href="#/tariffs" class=" fade in" ng-show="tariff.active">-->
+<!--                                {{tariff.title}} : {{tariff.expire}}-->
+<!--                            </a>-->
+<!--                            <a href="#/tariffs" class=" fade in" ng-show="!tariff.active">-->
+<!--                                {{tariff.title}} : окончен-->
+<!--                            </a>-->
+<!--                        </li>-->
 
                         <li class="dropdown profile-dropdown" ng-show="telegramStatus">
                             <span class=" fade in">
