@@ -228,6 +228,10 @@ class SiteController extends Controller
 
     public function actionSignup($success = false)
     {
+        if (!Yii::$app->user->isGuest) {
+            return Yii::$app->response->redirect(['site/index']);
+        }
+        
         $this->layout = 'login';
         $model = new SignupForm();
         if ($model->load(Yii::$app->request->post())) {
