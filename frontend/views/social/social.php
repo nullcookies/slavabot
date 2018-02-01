@@ -16,7 +16,7 @@ use frontend\controllers\SocialController;
                                     <li ng-show="available.facebook">
                                         <?=
                                             SocialController::getFBBtn(
-                                                'http://'.$_SERVER['HTTP_HOST'].'/social/fb',
+                                                'https://'.$_SERVER['HTTP_HOST'].'/social/fb',
                                                 'Facebook',
                                                 'facebook'
                                             );
