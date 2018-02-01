@@ -110,20 +110,20 @@ class FbJobs implements SocialJobs
 
 
             //todo включить видео
-//            if (isset($notes['Videos']) && is_array($notes['Videos'])) {
-//                $waitExists = Files::WaitExists($notes['Videos']);
-//                if ($waitExists == true) {
-//                    echo "Video files uploaded";
-//                    $link = rtrim($notes['hostname'], '/') . '/storage/download/videos/' . basename($notes['Videos'][0]);
-//                    $response = $fb->post("/{$page_id}/videos", ['description' => $messages, 'file_url' => $link,], $access_token);
-//                    $uploadVideo = $response->getGraphNode()->asArray();
-//
-//
-//                } else {
-//
-//                    throw new Exception("Ошибка получения файлов из telegram");
-//                }
-//            }
+            if (isset($notes['Videos']) && is_array($notes['Videos'])) {
+                $waitExists = Files::WaitExists($notes['Videos']);
+                if ($waitExists == true) {
+                    echo "Video files uploaded";
+                    $link = rtrim($notes['hostname'], '/') . '/storage/download/videos/' . basename($notes['Videos'][0]);
+                    $response = $fb->post("/{$page_id}/videos", ['description' => $messages, 'file_url' => $link,], $access_token);
+                    $uploadVideo = $response->getGraphNode()->asArray();
+
+
+                } else {
+
+                    throw new Exception("Ошибка получения файлов из telegram");
+                }
+            }
 
             //todo удалить
             $job->sendComplete();

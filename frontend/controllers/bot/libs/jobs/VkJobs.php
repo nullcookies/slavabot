@@ -68,7 +68,12 @@ class VkJobs implements SocialJobs
                 $waitExists = Files::WaitExists($notes['Videos']);
                 if ($waitExists == true) {
                     echo "Video files uploaded";
-                    $attachments = $vk->upload_video(['group_id' => $owner], $notes['Videos'][0]);
+//                  array('name' => 'Test video',
+//                        'description' => 'My description',
+//                        'wallpost' => 1,
+//                        'group_id' => 0
+//                    )
+                    $attachments = $vk->upload_video(['group_id' => preg_replace("/[^0-9]/", '', $owner)], $notes['Videos'][0]);
                 } else {
                     Logger::error('Ошибка получения видео из telegram', [
                         'notes' => $notes
@@ -76,7 +81,6 @@ class VkJobs implements SocialJobs
                     throw new \Exception("Ошибка получения файлов из telegram");
                 }
             }
-
 
             if (isset ($notes['Text'])) {
                 $result = $vk->api('wall.post', [

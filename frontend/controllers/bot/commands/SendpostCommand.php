@@ -290,7 +290,7 @@ class SendpostCommand extends UserCommand
             }
 
             if (isset($notes['Video']) && !empty($notes['Video'])) {
-                $v = json_decode($notes['Photo'], true);
+                $v = json_decode($notes['Video'], true)[0];
                 if (isset($v['file_path'])) {
                     $video = $v;
                 }
@@ -406,7 +406,7 @@ class SendpostCommand extends UserCommand
         }
 
         if (isset($notes['Video']) && !empty($notes['Video'])) {
-            $v = json_decode($notes['Photo'], true);
+            $v = json_decode($notes['Video'], true)[0];
             if (isset($v['file_path'])) {
                 $video = $v;
             }
@@ -443,6 +443,9 @@ class SendpostCommand extends UserCommand
         }
 
         if(isset($notes['Photo']) && !empty($notes['Photo'])){
+            $responseData['text'] = "Instagram - ...\n";
+            $success_text = "Instagram - готово\n";
+        }elseif(isset($notes['Video']) && !empty($notes['Video'])){
             $responseData['text'] = "Instagram - ...\n";
             $success_text = "Instagram - готово\n";
         }else{
