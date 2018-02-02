@@ -172,7 +172,7 @@ class SendpostCommand extends UserCommand
                 $arr['Photos'] = $photos;
             }
             if (isset($notes['Video']) && !empty($notes['Video'])) {
-                $v = json_decode($notes['Photo'], true);
+                $v = json_decode($notes['Video'], true)[0];
                 if (isset($v['file_path'])) {
                     $video = $v;
                 }

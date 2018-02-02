@@ -76,6 +76,7 @@ angular.module('cubeWebApp')
         $scope.vkErrorText = '';
         $scope.vkAuthBox = true;
         $scope.vkGroupBox = false;
+        $scope.vkWaitBox = false;
         $scope.vkfinish = false;
         $scope.userSelection = {};
         $scope.InstaLogin = '';
@@ -87,6 +88,7 @@ angular.module('cubeWebApp')
         $scope.fbGroupBox = false;
         $scope.fbAuthBox = true;
         $scope.fbFinish = false;
+        $scope.InstaWaitBox = false;
 
         $scope.InstaSave = function(){
             $scope.data = {
@@ -98,15 +100,19 @@ angular.module('cubeWebApp')
                     }
                 }
             };
+            $scope.InstaWaitBox = true;
+            $scope.instaAuthBox = false;
 
             if(checkData($scope.InstaLogin, 2) && checkData($scope.InstaPassword, 2)){
                 $http.post('/social/instagram', $.param($scope.data), config).then(function success(response) {
                     if(response.data.error){
                         $scope.instaError = response.data.error;
+                        $scope.InstaWaitBox = false;
+                        $scope.instaAuthBox = true;
                         return false;
                     }else{
                         $scope.instaError = '';
-                        $scope.instaAuthBox = false;
+                        $scope.InstaWaitBox = false;
                         $scope.instafinish = true;
                     }
 
@@ -189,22 +195,26 @@ angular.module('cubeWebApp')
                 password: $scope.vkPassword
             };
 
+            $scope.vkWaitBox = true;
+            $scope.vkAuthBox = false;
+
             if(checkData($scope.vkLogin, 9) && checkData($scope.vkPassword, 2)){
                 $http.post('/social/vk-auth', $.param($scope.data), config).then(function success(response) {
 
                     if(response.data.status){
-
+                        $scope.vkWaitBox = false;
                         $scope.vkError = false;
                         $scope.vkLoginError = false;
                         $scope.vkPasswordError = false;
                         $scope.vkErrorText = '';
                         $scope.checkUnprocessed();
-                        $scope.vkAuthBox = false;
                         $scope.vkGroupBox = true;
 
                     }else{
                         if(response.data.error==='login & pass are wrong'){
                             $scope.vkError = true;
+                            $scope.vkAuthBox = true;
+                            $scope.vkWaitBox = false;
                             $scope.vkLoginError = false;
                             $scope.vkPasswordError = false;
                             $scope.vkErrorText = 'Неверный логин/пароль';

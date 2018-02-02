@@ -196,9 +196,9 @@ class PostCommand extends UserCommand
 
                     if(!isset($notes['Text']) || !isset($notes['Photo'])){
                         $buttonsArray = [
+                            ['text' => 'Добавить', 'callback_data' => 'addpost'],
                             ['text' => 'Опубликовать', 'callback_data' => 'sendpost'],
                             ['text' => 'Запланировать', 'callback_data' => 'planpost'],
-                            ['text' => 'Добавить', 'callback_data' => 'addpost'],
                             ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
                         ];
                     }else{

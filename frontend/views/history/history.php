@@ -100,6 +100,9 @@ use common\models\User;
                     <button type="button" class="btn btn-success" ng-click="VkSave()">Подключить аккаунт</button>
                 </div>
             </div>
+            <div class="vkcard__content" ng-show="vkWaitBox">
+                Подождите. Идёт привязка аккаунта. Это может занять несколько секунд
+            </div>
             <div class="vkcard__content" ng-show="vkGroupBox">
                 <h4 class="modal-title" id="myModalLabel">
                     Укажите активное сообщество для аккаунта: {{unprocessedName}}
@@ -143,6 +146,9 @@ use common\models\User;
                 <div class="form-group">
                     <button type="button" class="btn btn-success" ng-click="InstaSave()">Подключить аккаунт</button>
                 </div>
+            </div>
+            <div class="vkcard__content" ng-show="InstaWaitBox">
+                Подождите. Идёт привязка аккаунта. Это может занять несколько секунд
             </div>
             <div class="vkcard__content" ng-show="instafinish">
                 <div class="alert alert-success">
