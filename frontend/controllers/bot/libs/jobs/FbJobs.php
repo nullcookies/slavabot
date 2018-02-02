@@ -103,10 +103,7 @@ class FbJobs implements SocialJobs
             }
 
 
-            $response = $fb->post(
-                "/{$page_id}/feed",
-                $linkData,
-                $access_token);
+
 
 
             //todo включить видео
@@ -123,6 +120,11 @@ class FbJobs implements SocialJobs
 
                     throw new Exception("Ошибка получения файлов из telegram");
                 }
+            }else{
+                $response = $fb->post(
+                    "/{$page_id}/feed",
+                    $linkData,
+                    $access_token);
             }
 
             //todo удалить
