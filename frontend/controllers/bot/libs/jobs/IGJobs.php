@@ -101,7 +101,7 @@ class IGJobs implements SocialJobs
                         ->resize(new Dimension(640, 480))
                         ->synchronize();
 
-                    $format = new X264('libfdk_aac');
+                    $format = new X264();//'libfdk_aac');
 
 
                     $output =  $notes['video_path'];
