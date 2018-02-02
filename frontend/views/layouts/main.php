@@ -38,7 +38,7 @@ AppAsset::register($this);
 <div id="theme-wrapper">
     <header class="navbar" id="header-navbar" ng-controller="header">
         <div class="container">
-            <a href="#/dasboard" id="logo" class="navbar-brand">
+            <a href="/" id="logo" class="navbar-brand">
                 <img src="/cube/img/logo.png" alt="" class="normal-logo logo-white"/>
                 <img src="/cube/img/logo-black.png" alt="" class="normal-logo logo-black"/>
                 <img src="/cube/img/logo-small.png" alt="" class="small-logo hidden-xs hidden-sm hidden"/>
@@ -64,6 +64,16 @@ AppAsset::register($this);
 
                 <div class="nav-no-collapse pull-right" id="header-nav" ng-controller="header">
                     <ul class="nav navbar-nav pull-right">
+
+<!--                        <li class="dropdown profile-dropdown">-->
+<!--                            <a href="#/tariffs" class=" fade in" ng-show="tariff.active">-->
+<!--                                {{tariff.title}} : {{tariff.expire}}-->
+<!--                            </a>-->
+<!--                            <a href="#/tariffs" class=" fade in" ng-show="!tariff.active">-->
+<!--                                {{tariff.title}} : окончен-->
+<!--                            </a>-->
+<!--                        </li>-->
+
                         <li class="dropdown profile-dropdown" ng-show="telegramStatus">
                             <span class=" fade in">
                                 <i class="fa fa-check-circle fa-fw fa-lg"></i>
@@ -137,7 +147,14 @@ AppAsset::register($this);
                                     <!--                                        </li>-->
                                     <!--                                    </ul>-->
                                 </li>
-                                <li class="header-nav__item" data-match-route="/pages/social"><a href="#/pages/social"><i class="fa fa-sliders"></i><span>Соц. сети</span></a></li>
+                                <li class="header-nav__item" data-match-route="/pages/social"><a
+                                            href="#/pages/social"><i
+                                                class="fa fa-sliders"></i><span>Соц. сети</span></a>
+                                </li>
+                                <li class="header-nav__item" data-match-route="/pages/notice"><a
+                                            href="#/pages/notice"><i
+                                                class="fa fa-bell-o"></i><span>Уведомления</span></a>
+                                </li>
 
                             </ul>
                         </div>

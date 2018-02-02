@@ -41,6 +41,7 @@ class AppAsset extends AssetBundle
         '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js',
         '//cdnjs.cloudflare.com/ajax/libs/angular-moment/0.9.0/angular-moment.min.js',
         '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/locales.js',
+        '/cube/angularjs/js/angular-cookies.min.js',
         '/cube/angularjs/js/angular-route.min.js',
         '/cube/angularjs/js/angular-animate.js',
         '/cube/angularjs/js/loading-bar.js',
@@ -54,9 +55,11 @@ class AppAsset extends AssetBundle
         '/cube/components/flot-orderBars/js/jquery.flot.orderBars.js',
         '/cube/components/flot/jquery.flot.threshold.js',
         '/cube/components/flot-axislabels/jquery.flot.axislabels.js',
+        '/cube/angularjs/js/jquery-slimscroll/jquery.slimscroll.min.js',
         '/cube/angularjs/app/app.js',
         '/cube/angularjs/app/directives.js',
         '/cube/angularjs/app/controllers.js',
+
     ];
     public $depends = [
         'yii\web\YiiAsset',

@@ -8,6 +8,7 @@ use Longman\TelegramBot\Conversation;
 use Longman\TelegramBot\Entities\Keyboard;
 use Longman\TelegramBot\Request;
 
+use Longman\TelegramBot\Entities\Update;
 
 class MainCommand extends UserCommand
 {
@@ -64,8 +65,14 @@ class MainCommand extends UserCommand
 
             }
 
-            $data = $telConfig->getMainWindow($data, '', ['post', 'settings']);
-            $result = Request::sendMessage($data);
+            $data = $telConfig->getMainWindow($data, 'Отправьте сообщение для публикации', ['settings']);
+
+            Request::sendMessage($data);
+
+            $this->conversation->stop();
+
+            return (new PostCommand($this->telegram,
+                new Update(json_decode($this->update->toJson(), true))))->execute(true, '');
 
             return $result;        // Send message!
         } catch (\Exception $e) {

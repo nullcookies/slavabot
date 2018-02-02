@@ -6,6 +6,11 @@ use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
+use common\models\billing\Payment;
+use Carbon\Carbon;
+use frontend\controllers\bot\libs\Utils;
+use common\commands\command\SendNotificationCommand;
+
 
 /**
  * User model
@@ -27,7 +32,7 @@ class User extends ActiveRecord implements IdentityInterface
 {
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
-
+    //public $tariff;
 
     /**
      * @inheritdoc
@@ -55,6 +60,25 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
+        ];
+    }
+    public function getTariffValue()
+    {
+        return $this->hasOne(Payment::className(), ['user_id' => 'id'])->where(['active' => 1]);
+
+    }
+
+    public function fields(){
+        return [
+            'id',
+            'username',
+            'password_hash',
+            'temp_password_hash',
+            'email',
+            'auth_key',
+            'status',
+            'timezone',
+            'tariff' => 'tariffValue',
         ];
     }
 
@@ -338,5 +362,78 @@ class User extends ActiveRecord implements IdentityInterface
         $user = self::findByID($id);
         $user->clearTempCode();
         return $user->save();
+    }
+
+    static function getUser()
+    {
+        $user = self::findByID(\Yii::$app->user->identity->id);
+
+
+        return array(
+            'id' => $user->id,
+            'name' => $user->username,
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'telegram' => $user->telegram_id > 0 ? true : false,
+            'tariff' => $user->tariffValue,
+        );
+    }
+
+    static function expireToString()
+    {
+        $user = self::findByID(\Yii::$app->user->identity->id);
+
+        Carbon::setLocale('ru');
+        $td = Carbon::now()->diff(\Carbon\Carbon::parse($user->tariffValue->expire));
+
+        $dif = "";
+
+        if ($td->y > 0) {
+            $dif .= Utils::human_plural_form($td->y, ["год", "года", "лет"]) . " ";
+        }
+        if ($td->m > 0) {
+            $dif .= Utils::human_plural_form($td->m, ["месяц", "месяц", "месяцев"]) . " ";
+        }
+        if ($td->d > 0) {
+            $dif .= Utils::human_plural_form($td->d, ["день", "дня", "дней"]);
+        }
+        if ($td->d == 0 && $td->h > 0) {
+            $dif .= Utils::human_plural_form($td->h, ["час", "часа", "часов"]);
+        }
+
+        return $dif;
+    }
+
+    static function expired()
+    {
+        return true;
+    }
+
+    static function currentTariff()
+    {
+        return \Yii::$app->user->identity->tariffValue;
+    }
+
+    static function notification($day)
+    {
+        return \Yii::$app->commandBus->handle(
+            new SendNotificationCommand(
+                [
+                    'day' => $day
+                ]
+            )
+        );
+    }
+
+    public static function getCustomerPhone(){
+        return \Yii::$app->user->identity->phone;
+    }
+
+    public static function getCustomerEmail(){
+        return \Yii::$app->user->identity->email;
+    }
+
+    public static function getCustomerId(){
+        return \Yii::$app->user->identity->id;
     }
 }

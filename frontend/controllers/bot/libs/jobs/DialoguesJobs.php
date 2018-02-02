@@ -13,7 +13,7 @@ use common\models\rest\Accounts;
 use common\models\SocialDialogues;
 use common\models\SocialDialoguesPeer;
 use frontend\controllers\bot\Bot;
-use frontend\controllers\bot\commands\NotificationCommand;
+use frontend\controllers\bot\commands\FrontendNotificationCommand;
 use yii\helpers\ArrayHelper;
 
 class DialoguesJobs implements SocialJobs
@@ -24,7 +24,7 @@ class DialoguesJobs implements SocialJobs
             $workloadJson = $job->getWorkload();
             $workload = json_decode($workloadJson);
 
-            var_dump($workload);
+            //var_dump($workload);
 
             $account_id = ArrayHelper::getValue($workload, 'id');
             $group_id = ArrayHelper::getValue($workload, 'group_id');
@@ -42,7 +42,7 @@ class DialoguesJobs implements SocialJobs
             $correctedAccount = false;
             if($account = Accounts::getVkById($account_id)) {
                 if($correctedAccount = $account->checkAccount($telegram_id, $group_id, $group_access_token)) {
-                    var_dump($correctedAccount);
+                    //var_dump($correctedAccount);
                     $telegram_id = $correctedAccount['telegram_id'];
                     $group_access_token = $correctedAccount['group_access_token'];
                     $access_token = $correctedAccount['access_token'];
@@ -87,14 +87,18 @@ class DialoguesJobs implements SocialJobs
 
                 $bot = new Bot();
                 $telegram = $bot->GetTelegram();
-                $command = new NotificationCommand($telegram);
-                $command->prepareParams([
-                    'tid' => $telegram_id,
-                    'message' => $title.': '.$message->getMessageForSend()
-                ]);
-                $command->execute();
 
-                echo 'sended' . PHP_EOL;
+                if($message->direction!=2){
+                    $command = new FrontendNotificationCommand($telegram);
+                    $command->prepareParams([
+                        'tid' => $telegram_id,
+                        'message' => $title.":\n".$message->getMessageForSend(),
+                    ]);
+                    $command->execute($peer_id);
+
+                    echo 'sended' . PHP_EOL;
+                }
+
 
             } else {
                 if($correctedAccount) {

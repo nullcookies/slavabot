@@ -1,0 +1,135 @@
+<div class="col-lg-12">
+
+    <div class="row">
+        <div class="col-lg-12">
+            <ol class="breadcrumb">
+                <li><a href="/">Главная</a></li>
+                <li><a href="/#/pages/notice">Уведомления</a></li>
+                <li class="active"><span>Профиль пользователя</span></li>
+            </ol>
+
+            <h1>Профиль пользователя</h1>
+        </div>
+    </div>
+
+    <div class="row" id="user-profile">
+        <div class="col-lg-3 col-md-4 col-sm-4">
+            <div class="main-box clearfix">
+                <header class="main-box-header clearfix">
+                    <h2>{{userName}}</h2>
+                </header>
+
+                <div class="main-box-body clearfix">
+                    <!--<div class="profile-status">-->
+                        <!--<i class="fa fa-circle"></i> Online-->
+                    <!--</div>-->
+
+                    <img src="{{userAvatar}}" alt="" class="profile-img img-responsive center-block" />
+
+                    <!--<div class="profile-label">-->
+                        <!--<span class="label label-danger">Admin</span>-->
+                    <!--</div>-->
+
+                    <!--<div class="profile-stars">-->
+                        <!--<i class="fa fa-star"></i>-->
+                        <!--<i class="fa fa-star"></i>-->
+                        <!--<i class="fa fa-star"></i>-->
+                        <!--<i class="fa fa-star"></i>-->
+                        <!--<i class="fa fa-star-o"></i>-->
+                        <!--<span>Super User</span>-->
+                    <!--</div>-->
+
+                    <!--<div class="profile-since">-->
+                        <!--Member since: Jan 2012-->
+                    <!--</div>-->
+
+                    <div class="profile-details">
+                        <ul class="fa-ul">
+                            <li><i class="fa-li fa fa-comment"></i>Сообщений: <span>{{userNotification.length}}</span></li>
+                            <li><i class="fa-li fa fa-tasks"></i>Последнее: <span>
+                            <time title="{{ userNotification[userNotification.length - 1].created_at | amDateFormat: 'dddd, MMMM Do YYYY, h:mm a' }}">{{ userNotification[userNotification.length - 1].created_at | amCalendar }}</time>
+                            </span></li>
+                        </ul>
+                    </div>
+
+                    <!--<div class="profile-message-btn center-block text-center">-->
+                        <!--<a href="#" class="btn btn-success">-->
+                            <!--<i class="fa fa-envelope"></i>-->
+                            <!--Отправить сообщение-->
+                        <!--</a>-->
+                    <!--</div>-->
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-lg-9 col-md-8 col-sm-8">
+            <div class="main-box clearfix">
+                <div class="tabs-wrapper profile-tabs">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#tab-chat" data-toggle="tab">Сообщения</a></li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane fade in active" id="tab-chat">
+                            <div class="conversation-wrapper">
+                                <div class="conversation-content">
+                                    <div class="conversation-inner">
+                                        <div ng-repeat="notification in userNotification" ng-class="{'item-right' : notification.direction==2}" class="conversation-item item-left clearfix">
+                                            <div class="conversation-user" ng-show="notification.direction==1">
+                                                <img src="{{userAvatar}}" alt="" style="width:100%">
+                                            </div>
+                                            <div class="conversation-body">
+                                                <div class="name" ng-show="notification.direction==1">
+                                                    {{userName}}
+                                                </div>
+                                                <div class="name" ng-show="notification.direction==2">
+                                                    Вы
+                                                </div>
+                                                <div class="time hidden-xs">
+                                                    <time title="{{ notification.created_at | amDateFormat: 'dddd, MMMM Do YYYY, h:mm a' }}">{{ notification.created_at | amCalendar }}</time>
+                                                </div>
+                                                <div class="text">
+                                                    {{notification.message}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="conversation-new-message">
+                                    <form ng-submit="sendMessage()">
+                                        <div class="form-group">
+                                            <input class="form-control" rows="2" ng-model="message" placeholder="Введите сообщение..."></input>
+                                        </div>
+
+                                        <div class="clearfix">
+                                            <button type="submit" class="btn btn-success pull-right">Отправить сообщение</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="test" id="refresh"></div>
+
+<script>
+    $(document).ready(function() {
+//        $('.conversation-inner').bind("DOMNodeInserted",function(){
+//            console.log('!!!');
+//        });
+        //$('.test').on('click', function(){
+            $('.conversation-inner').slimScroll({
+                height: '340px',
+                start: 'bottom'
+            });
+        //});
+    });
+</script>

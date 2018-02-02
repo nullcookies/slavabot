@@ -29,7 +29,12 @@ return [
                     'hook',
                     'get-user-email',
                     'clear-telegram',
-                    'vk'
+                    'vk',
+                    'facebook-webhooks',
+                    'check',
+                    'aviso',
+                    'success',
+                    'fail'
                 ],
                 'allow' => true,
                 'roles' => ['?'],
@@ -57,6 +62,16 @@ return [
                     'backgroundHandlerRoute' => 'command-bus/handle',
                 ]
             ]
+        ],
+        'yakassa' => [
+            'class' => 'kroshilin\yakassa\YaKassa',
+            'shopPassword' => 'password',
+            'securityType' => 'MD5',
+            'shopId' => '180533',
+            'scId' => '561226',
+            'currency' => '10643'
+            //'paymentAction' => 'https://demomoney.yandex.ru/eshop.xml',
+
         ],
         'request' => [
             'baseUrl' => '/',

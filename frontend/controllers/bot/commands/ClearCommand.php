@@ -28,9 +28,10 @@ class ClearCommand extends UserCommand
         //подключаем обертку с настройками
         $telConfig = new TelegramWrap();
 
-        $message = $this->getMessage();
+        $message = $message = $this->getMessage() ?: $this->getCallbackQuery()->getMessage();
         $chat = $message->getChat();
-        $user = $message->getFrom();
+        $user = $this->getMessage() ? $message->getFrom() : $this->getCallbackQuery()->getFrom();
+
         $text = trim($message->getText(true));
         $chat_id = $chat->getId();
         $user_id = $user->getId();

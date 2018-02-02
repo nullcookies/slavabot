@@ -74,6 +74,7 @@ class FacebookService
             'id' => $user['id'],
             'name' => 'Стена пользователя ' . $user['name'],
         );
+        //$res['data']['access'] = self::setWebhooksAccess($fb, $accessToken, $this->app_id);
 
         return $res;
     }
@@ -209,5 +210,23 @@ class FacebookService
             echo 'Facebook SDK returned an error: ' . $e->getMessage();
             exit;
         }
+    }
+
+    public function setWebhooksAccess($fb, $accessToken, $app_id){
+
+        try {
+            // Returns a `Facebook\FacebookResponse` object
+            $response = $fb->get(
+                '/'.$app_id.'/subscriptions',
+                $accessToken
+            );
+        } catch(Facebook\Exceptions\FacebookResponseException $e) {
+            echo 'Graph returned an error: ' . $e->getMessage();
+            exit;
+        } catch(Facebook\Exceptions\FacebookSDKException $e) {
+            echo 'Facebook SDK returned an error: ' . $e->getMessage();
+            exit;
+        }
+        $graphNode = $response->getGraphNode();
     }
 }

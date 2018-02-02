@@ -1,0 +1,41 @@
+<div class="row" style="opacity: 1;">
+    <div class="col-lg-12">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <ol class="breadcrumb">
+                    <li><a href="/">Главная</a></li>
+                    <li><a href="/#/tariffs">Тарифы</a></li>
+                    <li class="active"><span>{{tariff.title}}</span></li>
+                </ol>
+
+                <h1></h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="main-box clearfix" ng-show="!pay">
+                    <header class="main-box-header clearfix">
+                        <h2></h2>
+                    </header>
+
+                    Название тарифа: {{tariff.title}} <br>
+
+                    Общая стоимость: {{tariff.cost * count}}<br>
+
+                    <input type="number" ng-model="count"><br>
+
+                    <div ng-click="submit()">
+                        Оплатить
+                    </div>
+
+                </div>
+
+                <div class="main-box clearfix"  ng-show="pay" ng-bind-html="sce.trustAsHtml(payMarkUp)">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -15,6 +15,8 @@ use frontend\controllers\bot\libs\Logger;
 use frontend\controllers\bot\libs\SalesBotApi;
 use frontend\controllers\bot\libs\SocialNetworks;
 use Facebook\Facebook;
+use common\commands\command\EditTelegramNotificationCommand;
+
 
 class FbJobs implements SocialJobs
 {
@@ -101,27 +103,29 @@ class FbJobs implements SocialJobs
             }
 
 
-            $response = $fb->post(
-                "/{$page_id}/feed",
-                $linkData,
-                $access_token);
+
 
 
             //todo включить видео
-//            if (isset($notes['Videos']) && is_array($notes['Videos'])) {
-//                $waitExists = Files::WaitExists($notes['Videos']);
-//                if ($waitExists == true) {
-//                    echo "Video files uploaded";
-//                    $link = rtrim($notes['hostname'], '/') . '/storage/download/videos/' . basename($notes['Videos'][0]);
-//                    $response = $fb->post("/{$page_id}/videos", ['description' => $messages, 'file_url' => $link,], $access_token);
-//                    $uploadVideo = $response->getGraphNode()->asArray();
-//
-//
-//                } else {
-//
-//                    throw new Exception("Ошибка получения файлов из telegram");
-//                }
-//            }
+            if (isset($notes['Videos']) && is_array($notes['Videos'])) {
+                $waitExists = Files::WaitExists($notes['Videos']);
+                if ($waitExists == true) {
+                    echo "Video files uploaded";
+                    $link = rtrim($notes['hostname'], '/') . '/storage/download/videos/' . basename($notes['Videos'][0]);
+                    $response = $fb->post("/{$page_id}/videos", ['description' => $messages, 'file_url' => $link,], $access_token);
+                    $uploadVideo = $response->getGraphNode()->asArray();
+
+
+                } else {
+
+                    throw new Exception("Ошибка получения файлов из telegram");
+                }
+            }else{
+                $response = $fb->post(
+                    "/{$page_id}/feed",
+                    $linkData,
+                    $access_token);
+            }
 
             //todo удалить
             $job->sendComplete();
@@ -146,6 +150,18 @@ class FbJobs implements SocialJobs
                 //отправляем в api
                 $arParam = ['data' => json_encode($post->toArray()), 'type' => SocialNetworks::FB, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
+
+                try{
+                    \Yii::$app->commandBus->handle(
+                        new EditTelegramNotificationCommand(
+                            [
+                                'data' => $notes['response_data']
+                            ]
+                        )
+                    );
+                }catch (\Exception $e){
+                    Logger::error($e->getMessage());
+                }
             }
 
 

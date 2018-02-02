@@ -1,18 +1,18 @@
 buttons:
   menu:
     label: \xF0\x9F\x93\x8B Меню
-    description: выход в главное меню
+    description: Главная
     command: /main
   email:
     label: \xE2\x9C\x89 Указать email
     description: ввести email пользователя в системе SlavaBot
     command: /email
   account:
-      label: \xE2\x9C\x89 Email пользователя
+      label: Учетная запись
       description: Настройки учетной записи
       command: /account
   clear:
-      label: \xE2\x9C\x89 Отключить
+      label: Отключить
       description: Отключить аккаунт
       command: /clear
   repeatcode:
@@ -24,13 +24,17 @@ buttons:
     description: опубликовать новый пост в ваших группах
     command: /post
   settings:
-    label: \xF0\x9F\x94\xA7 Настройка
+    label: Настройка
     description: настройки публикации
     command: /settings
   time:
-    label: \xF0\x9F\x95\x9C Часовой пояс
+    label: Часовой пояс
     description: установить часовой пояс
     command: /time
+  rollback_main:
+    label: Отмена
+    description: Отмена
+    command: /main
 timezones:
     active: \xE2\x9C\x94
     buttons:

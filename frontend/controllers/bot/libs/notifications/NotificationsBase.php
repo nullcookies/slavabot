@@ -9,7 +9,8 @@ namespace frontend\controllers\bot\libs\notifications;
 
 use frontend\controllers\bot\Bot;
 use frontend\controllers\bot\libs\SalesBotApi;
-use frontend\controllers\bot\commands\NotificationCommand;
+//use Longman\TelegramBot\Commands\UserCommands\NotificationCommand
+use frontend\controllers\bot\commands\FrontendNotificationCommand;
 use Longman\TelegramBot\Exception\TelegramException;
 
 class NotificationsBase
@@ -46,7 +47,7 @@ class NotificationsBase
             throw new \Exception('Отсутствуют параметры telegram_id или message');
         }
 
-        if(($command = $this->GetCommand()) instanceof NotificationCommand) {
+        if(($command = $this->GetCommand()) instanceof FrontendNotificationCommand) {
             $command->prepareParams($_params);
             $result = $command->execute();
         }

@@ -8,6 +8,7 @@ var app = angular.module('cubeWebApp', [
 	'angular-loading-bar',
 	'ngAnimate',
 	'easypiechart',
+    'ngCookies',
     'angularMoment',
     'ui.utils'
 ]);
@@ -31,7 +32,7 @@ app.config(['$routeProvider', function ($routeProvider) {
         .when("/potential", {
             templateUrl: "views/users.html",
             controller: "potentialCtrl",
-            title: 'Потенциальные клиенты',
+            title: 'Потенциальные клиенты'
         })
 		.when("/potential/:id", {
 			templateUrl: "views/filter.html",
@@ -58,6 +59,11 @@ app.config(['$routeProvider', function ($routeProvider) {
             controller: "helpCtrl",
             title: 'Помощь'
         })
+        .when("/tariffs", {
+            templateUrl: "views/tariffs.html",
+            controller: "tariffsCtrl",
+            title: 'Тарифы'
+        })
         .when("/error/owner", {
             templateUrl: "views/errors/owner.html",
             title: 'Ошибка'
@@ -66,6 +72,16 @@ app.config(['$routeProvider', function ($routeProvider) {
             templateUrl: "/social",
             controller: "socialCtrl",
             title: 'Соц.сети'
+        })
+        .when("/pages/notice", {
+            templateUrl: "views/notice.html",
+            controller: "notificationCtrl",
+            title: 'Уведомления'
+        })
+        .when("/pages/notice/:id", {
+            templateUrl: "views/user-notice.html",
+            controller: "userNotificationCtrl",
+            title: 'Уведомления пользователя'
         })
         .when("/history", {
             templateUrl: "/history",
@@ -81,6 +97,16 @@ app.config(['$routeProvider', function ($routeProvider) {
             templateUrl: "/posts",
             controller: "postsCtrl",
             title: 'Посты и комментарии'
+        })
+        .when("/payment/:id", {
+            templateUrl: "views/payment.html",
+            controller: "paymentCtrl",
+            title: 'Оплата тарифа'
+        })
+        .when("/pay/:id", {
+            templateUrl: "views/payment.html",
+            controller: "paymentCtrl",
+            title: 'Оплата тарифа'
         })
         .when("/error-404", {
             templateUrl: "views/error404.html",

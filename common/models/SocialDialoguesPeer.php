@@ -1,7 +1,10 @@
 <?php
 
 namespace common\models;
-
+use common\models\SocialDialoguesSimple;
+use common\models\User;
+use yii\db\ActiveRecord;
+use Carbon\Carbon;
 use Yii;
 
 /**
@@ -15,7 +18,7 @@ use Yii;
  * @property string $avatar
  * @property string $created_at
  */
-class SocialDialoguesPeer extends \yii\db\ActiveRecord
+class SocialDialoguesPeer extends ActiveRecord
 {
     const SOCIAL_VK = "VK"; // Вконтакте
     const SOCIAL_FB = "FB"; // facebook
@@ -31,6 +34,25 @@ class SocialDialoguesPeer extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'social_dialogues_peer';
+    }
+
+    public function getDataNotifications()
+    {
+        return $this->hasMany(SocialDialoguesSimple::className(), [
+            'peer_id' => 'peer_id',
+        ]);
+    }
+
+    public function fields()
+    {
+        return [
+            'id',
+            'created_at',
+            'avatar',
+            'peer_id',
+            'title',
+            'notification' => 'dataNotifications',
+        ];
     }
 
     /**
@@ -153,5 +175,12 @@ class SocialDialoguesPeer extends \yii\db\ActiveRecord
         $result = ['title' => $name, 'avatar' => $avatar];
 
         return $result;
+    }
+
+    public static function getPeerByID($peerId){
+        $peer = static::find()
+            ->where(['peer_id' => $peerId])
+            ->one();
+        return $peer->title;
     }
 }

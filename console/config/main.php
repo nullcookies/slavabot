@@ -16,6 +16,9 @@ return [
             'class' => 'yii\console\controllers\FixtureController',
             'namespace' => 'common\fixtures',
           ],
+        'background-bus' => [
+            'class' => 'trntv\bus\console\BackgroundBusController',
+        ]
     ],
     'components' => [
         'log' => [
@@ -25,6 +28,21 @@ return [
                     'levels' => ['error', 'warning'],
                 ],
             ],
+        ],
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+            'viewPath' => '@app/views/mail',
+            'useFileTransport' => false
+        ],
+        'commandBus' => [
+            'class' => 'trntv\bus\CommandBus',
+            'middlewares' => [
+                [
+                    'class' => '\trntv\bus\middlewares\BackgroundCommandMiddleware',
+                    'backgroundHandlerPath' => '@console/yii',
+                    'backgroundHandlerRoute' => 'background-bus/handle',
+                ]
+            ]
         ],
     ],
     'params' => $params,

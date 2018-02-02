@@ -22,18 +22,45 @@ class V1Controller extends Controller
             'access' => [
                 'class' => AccessControl::className(),
                 'only' => [
-                    'vk'
+                    'new-event'
                 ],
                 'rules' => [
+                    [
+                        'actions' => [],
+                        'allow' => true,
+                        'roles' => ['?'],
+                    ],
                     [
                         'actions' => [
                             'vk'
                         ],
                         'allow' => true,
-                        'roles' => ['?'],
+                        'roles' => ['@'],
                     ],
                 ],
             ],
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'new-event' => ['post']
+                ],
+            ],
+//
+//            'access' => [
+//                'class' => AccessControl::className(),
+//                'only' => [
+//                    'vk'
+//                ],
+//                'rules' => [
+//                    [
+//                        'actions' => [
+//                            'vk'
+//                        ],
+//                        'allow' => true,
+//                        'roles' => ['?'],
+//                    ],
+//                ],
+//            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -57,11 +84,14 @@ class V1Controller extends Controller
         return parent::beforeAction($action);
     }
 
-    public function actionVk()
+    public static function actionVk($user_id = '', $peer_id = '', $message = '')
     {
-        $user_id = Yii::$app->request->post('user_id');
-        $peer_id = Yii::$app->request->post('peer_id');
-        $message = Yii::$app->request->post('message');
+        if($user_id == ''){
+            $user_id = Yii::$app->request->post('user_id');
+            $peer_id = Yii::$app->request->post('peer_id');
+            $message = Yii::$app->request->post('message');
+        }
+
 
         if(!$account = Accounts::getByUserId($user_id, Accounts::TYPE_VK)) {
             throw new \InvalidArgumentException('Аккаунт не найден');

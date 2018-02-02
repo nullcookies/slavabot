@@ -70,6 +70,7 @@ use common\models\User;
 
 
 <?if(Yii::$app->user->identity['authorized']==0){?>
+
     <div class="wizard" id="satellite-wizard" ng-controller='dashboardCtrl' data-title="Мастер настройки">
 
         <!-- Step 1 Name & FQDN -->
@@ -98,6 +99,9 @@ use common\models\User;
                 <div class="form-group">
                     <button type="button" class="btn btn-success" ng-click="VkSave()">Подключить аккаунт</button>
                 </div>
+            </div>
+            <div class="vkcard__content" ng-show="vkWaitBox">
+                Подождите. Идёт привязка аккаунта. Это может занять несколько секунд
             </div>
             <div class="vkcard__content" ng-show="vkGroupBox">
                 <h4 class="modal-title" id="myModalLabel">
@@ -143,6 +147,9 @@ use common\models\User;
                     <button type="button" class="btn btn-success" ng-click="InstaSave()">Подключить аккаунт</button>
                 </div>
             </div>
+            <div class="vkcard__content" ng-show="InstaWaitBox">
+                Подождите. Идёт привязка аккаунта. Это может занять несколько секунд
+            </div>
             <div class="vkcard__content" ng-show="instafinish">
                 <div class="alert alert-success">
                     <i class="fa fa-check-circle fa-fw fa-lg"></i>
@@ -187,7 +194,7 @@ use common\models\User;
         </div>
         <div class="wizard-card" data-cardname="tlgcard">
             <h3>Подключение Telegram</h3>
-            <p>Подключитесь к <a href="<?=\common\services\StaticConfig::botUrl()?>" target="_blank">Славаботу</a> в Telegram.
+            <p>Перейдите по ссылке в Telegram и подключитесь к <a href="<?=\common\services\StaticConfig::botUrl()?>" target="_blank">Славаботу</a>
 
             </p>
         </div>
@@ -264,7 +271,6 @@ use common\models\User;
             });
 
             $(".wizard-next").on('click', function(){
-                console.log('click');
                 $('.active_save_btn').click();
             });
 
@@ -272,7 +278,6 @@ use common\models\User;
                 wizard.show();
                 setCookie('modal', true)
             }
-
         });
     </script>
     <?

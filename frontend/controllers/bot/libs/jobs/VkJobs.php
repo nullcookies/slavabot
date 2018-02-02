@@ -7,6 +7,7 @@
 
 namespace frontend\controllers\bot\libs\jobs;
 
+use common\commands\command\EditTelegramNotificationCommand;
 use common\models\JobPost;
 use common\models\Post;
 use frontend\controllers\bot\libs\Files;
@@ -67,7 +68,25 @@ class VkJobs implements SocialJobs
                 $waitExists = Files::WaitExists($notes['Videos']);
                 if ($waitExists == true) {
                     echo "Video files uploaded";
-                    $attachments = $vk->upload_video(['group_id' => $owner], $notes['Videos'][0]);
+
+//                    [
+//                        'link' => $video_url,
+//                        'wallpost' => 0
+//                    ]
+
+                    $attachments = $vk->upload_video(['group_id' => preg_replace("/[^0-9]/", '', $owner)], $notes['Videos'][0]);
+
+//                    $attachments = $vk->upload_video(
+//                        array('name' => 'Test video',
+//                            'description' => 'My description',
+//                            'wallpost' => 1,
+//                            'group_id' => 0
+//                        ), 'video.mp4');
+
+
+                    Logger::info('Видео:', [
+                        'result' => json_encode($attachments). ' Инфо о видео: ' . json_encode($notes['Videos'][0])
+                    ]);
                 } else {
                     Logger::error('Ошибка получения видео из telegram', [
                         'notes' => $notes
@@ -75,7 +94,6 @@ class VkJobs implements SocialJobs
                     throw new \Exception("Ошибка получения файлов из telegram");
                 }
             }
-
 
             if (isset ($notes['Text'])) {
                 $result = $vk->api('wall.post', [
@@ -110,6 +128,18 @@ class VkJobs implements SocialJobs
                 //отправляем в api
                 $arParam = ['data' => json_encode($post->getAttributes()), 'type' => SocialNetworks::VK, 'tid' => 0];
                 var_dump($SalesBot->newEvent($arParam));
+
+                try{
+                    \Yii::$app->commandBus->handle(
+                        new EditTelegramNotificationCommand(
+                            [
+                                'data' => $notes['response_data']
+                            ]
+                        )
+                    );
+                }catch (\Exception $e){
+                    Logger::error($e->getMessage());
+                }
             }
 
             /** @var JobPost $jobPost */

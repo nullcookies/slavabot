@@ -23,6 +23,42 @@ function checkArray($arr, $param, $value){
     return $status;
 }
 
+function setCookie(name, value, options) {
+    options = options || {};
+
+    var expires = options.expires;
+
+    if (typeof expires == "number" && expires) {
+        var d = new Date();
+        d.setTime(d.getTime() + expires * 1000);
+        expires = options.expires = d;
+    }
+    if (expires && expires.toUTCString) {
+        options.expires = expires.toUTCString();
+    }
+
+    value = encodeURIComponent(value);
+
+    var updatedCookie = name + "=" + value;
+
+    for (var propName in options) {
+        updatedCookie += "; " + propName;
+        var propValue = options[propName];
+        if (propValue !== true) {
+            updatedCookie += "=" + propValue;
+        }
+    }
+
+    document.cookie = updatedCookie;
+}
+
+function getCookie(name) {
+    var matches = document.cookie.match(new RegExp(
+        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+    ));
+    return matches ? decodeURIComponent(matches[1]) : false;
+}
+
 angular.module('cubeWebApp')
     .controller('dashboardCtrl', function ($scope, $http, $sce, $interval) {
         var config = {
@@ -40,6 +76,7 @@ angular.module('cubeWebApp')
         $scope.vkErrorText = '';
         $scope.vkAuthBox = true;
         $scope.vkGroupBox = false;
+        $scope.vkWaitBox = false;
         $scope.vkfinish = false;
         $scope.userSelection = {};
         $scope.InstaLogin = '';
@@ -51,8 +88,7 @@ angular.module('cubeWebApp')
         $scope.fbGroupBox = false;
         $scope.fbAuthBox = true;
         $scope.fbFinish = false;
-
-
+        $scope.InstaWaitBox = false;
 
         $scope.InstaSave = function(){
             $scope.data = {
@@ -64,15 +100,19 @@ angular.module('cubeWebApp')
                     }
                 }
             };
+            $scope.InstaWaitBox = true;
+            $scope.instaAuthBox = false;
 
             if(checkData($scope.InstaLogin, 2) && checkData($scope.InstaPassword, 2)){
                 $http.post('/social/instagram', $.param($scope.data), config).then(function success(response) {
                     if(response.data.error){
                         $scope.instaError = response.data.error;
+                        $scope.InstaWaitBox = false;
+                        $scope.instaAuthBox = true;
                         return false;
                     }else{
                         $scope.instaError = '';
-                        $scope.instaAuthBox = false;
+                        $scope.InstaWaitBox = false;
                         $scope.instafinish = true;
                     }
 
@@ -105,7 +145,6 @@ angular.module('cubeWebApp')
                     $scope.fbGroupBox = true;
                     $scope.fbAuthBox = false;
 
-                    console.log($scope.unprocessed);
 
                     $scope.userSelection.activeValueFB = $scope.unprocessed[0].id;
                 }
@@ -156,23 +195,26 @@ angular.module('cubeWebApp')
                 password: $scope.vkPassword
             };
 
+            $scope.vkWaitBox = true;
+            $scope.vkAuthBox = false;
+
             if(checkData($scope.vkLogin, 9) && checkData($scope.vkPassword, 2)){
                 $http.post('/social/vk-auth', $.param($scope.data), config).then(function success(response) {
-                    console.log(response);
 
                     if(response.data.status){
-
+                        $scope.vkWaitBox = false;
                         $scope.vkError = false;
                         $scope.vkLoginError = false;
                         $scope.vkPasswordError = false;
                         $scope.vkErrorText = '';
                         $scope.checkUnprocessed();
-                        $scope.vkAuthBox = false;
                         $scope.vkGroupBox = true;
 
                     }else{
                         if(response.data.error==='login & pass are wrong'){
                             $scope.vkError = true;
+                            $scope.vkAuthBox = true;
+                            $scope.vkWaitBox = false;
                             $scope.vkLoginError = false;
                             $scope.vkPasswordError = false;
                             $scope.vkErrorText = 'Неверный логин/пароль';
@@ -191,14 +233,11 @@ angular.module('cubeWebApp')
 
             }
         }
-
-        // Сохранение аккаунтов конец
-
-
     })
+    .controller('header', function ($scope, $http, $interval, $location) {
 
-    .controller('header', function ($scope, $http, $interval) {
         $scope.telegramStatus = false;
+
         var config = {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
@@ -208,15 +247,24 @@ angular.module('cubeWebApp')
 
         $scope.getUserData = function(){
             $http.post('/system/main-data', {}, config).then(function success(response) {
+                $scope.tariff = response.data.user.tariff;
                 $scope.telegramStatus = response.data.user.telegram;
                 $scope.UserName = response.data.user.name;
+
+                // Единоразовый редирект на страницу тарифов, после окончания оплаченного периода
+
+                if(!$scope.tariff.active && !getCookie('payment_' +  $scope.tariff.payment_id)){
+                    setCookie('payment_' +  $scope.tariff.payment_id, true);
+                    $location.path('/tariffs');
+                }
+
+
             });
         };
 
         $scope.Timer = $interval(function () {
             $scope.getUserData()
         }, 5000);
-
 
         $scope.getUserData();
     })
@@ -549,7 +597,6 @@ angular.module('cubeWebApp')
         }, 10000);
 })
     .controller('detailCtrl', function($scope, $http, $routeParams, $sce,$location){
-        console.log($location.path());
         $scope.webhook = [];
         $scope.sce = $sce;
         moment.locale('ru');
@@ -565,7 +612,6 @@ angular.module('cubeWebApp')
             $http.post('/potential/detail', data, config).then(function success(response) {
                 $scope.user = response.data.user;
                 $scope.webhook = response.data.webhooks.webhooks;
-                console.log($scope.webhook);
             });
         };
 
@@ -795,12 +841,9 @@ angular.module('cubeWebApp')
 
         $http.post('/site/user/', [], config).then(function success(response) {
             if (response) {
-                console.log(response);
                 $scope.timezone = response.data.timezone;
                 $scope.username = response.data.username;
                 $scope.phone = response.data.phone;
-            } else {
-                console.log('error');
             }
         });
 
@@ -830,12 +873,10 @@ angular.module('cubeWebApp')
 
         $scope.savePassword = function() {
 
-            console.log('Try to save new password');
 
             if(!checkData($scope.password, 2)){
                 $scope.passwordError = true;
 
-                console.log('Old password error');
 
                 return false;
             }
@@ -843,7 +884,6 @@ angular.module('cubeWebApp')
             if(!checkData($scope.new_password, 3)){
                 $scope.new_passwordError = true;
 
-                console.log('New password error');
 
                 return false;
             }
@@ -851,7 +891,6 @@ angular.module('cubeWebApp')
             if($scope.new_password!=$scope.new_password_repeat){
                 $scope.new_password_repeatError = true;
 
-                console.log('New password repeat error');
 
                 return false;
             }
@@ -937,7 +976,6 @@ angular.module('cubeWebApp')
         $scope.getAccounts = function() {
             $http.post('/social/accounts', [], config).then(function success(response) {
                 $scope.accounts = response.data;
-                console.log($scope.accounts);
                 $scope.available = {
                     'instagram' : true,
                     'facebook' : true,
@@ -946,8 +984,6 @@ angular.module('cubeWebApp')
                 for (key in $scope.accounts) {
                     $scope.available[$scope.accounts[key].type] = false;
                 }
-                console.log();
-                console.log($scope.available);
             });
         }
 
@@ -961,8 +997,6 @@ angular.module('cubeWebApp')
                         document.getElementById('closeConfirmModal').click();
                     }
                 });
-            }else{
-                console.log('ID error!');
             }
 
         };
@@ -987,7 +1021,6 @@ angular.module('cubeWebApp')
 
             document.getElementById('instagram').click();
 
-            console.log($account);
         };
 
         $scope.VKRefresh = function($account) {
@@ -1030,7 +1063,6 @@ angular.module('cubeWebApp')
             if(checkData($scope.vkLogin, 9) && checkData($scope.vkPassword, 2)){
                 $http.post('/social/vk-auth', $.param($scope.data), config).then(function success(response) {
 
-                    console.log(response);
 
                     if(response.data.status){
                         $scope.vkError = false;
@@ -1211,10 +1243,8 @@ angular.module('cubeWebApp')
 
         $scope.getList = function($data){
             $data = $data || [];
-            console.log($data);
             $http.post('/history/get-list', $data, config).then(function success(response) {
                 $scope.history = response.data.history;
-                console.log($scope.history);
                 $scope.pages = response.data.pages;
                 $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
             });
@@ -1225,7 +1255,6 @@ angular.module('cubeWebApp')
             $data = $data || [];
             $http.post('/history/get-planned', $data, config).then(function success(response) {
                 $scope.planned = response.data.history;
-                console.log($scope.planned);
                 $scope.plannedPages = response.data.pages;
                 $scope.plannedNumberOfPages = $scope.plannedPages.totalCount / $scope.pageSize;
             });
@@ -1311,7 +1340,195 @@ angular.module('cubeWebApp')
         //     $scope.setPage($scope.currentPage);
         // }, 5000);
 
-    });
+    })
+    .controller('notificationCtrl', function($scope, $http, $sce, $interval){
+
+        $scope.userNotifications = [];
+        $scope.notificationMessage = [];
+        moment.locale('ru');
+
+        // Пагинация
+
+        $scope.numberOfPages = 0; // Количество страниц
+        $scope.currentPage = 0;   // Текущая страница
+        $scope.pageSize = 10;     // Количество элементов на странице
+
+        $scope.disabledBack = function() {
+            if($scope.currentPage == 0){
+                return false;
+            }else{
+                $scope.currentPage = $scope.currentPage-1
+                $scope.setPage($scope.currentPage);
+            }
+        };
+
+        $scope.paginationBlock = function(n){
+            if($scope.currentPage < 4 && n < 7){
+                return true;
+            }else{
+                if($scope.currentPage >  n + 3 || $scope.currentPage <  n - 3){
+                    return false;
+                }else{
+                    return true;
+                }
+            }
+        };
+
+        $scope.disabledNext = function() {
+            if($scope.currentPage >= $scope.numberOfPages - 1){
+                return false;
+            }else{
+                $scope.currentPage = $scope.currentPage+1
+                $scope.setPage($scope.currentPage);
+            }
+        };
+
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+                'X-CSRF-Token': getCSRF()
+            }
+        };
+
+        $scope.getNotifications = function($data){
+
+            $data = $data || [];
+
+            $http.post('/notification/notifications', $data, config).then(function success(response) {
+                $scope.userNotifications = response.data.notifications;
+                $scope.pages = response.data.pages;
+                $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
+            });
+        };
+
+        $scope.setPage = function(n){
+            $scope.getNotifications($.param({'page' : n}));
+            $scope.currentPage = n;
+        };
+
+        $scope.Timer = $interval(function () {
+            $scope.setPage($scope.currentPage);
+        }, 1000);
+    })
+    .controller('userNotificationCtrl', function($scope, $http, $sce, $interval, $routeParams){
+
+        $scope.message = '';
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+                'X-CSRF-Token': getCSRF()
+            }
+        };
+        $scope.getNotificationsForUser = function(){
+            moment.locale('ru');
+
+
+            var data = $.param({'id' : $routeParams["id"]});
+
+
+            $http.post('/notification/user-notifications', data, config).then(function success(response) {
+                $scope.data = response.data.peer[0];
+                $scope.userNotification = $scope.data.notification;
+                $scope.userAvatar = $scope.data.avatar;
+                $scope.userName = $scope.data.title;
+                $scope.user_id = response.data.user;
+                $scope.peer_id = $scope.data.peer_id;
+                document.getElementById('refresh').click();
+
+            });
+        };
+
+
+
+        $scope.sendMessage = function(){
+            $data = $.param({'user_id' : $scope.user_id, 'peer_id' : $scope.peer_id, 'message': $scope.message});
+
+            $http.post('/rest/send/v1/vk', $data, config).then(function success(response) {
+                $scope.message = '';
+
+            });
+        };
+
+        $scope.getNotificationsForUser();
+
+        $scope.Timer = $interval(function () {
+            $scope.getNotificationsForUser();
+        }, 1000);
+
+
+    })
+    .controller('tariffsCtrl', function($scope, $http, $sce, $interval){
+        $scope.tariffs = [];
+
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+                'X-CSRF-Token': getCSRF()
+            }
+        };
+
+        $scope.getTariffs = function(){
+            $http.post('/billing/tariffs', [], config).then(function success(response) {
+                $scope.tariffs = response.data;
+            });
+        };
+
+        $scope.getTariffs();
+
+    })
+    .controller('paymentCtrl', function($scope, $http, $sce, $routeParams){
+        $scope.tariff = [];
+        $scope.pay = false;
+        $scope.payMarkUp = '';
+        $scope.count = 3;
+        $scope.sce = $sce;
+
+
+        var data = $.param({'id' : $routeParams["id"]});
+
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+                'X-CSRF-Token': getCSRF()
+            }
+        };
+
+        $scope.getTariffs = function(){
+            $http.post('/billing/tariffs/get', data, config).then(function success(response) {
+                $scope.tariff = response.data;
+
+                console.log($scope.tariff);
+            });
+        };
+
+        $scope.submit = function(){
+            $http.post(
+                '/billing/order',
+                $.param(
+                    {
+                        'id' : $scope.tariff.id,
+                        'count':$scope.count}
+                        ),
+                config
+            ).then(function success(response) {
+                $http.post(
+                    '/payment',
+                    $.param(
+                        {
+                            'order' : response.data.order_id
+                        }
+                    ),
+                    config
+                ).then(function success(response) {
+                    $scope.pay = true;
+                    $scope.payMarkUp = response.data;
+                });
+            });
+        };
+
+        $scope.getTariffs();
+    })
+
     app.filter('startFrom', function() {
         return function(input, start) {
             start = +start; //parse to int
