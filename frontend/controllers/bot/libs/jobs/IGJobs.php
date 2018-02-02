@@ -10,6 +10,9 @@ namespace frontend\controllers\bot\libs\jobs;
 use common\models\JobPost;
 use common\models\Post;
 use common\services\StaticConfig;
+use FFMpeg\Coordinate\Dimension;
+use FFMpeg\FFMpeg;
+use FFMpeg\Format\Video\X264;
 use frontend\controllers\bot\libs\Files;
 use frontend\controllers\bot\libs\Logger;
 use frontend\controllers\bot\libs\SalesBotApi;
@@ -89,8 +92,32 @@ class IGJobs implements SocialJobs
             if (isset($notes['Videos']) && is_array($notes['Videos'])) {
                 $waitExists = Files::WaitExists($notes['Videos']);
                 if ($waitExists == true) {
-                    $videoFilename = $notes['Videos'][0];
-                    $result = $ig->timeline->uploadVideo($videoFilename, ['caption' => $messages]);
+
+                    $ffmpeg = FFMpeg::create();
+
+                    $video = $ffmpeg->open($notes['Videos'][0]);
+                    $video
+                        ->filters()
+                        ->resize(new Dimension(640, 480))
+                        ->synchronize();
+
+                    $format = new X264('libfdk_aac');
+
+
+                    $output =  $notes['video_path'];
+
+                    $res = $video->save($format, $output);
+
+                    $waitExistsPress = Files::WaitExists([$output]);
+
+                    if ($waitExistsPress == true) {
+                        $result = $ig->timeline->uploadVideo($output, ['caption' => $messages]);
+                    }else {
+                        Logger::error('Ошибка сжатия видео из Telegram', [
+                            'notes' => $notes
+                        ]);
+                        throw new \Exception('Ошибка сжатия видео из Telegram');
+                    }
                 } else {
                     Logger::error('Ошибка получения видео из Telegram', [
                         'notes' => $notes

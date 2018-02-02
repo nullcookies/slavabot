@@ -398,7 +398,7 @@ class SendpostCommand extends UserCommand
         $arr['page_id'] = $user['username'];
         $arr['post_model_id'] = $post->id;
         $arr['Text'] = $notes['Text'] ?: "";
-
+        $arr['video_path'] = '';
 
         if (isset($notes['Photo']) && !empty($notes['Photo'])) {
             //todo сделать множественную загрузку
@@ -412,6 +412,7 @@ class SendpostCommand extends UserCommand
             }
             $videos[] = StaticConfig::getDownloadDir(true) . $video['file_path'];
             $arr['Videos'] = $videos;
+            $arr['video_path'] = StaticConfig::getDownloadDir(true).'press/'.$video['file_path'];
         }
         if (isset($notes['Audio']) && !empty($notes['Audio'])) {
             $audio = end(json_decode($notes['Audio'], true));
