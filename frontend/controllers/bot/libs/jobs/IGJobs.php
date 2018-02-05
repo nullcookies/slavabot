@@ -89,9 +89,21 @@ class IGJobs implements SocialJobs
 
             }
 
+            /**
+             * Обработка прикрепленного видео инстаграм.
+             */
+
             if (isset($notes['Videos']) && is_array($notes['Videos'])) {
                 $waitExists = Files::WaitExists($notes['Videos']);
+                /**
+                 * Ждем, пока исходный файл сохранится на сервере
+                 */
                 if ($waitExists == true) {
+
+                    /**
+                     * Сжимаем видео, т.к. инстаграм принимает видео только
+                     * от 480 до 720p
+                     */
 
                     $ffmpeg = FFMpeg::create();
 
@@ -101,6 +113,12 @@ class IGJobs implements SocialJobs
                         ->resize(new Dimension(640, 480))
                         ->synchronize();
 
+                    /**
+                     * Для работы конвертера для дева запускать как
+                     * new X264('libfdk_aac');
+                     *
+                     */
+
                     $format = new X264();//'libfdk_aac');
 
 
@@ -108,9 +126,15 @@ class IGJobs implements SocialJobs
 
                     $res = $video->save($format, $output);
 
+                    /**
+                     * Ждем, пока будет сохранен сконвертированный файл
+                     */
                     $waitExistsPress = Files::WaitExists([$output]);
 
                     if ($waitExistsPress == true) {
+                        /**
+                         * Отправляем сжатый файл в инстаграм
+                         */
                         $result = $ig->timeline->uploadVideo($output, ['caption' => $messages]);
                     }else {
                         Logger::error('Ошибка сжатия видео из Telegram', [
@@ -141,6 +165,14 @@ class IGJobs implements SocialJobs
                 //отправляем в api
                 $arParam = ['data' => json_encode($post->toArray()), 'type' => SocialNetworks::IG, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
+
+                /**
+                 * Отправляем клиенту уведомление об удачной отправке
+                 * $notes['response_data'] - содержит в себе:
+                 * - id пользователя
+                 * - id чата
+                 * - id сообщений вида "instagam - ...", которое мы заменяем на "instagam - готово"
+                 */
 
                 try{
                     \Yii::$app->commandBus->handle(
