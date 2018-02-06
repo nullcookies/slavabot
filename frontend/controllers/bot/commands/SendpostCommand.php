@@ -208,7 +208,7 @@ class SendpostCommand extends UserCommand
                 return 'cron';
             }
 
-            $responseData['text'] = "Вконтакте - ...\n";
+            $responseData['text'] = "Вконтакте - идёт публикация...\n";
 
             $response = [
                 'chat_id' => $responseData['chat_id'],
@@ -326,7 +326,7 @@ class SendpostCommand extends UserCommand
 
             }
 
-            $responseData['text'] = "Facebook - ...\n";
+            $responseData['text'] = "Facebook - идёт публикация...\n";
 
             $response = [
                 'chat_id' => $responseData['chat_id'],
@@ -444,10 +444,10 @@ class SendpostCommand extends UserCommand
         }
 
         if(isset($notes['Photo']) && !empty($notes['Photo'])){
-            $responseData['text'] = "Instagram - ...\n";
+            $responseData['text'] = "Instagram - идёт публикация...\n";
             $success_text = "Instagram - готово\n";
         }elseif(isset($notes['Video']) && !empty($notes['Video'])){
-            $responseData['text'] = "Instagram - ...\n";
+            $responseData['text'] = "Instagram - идёт публикация...\n";
             $success_text = "Instagram - готово\n";
         }else{
             $responseData['text'] = "Instagram - отсутствует фото\n";
