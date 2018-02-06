@@ -332,7 +332,6 @@ class PostCommand extends UserCommand
                         }
 
                         $data['text'] = "Ваш пост будет опубликован через " . $dif;
-                        $notes['fm'] = Request::sendMessage($data);
 
                         return (new SendpostCommand($this->telegram,
                             new Update(json_decode($this->update->toJson(), true))))->executeNow($data['text']);
