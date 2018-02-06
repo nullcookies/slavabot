@@ -57,52 +57,36 @@ class SendpostCommand extends UserCommand
         ];
         Request::editMessageText($data_edit);
 
-        try{
+        //try{
             $this->prepareVkJob($notes, $user_id, $responseData);
             $this->prepareFbJob($notes, $user_id, $responseData);
             $this->prepareIgJob($notes, $user_id, $responseData);
 
             $this->conversation->stop();
-        }catch (\Exception $e){
-
-            $data_edit['text'] = 'Ошибка: '.$e->getMessage();
-            Request::editMessageText($data_edit);
-
-        }
+//        }catch (\Exception $e){
+//
+//            $data_edit['text'] = 'Ошибка: '.$e->getMessage();
+//            Request::editMessageText($data_edit);
+//
+//        }
         return (new PostCommand($this->telegram,
-            new Update(json_decode($this->update->toJson(), true))))->execute(true, 'Отправьте сообщение для публикации');
+            new Update(json_decode($this->update->toJson(), true))))->execute(true, '');
 
     }
 
-    public function executeNow($text){
+    public function executeNow($text, $notes){
 
         $chat_id = $this->getMessage()->getFrom()->getId();
         $user_id = $this->getMessage()->getFrom()->getId();
 
-        $this->conversation = new Conversation($user_id, $chat_id, 'post');
-        $notes = &$this->conversation->notes;
+        //$mid = $notes['fm']['result']['message_id'];
 
-        $mid = $notes['fm']['result']['message_id'];
 
-        $data_edit = [
-            'chat_id' => $chat_id,
-            'user_id' => $user_id,
-            'message_id' => $mid,
-            'text' => 'test',
+        $this->prepareVkJob($notes, $user_id);
+        $this->prepareFbJob($notes, $user_id);
+        $this->prepareIgJob($notes, $user_id);
 
-        ];
-        try{
-            $this->prepareVkJob($notes, $user_id);
-            $this->prepareFbJob($notes, $user_id);
-            $this->prepareIgJob($notes, $user_id);
-
-            $this->conversation->stop();
-        }catch (\Exception $e){
-
-            $data_edit['text'] = 'Ошибка: '.$e->getMessage();
-            Request::editMessageText($data_edit);
-
-        }
+        //$this->conversation->stop();
 
         return (new PostCommand($this->telegram,
             new Update(json_decode($this->update->toJson(), true))))->execute(true, $text);

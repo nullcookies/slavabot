@@ -208,7 +208,37 @@ class VkJobs implements SocialJobs
                     'status' => 0
                 ];
                 $SalesBot->setUserAccountStatus($arParam);
+
+                try{
+                    $notes['response_data']['text'] = 'Вконтакте - ошибка';
+                    \Yii::$app->commandBus->handle(
+                        new EditTelegramNotificationCommand(
+                            [
+                                'data' => $notes['response_data']
+                            ]
+                        )
+                    );
+                }catch (\Exception $e){
+                    Logger::error($e->getMessage());
+                }
+
+                try{
+                    return \Yii::$app->commandBus->handle(
+                        new CheckStatusNotificationCommand(
+                            [
+                                'data' => [
+                                    'callback_tlg_message_status' => $post->callback_tlg_message_status
+                                ]
+                            ]
+                        )
+                    );
+                }catch (\Exception $e){
+                    return ($e->getMessage());
+                }
             }
+
+
+
 
             $jobPost = JobPost::findOne([
                 'post_id' => $postModelId,

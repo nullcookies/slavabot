@@ -80,6 +80,19 @@ class PostCommand extends UserCommand
                 json_encode($this->conversation) . "\n", FILE_APPEND);
 
             $notes = &$this->conversation->notes;
+
+            if($notes['state'] == 5){
+
+                $this->conversation->stop();
+
+                $this->conversation = new Conversation($user_id, $chat_id, $this->getName());
+
+                file_put_contents(\Yii::getAlias('@frontend') . '/runtime/logs/cbb.log',
+                    json_encode($this->conversation) . "\n", FILE_APPEND);
+
+                $notes = &$this->conversation->notes;
+            }
+
             !is_array($notes) && $notes = [];
             //cache data from the tracking session if any
 
@@ -90,7 +103,10 @@ class PostCommand extends UserCommand
             if (isset($notes['state'])) {
                 $state = $notes['state'];
             }
-
+//            $data['text'] = $notes['state'];
+//
+//
+//            Request::sendMessage($data);
             switch ($state) {
                 case 0:
                     /**
@@ -107,10 +123,7 @@ class PostCommand extends UserCommand
 
                         $this->conversation->update();
 
-                        //$data['text'] = 'Введите данные: ';
 
-
-//                        Request::sendMessage($data);
 
                         break;
                     }else{
@@ -276,7 +289,7 @@ class PostCommand extends UserCommand
                      * Если данные корректны, отправляем пост в очередь на публикацию.
                      */
 
-                    $notes['MsgId'] = $message->getMessageId();
+                    //$notes['MsgId'] = $message->getMessageId();
 
 
                     if (!self::IsDate($text)) {
@@ -299,42 +312,29 @@ class PostCommand extends UserCommand
                         $notes['state'] = 5;
                         $notes['schedule_dt'] = Carbon::parse($text,
                             $timeZone)->setTimezone('Europe/London')->toDateTimeString();
+                        $this->conversation->update();
                         //Carbon::parse($text)->timezone($timeZone)->timezone('Europe/London')->toDateTimeString();
 
-                        $this->conversation->update();
+
                         $inline_keyboard = new InlineKeyboard([
                             ['text' => 'Опубликовать', 'callback_data' => 'sendpost'],
                             ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
                         ]);
 
                         Carbon::setLocale('ru');
-                        $td = Carbon::now()->timezone($timeZone)->diff(\Carbon\Carbon::parse($text, $timeZone));
+                        $dateText = Carbon::parse($text, $timeZone)->format('d.m.Y');
+                        $timeText = Carbon::parse($text, $timeZone)->format('H:i');
 
-                        $dif = "";
 
-                        if ($td->y > 0) {
-                            $dif .= Utils::human_plural_form($td->y, ["год", "года", "лет"]) . " ";
-                        }
-                        if ($td->m > 0) {
-                            $dif .= Utils::human_plural_form($td->m, ["месяц", "месяц", "месяцев"]) . " ";
-                        }
-                        if ($td->d > 0) {
-                            $dif .= Utils::human_plural_form($td->d, ["день", "дня", "дней"]) . " ";
-                        }
-                        if ($td->h > 0) {
-                            $dif .= Utils::human_plural_form($td->h, ["час", "часа", "часов"]) . " ";
-                        }
-                        if ($td->i > 0) {
-                            $dif .= Utils::human_plural_form($td->i, ["минуту", "минуты", "минут"]) . " ";
-                        }
-                        if ($td->s > 0) {
-                            $dif .= Utils::human_plural_form($td->s, ["секунду", "секунды", "секунд"]);
-                        }
+                        $data['text'] = 'Публикация запланирована на '.$dateText.' в '. $timeText. "\nОтправьте сообщение для публикации";
 
-                        $data['text'] = "Ваш пост будет опубликован через " . $dif. "\nОтправьте сообщение для публикации";
+                        //
+
+
 
                         return (new SendpostCommand($this->telegram,
-                            new Update(json_decode($this->update->toJson(), true))))->executeNow($data['text']);
+                            new Update(json_decode($this->update->toJson(), true))))->executeNow($data['text'], $notes);
+
                     }
             }
 //            switch ($state) {

@@ -184,7 +184,7 @@ class StartCommand extends SystemCommand
 
         } else {
 
-            $data = $telConfig->getMainWindow($data);
+            $data = $telConfig->getWelcomeWindow($data, 'Добро пожаловать. Отправьте сообщение для публикации.', ['settings']);
 
             try {
                 Request::sendMessage($data);

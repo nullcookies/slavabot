@@ -228,6 +228,32 @@ class FbJobs implements SocialJobs
                     'wall_id' => $post->wall_id,
                     'status' => 0
                 ];
+                try{
+                    $notes['response_data']['text'] = 'Facebook - ошибка';
+                    \Yii::$app->commandBus->handle(
+                        new EditTelegramNotificationCommand(
+                            [
+                                'data' => $notes['response_data']
+                            ]
+                        )
+                    );
+                }catch (\Exception $e){
+                    Logger::error($e->getMessage());
+                }
+
+                try{
+                    return \Yii::$app->commandBus->handle(
+                        new CheckStatusNotificationCommand(
+                            [
+                                'data' => [
+                                    'callback_tlg_message_status' => $post->callback_tlg_message_status
+                                ]
+                            ]
+                        )
+                    );
+                }catch (\Exception $e){
+                    return ($e->getMessage());
+                }
                 var_dump($SalesBot->setUserAccountStatus($arParam));
             }
 

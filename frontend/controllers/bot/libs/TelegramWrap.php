@@ -231,10 +231,10 @@ class TelegramWrap
         $keyboardArray = array();
 
         foreach($buttons as $btn){
-            $str .= sprintf("%s - %s.",
-                    $this->config['buttons'][$btn]['command'],
-                    $this->config['buttons'][$btn]['description']
-                ) . "\n";
+//            $str .= sprintf("%s - %s.",
+//                    $this->config['buttons'][$btn]['command'],
+//                    $this->config['buttons'][$btn]['description']
+//                ) . "\n";
 
             $keyboardArray[] = ['text' => $this->config['buttons'][$btn]['label']];
         }

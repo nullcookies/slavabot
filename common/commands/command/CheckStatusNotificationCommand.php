@@ -10,6 +10,8 @@
 
 namespace common\commands\command;
 use common\models\Post;
+use frontend\controllers\bot\libs\SalesBotApi;
+use frontend\controllers\bot\libs\SocialNetworks;
 use trntv\bus\interfaces\SelfHandlingCommand;
 use yii\base\Object as BaseObject;
 use frontend\controllers\bot\Bot;
@@ -32,14 +34,34 @@ class CheckStatusNotificationCommand extends BaseObject implements SelfHandlingC
     {
 
         $data = $command->data;
-        $updData = $data;
 
-        $updData['job_status'] = 'POSTED';
+        $this->GetCommand();
 
-        if(Post::find()->where($data)->count()==Post::find()->where($updData)->count()){
+        $data['status'] = 'POSTED';
+
+        $chat = Post::find()->where($data)->one()['internal_uid'];
+
+        $user = $this->getUserCredentialsBySocial($chat, SocialNetworks::VK);
+
+        if (isset($user['wall_id'])) {
+            $arr[]='vk';
+        }
+
+        $user = $this->getUserCredentialsBySocial($chat, SocialNetworks::FB);
+
+        if ($user['page_id']) {
+            $arr[]='fb';
+        }
+
+        $user = $this->getUserCredentialsBySocial($chat, SocialNetworks::IG);
+
+        if ($user) {
+            $arr[]='ig';
+        }
+
+        if(Post::find()->where($data)->count()==count($arr)){
             try {
-                $this->GetCommand();
-                $chat = Post::find()->where($updData)->one()['internal_uid'];
+
 
                 $result = Request::sendMessage([
                     'chat_id' => $chat,
@@ -53,6 +75,16 @@ class CheckStatusNotificationCommand extends BaseObject implements SelfHandlingC
                 return $e->getMessage();
             }
         }
+    }
 
+    public function getUserCredentialsBySocial($internal_id, $social)
+    {
+        $SalesBot = new SalesBotApi();
+        $arRequest = $SalesBot->getUserAccounts(['tid' => $internal_id]);
+        if ($arRequest == false) {
+            return null;
+        } else {
+            return SocialNetworks::getParams($arRequest, $social);
+        }
     }
 }
