@@ -94,11 +94,20 @@ class IGJobs implements SocialJobs
              */
 
             if (isset($notes['Videos']) && is_array($notes['Videos'])) {
+
                 $waitExists = Files::WaitExists($notes['Videos']);
                 /**
                  * Ждем, пока исходный файл сохранится на сервере
                  */
                 if ($waitExists == true) {
+
+
+                    /**
+                     * Проверяем видео на наличие расширения.
+                     * Если оно отсутствует, то проставляем его.
+                     */
+
+                    $videoFile = self::checkVideo($notes['Videos'][0]);
 
                     /**
                      * Сжимаем видео, т.к. инстаграм принимает видео только
@@ -107,7 +116,7 @@ class IGJobs implements SocialJobs
 
                     $ffmpeg = FFMpeg::create();
 
-                    $video = $ffmpeg->open($notes['Videos'][0]);
+                    $video = $ffmpeg->open($videoFile);
                     $video
                         ->filters()
                         ->resize(new Dimension(640, 480))
@@ -119,10 +128,12 @@ class IGJobs implements SocialJobs
                      *
                      */
 
-                    $format = new X264();//'libfdk_aac');
+                    $format = new X264();
+
+                    //$format = new X264('libfdk_aac');
 
 
-                    $output =  $notes['video_path'];
+                    $output =  self::checkPressPath($notes['video_path']);
 
                     $res = $video->save($format, $output);
 
@@ -256,6 +267,36 @@ class IGJobs implements SocialJobs
 
             $job->sendComplete();
             return "Error jobs IG";
+        }
+    }
+
+    public static function getExtension($filename) {
+        $path_info = pathinfo($filename);
+        return $path_info['extension'];
+    }
+
+
+    public static function checkVideo($file){
+        if(self::getExtension($file)===null){
+
+            $newFile = $file.'.'.explode("/", mime_content_type($file))[1];
+
+            if (!copy($file, $newFile)) {
+                return false;
+            }
+
+            $file = $newFile;
+        }
+
+        return $file;
+    }
+
+    public static function checkPressPath($file){
+
+        if(strlen(array_pop(explode(".", $file)))>4){
+            return $file.'.mp4';
+        }else{
+            return $file;
         }
     }
 }

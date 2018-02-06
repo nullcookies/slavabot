@@ -1,6 +1,6 @@
 <?
-use frontend\controllers\SocialController;
-use common\models\User;
+    use frontend\controllers\SocialController;
+    use common\models\User;
 ?>
 
     <div class="row">
