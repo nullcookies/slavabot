@@ -82,6 +82,15 @@ class SendpostCommand extends UserCommand
         $this->conversation = new Conversation($user_id, $chat_id, 'post');
         $notes = &$this->conversation->notes;
 
+        $mid = $notes['fm']['result']['message_id'];
+
+        $data_edit = [
+            'chat_id' => $chat_id,
+            'user_id' => $user_id,
+            'message_id' => $mid,
+            'text' => 'test',
+
+        ];
         try{
             $this->prepareVkJob($notes, $user_id);
             $this->prepareFbJob($notes, $user_id);
@@ -239,7 +248,7 @@ class SendpostCommand extends UserCommand
      * @param $user_id
      * @return string
      */
-    public function prepareFbJob($notes, $user_id, $responseData)
+    public function prepareFbJob($notes, $user_id, $responseData = [])
     {
 
         $user = $this->getUserCredentialsBySocial($user_id, SocialNetworks::FB);
@@ -356,7 +365,7 @@ class SendpostCommand extends UserCommand
      * @param $user_id
      * @return string
      */
-    public function prepareIgJob($notes, $user_id, $responseData)
+    public function prepareIgJob($notes, $user_id, $responseData = [])
     {
 
         $user = $this->getUserCredentialsBySocial($user_id, SocialNetworks::IG);
