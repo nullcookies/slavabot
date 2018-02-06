@@ -16,6 +16,8 @@ use frontend\controllers\bot\libs\SalesBotApi;
 use frontend\controllers\bot\libs\SocialNetworks;
 use Facebook\Facebook;
 use common\commands\command\EditTelegramNotificationCommand;
+use common\commands\command\CheckStatusNotificationCommand;
+
 
 
 class FbJobs implements SocialJobs
@@ -161,6 +163,20 @@ class FbJobs implements SocialJobs
                     );
                 }catch (\Exception $e){
                     Logger::error($e->getMessage());
+                }
+
+                try{
+                    return \Yii::$app->commandBus->handle(
+                        new CheckStatusNotificationCommand(
+                            [
+                                'data' => [
+                                    'callback_tlg_message_status' => $post->callback_tlg_message_status
+                                ]
+                            ]
+                        )
+                    );
+                }catch (\Exception $e){
+                    return ($e->getMessage());
                 }
             }
 

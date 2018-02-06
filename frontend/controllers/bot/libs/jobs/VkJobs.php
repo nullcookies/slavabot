@@ -8,6 +8,8 @@
 namespace frontend\controllers\bot\libs\jobs;
 
 use common\commands\command\EditTelegramNotificationCommand;
+use common\commands\command\CheckStatusNotificationCommand;
+
 use common\models\JobPost;
 use common\models\Post;
 use frontend\controllers\bot\libs\Files;
@@ -139,6 +141,20 @@ class VkJobs implements SocialJobs
                     );
                 }catch (\Exception $e){
                     Logger::error($e->getMessage());
+                }
+
+                try{
+                    return \Yii::$app->commandBus->handle(
+                        new CheckStatusNotificationCommand(
+                            [
+                                'data' => [
+                                    'callback_tlg_message_status' => $post->callback_tlg_message_status
+                                ]
+                            ]
+                        )
+                    );
+                }catch (\Exception $e){
+                    return ($e->getMessage());
                 }
             }
 

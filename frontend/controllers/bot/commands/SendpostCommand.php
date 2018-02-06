@@ -70,7 +70,7 @@ class SendpostCommand extends UserCommand
 
         }
         return (new PostCommand($this->telegram,
-            new Update(json_decode($this->update->toJson(), true))))->execute(true, 'Отправьте сообщение для публикации');
+            new Update(json_decode($this->update->toJson(), true))))->execute(true, '');
 
     }
 
@@ -104,7 +104,7 @@ class SendpostCommand extends UserCommand
 
         $this->conversation->stop();
         return (new PostCommand($this->telegram,
-            new Update(json_decode($this->update->toJson(), true))))->execute(true, 'Отправьте сообщение для публикации');
+            new Update(json_decode($this->update->toJson(), true))))->execute(true, '');
 
     }
 
