@@ -253,10 +253,10 @@ angular.module('cubeWebApp')
 
                 // Единоразовый редирект на страницу тарифов, после окончания оплаченного периода
 
-                if(!$scope.tariff.active && !getCookie('payment_' +  $scope.tariff.payment_id)){
-                    setCookie('payment_' +  $scope.tariff.payment_id, true);
-                    $location.path('/tariffs');
-                }
+                // if(!$scope.tariff.active && !getCookie('payment_' +  $scope.tariff.payment_id)){
+                //     setCookie('payment_' +  $scope.tariff.payment_id, true);
+                //     $location.path('/tariffs');
+                // }
 
 
             });
