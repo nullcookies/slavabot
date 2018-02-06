@@ -922,7 +922,7 @@ angular.module('cubeWebApp')
             }
         };
     })
-    .controller('socialCtrl', function($scope, $http, $sce){
+    .controller('socialCtrl', function($scope, $http, $sce, $timeout){
 
         $scope.InstaLogin = '';
         $scope.InstaPassword = '';
@@ -1143,6 +1143,7 @@ angular.module('cubeWebApp')
                 $http.post('/social/instagram', $.param($scope.data), config).then(function success(response) {
                     if(response.data.error){
                         $scope.instaError = response.data.error;
+                        $timeout($scope.ClearError, 5000);
                         return false;
                     }else{
                         $scope.instaError = '';
@@ -1154,6 +1155,10 @@ angular.module('cubeWebApp')
             }
 
         }
+
+        $scope.ClearError = function(){
+            $scope.instaError = '';
+        };
     })
     .controller('historyCtrl', function($scope, $http, $sce, $interval){
 

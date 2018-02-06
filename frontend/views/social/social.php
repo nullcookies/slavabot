@@ -22,7 +22,7 @@ use frontend\controllers\SocialController;
                                             );
                                         ?>
                                     </li>
-                                    <li><a data-toggle="modal" id="vkontakte" data-target="#myModalVK">Вконтакте</a></li>
+                                    <li ng-show="available.vk"><a data-toggle="modal" id="vkontakte" data-target="#myModalVK">Вконтакте</a></li>
                                     <li ng-show="available.instagram"><a data-toggle="modal" id="instagram" data-target="#myModal">Instagram</a></li>
                                 </ul>
                             </div>
