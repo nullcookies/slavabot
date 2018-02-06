@@ -194,7 +194,9 @@ class PostCommand extends UserCommand
 
                     // Проверяем на возможность добавления в пост текста/медиа
 
-                    if(!isset($notes['Text']) || !isset($notes['Photo'])){
+                    $inline_keyboard = new InlineKeyboard([]);
+
+                    if(!isset($notes['Text']) || (!isset($notes['Photo']) && !isset($notes['Video']))){
                         $buttonsArray = [
                             ['text' => 'Добавить', 'callback_data' => 'addpost'],
                             ['text' => 'Опубликовать', 'callback_data' => 'sendpost'],
@@ -209,8 +211,17 @@ class PostCommand extends UserCommand
                         ];
                     }
 
+                    foreach($buttonsArray as $button){
+                        $inline_keyboard->addRow(
+                            [
+                                'text' => $button['text'],
+                                'callback_data' => $button['callback_data']
+                            ]
+                        );
 
-                    $inline_keyboard = new InlineKeyboard($buttonsArray);
+                    }
+
+                    $inline_keyboard->setResizeKeyboard(true);
 
                     $data['reply_markup'] = $inline_keyboard;
 
