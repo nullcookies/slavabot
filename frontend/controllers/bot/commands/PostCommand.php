@@ -331,7 +331,7 @@ class PostCommand extends UserCommand
                             $dif .= Utils::human_plural_form($td->s, ["секунду", "секунды", "секунд"]);
                         }
 
-                        $data['text'] = "Ваш пост будет опубликован через " . $dif;
+                        $data['text'] = "Ваш пост будет опубликован через " . $dif. "\nОтправьте сообщение для публикации";
 
                         return (new SendpostCommand($this->telegram,
                             new Update(json_decode($this->update->toJson(), true))))->executeNow($data['text']);
