@@ -199,19 +199,6 @@ class IGJobs implements SocialJobs
                     Logger::error($e->getMessage());
                 }
 
-                try{
-                    return \Yii::$app->commandBus->handle(
-                        new CheckStatusNotificationCommand(
-                            [
-                                'data' => [
-                                    'callback_tlg_message_status' => $post->callback_tlg_message_status
-                                ]
-                            ]
-                        )
-                    );
-                }catch (\Exception $e){
-                    return ($e->getMessage());
-                }
             }
 
 
@@ -279,6 +266,20 @@ class IGJobs implements SocialJobs
                 //отправляем в api
                 $arParam = ['data' => json_encode($jobPost->getAttributes()), 'type' => SocialNetworks::IG, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
+            }else{
+                try{
+                    \Yii::$app->commandBus->handle(
+                        new CheckStatusNotificationCommand(
+                            [
+                                'data' => [
+                                    'callback_tlg_message_status' => $post->callback_tlg_message_status
+                                ]
+                            ]
+                        )
+                    );
+                }catch (\Exception $e){
+                    return ($e->getMessage());
+                }
             }
 
             $job->sendComplete();

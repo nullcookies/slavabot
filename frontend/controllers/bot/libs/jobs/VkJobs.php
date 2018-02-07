@@ -76,7 +76,8 @@ class VkJobs implements SocialJobs
 //                        'wallpost' => 0
 //                    ]
 
-                    $attachments = $vk->upload_video(['group_id' => preg_replace("/[^0-9]/", '', $owner)], $notes['Videos'][0]);
+                    $attachments = $vk->upload_video(['group_id' => preg_replace("/[^0-9]/", '', $owner)],
+                        $notes['Videos'][0]);
 
 //                    $attachments = $vk->upload_video(
 //                        array('name' => 'Test video',
@@ -87,7 +88,7 @@ class VkJobs implements SocialJobs
 
 
                     Logger::info('Видео:', [
-                        'result' => json_encode($attachments). ' Инфо о видео: ' . json_encode($notes['Videos'][0])
+                        'result' => json_encode($attachments) . ' Инфо о видео: ' . json_encode($notes['Videos'][0])
                     ]);
                 } else {
                     Logger::error('Ошибка получения видео из telegram', [
@@ -126,12 +127,20 @@ class VkJobs implements SocialJobs
                 $post->job_result = json_encode($result);
                 $post->job_status = \common\models\Post::JOB_STATUS_POSTED;
                 $post->save(false);
+                $data =  [
+                    'callback_tlg_message_status' => $post->callback_tlg_message_status
+                ];
 
+                $elseData = $data;
+                $data['job_status'] = 'POSTED';
+                $elseData['job_status'] = 'FAIL';
+
+                $count = Post::find()->where(['OR', $data, $elseData])->count();
                 //отправляем в api
                 $arParam = ['data' => json_encode($post->getAttributes()), 'type' => SocialNetworks::VK, 'tid' => 0];
                 var_dump($SalesBot->newEvent($arParam));
 
-                try{
+                try {
                     \Yii::$app->commandBus->handle(
                         new EditTelegramNotificationCommand(
                             [
@@ -139,23 +148,10 @@ class VkJobs implements SocialJobs
                             ]
                         )
                     );
-                }catch (\Exception $e){
+                } catch (\Exception $e) {
                     Logger::error($e->getMessage());
                 }
 
-                try{
-                    return \Yii::$app->commandBus->handle(
-                        new CheckStatusNotificationCommand(
-                            [
-                                'data' => [
-                                    'callback_tlg_message_status' => $post->callback_tlg_message_status
-                                ]
-                            ]
-                        )
-                    );
-                }catch (\Exception $e){
-                    return ($e->getMessage());
-                }
             }
 
             /** @var JobPost $jobPost */
@@ -172,6 +168,21 @@ class VkJobs implements SocialJobs
                 //отправляем в api
                 $arParam = ['data' => json_encode($jobPost->getAttributes()), 'type' => SocialNetworks::VK, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
+            }else{
+                try {
+                    \Yii::$app->commandBus->handle(
+                        new CheckStatusNotificationCommand(
+                            [
+                                'data' => [
+                                    'callback_tlg_message_status' => $post->callback_tlg_message_status,
+                                    'count' => $count
+                                ]
+                            ]
+                        )
+                    );
+                } catch (\Exception $e) {
+                    return ($e->getMessage());
+                }
             }
 
 
@@ -209,7 +220,7 @@ class VkJobs implements SocialJobs
                 ];
                 $SalesBot->setUserAccountStatus($arParam);
 
-                try{
+                try {
                     $notes['response_data']['text'] = 'Вконтакте - ошибка';
                     \Yii::$app->commandBus->handle(
                         new EditTelegramNotificationCommand(
@@ -218,27 +229,11 @@ class VkJobs implements SocialJobs
                             ]
                         )
                     );
-                }catch (\Exception $e){
+                } catch (\Exception $e) {
                     Logger::error($e->getMessage());
                 }
 
-                try{
-                    return \Yii::$app->commandBus->handle(
-                        new CheckStatusNotificationCommand(
-                            [
-                                'data' => [
-                                    'callback_tlg_message_status' => $post->callback_tlg_message_status
-                                ]
-                            ]
-                        )
-                    );
-                }catch (\Exception $e){
-                    return ($e->getMessage());
-                }
             }
-
-
-
 
             $jobPost = JobPost::findOne([
                 'post_id' => $postModelId,
@@ -253,6 +248,20 @@ class VkJobs implements SocialJobs
                 //отправляем в api
                 $arParam = ['data' => json_encode($jobPost->getAttributes()), 'type' => SocialNetworks::VK, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
+            } else {
+                try {
+                    \Yii::$app->commandBus->handle(
+                        new CheckStatusNotificationCommand(
+                            [
+                                'data' => [
+                                    'callback_tlg_message_status' => $post->callback_tlg_message_status
+                                ]
+                            ]
+                        )
+                    );
+                } catch (\Exception $e) {
+                    Logger::error($e->getMessage());
+                }
             }
 
             $job->sendComplete();

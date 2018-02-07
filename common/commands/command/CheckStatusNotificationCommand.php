@@ -22,7 +22,7 @@ use Longman\TelegramBot\Request;
 class CheckStatusNotificationCommand extends BaseObject implements SelfHandlingCommand
 {
     public $data;
-
+    public $count;
     protected function GetCommand()
     {
         $bot = new Bot();
@@ -34,34 +34,38 @@ class CheckStatusNotificationCommand extends BaseObject implements SelfHandlingC
     {
 
         $data = $command->data;
-
+        $count = $command->count;
         $this->GetCommand();
 
-        $data['status'] = 'POSTED';
 
-        $chat = Post::find()->where($data)->one()['internal_uid'];
 
-        $user = $this->getUserCredentialsBySocial($chat, SocialNetworks::VK);
+        $elseData = $data;
+        $data['job_status'] = 'POSTED';
+        $elseData['job_status'] = 'FAIL';
 
-        if (isset($user['wall_id'])) {
+
+        $chat = Post::find()->where(['OR', $data, $elseData])->one()['internal_uid'];
+
+        $user1 = $this->getUserCredentialsBySocial($chat, SocialNetworks::VK);
+
+        if (isset($user1['wall_id'])) {
             $arr[]='vk';
         }
 
-        $user = $this->getUserCredentialsBySocial($chat, SocialNetworks::FB);
+        $user2 = $this->getUserCredentialsBySocial($chat, SocialNetworks::FB);
 
-        if ($user['page_id']) {
+        if ($user2['page_id']) {
             $arr[]='fb';
         }
 
-        $user = $this->getUserCredentialsBySocial($chat, SocialNetworks::IG);
+        $user3 = $this->getUserCredentialsBySocial($chat, SocialNetworks::IG);
 
-        if ($user) {
+        if ($user3) {
             $arr[]='ig';
         }
 
-        if(Post::find()->where($data)->count()==count($arr)){
+        if($count==count($arr)){
             try {
-
 
                 $result = Request::sendMessage([
                     'chat_id' => $chat,
