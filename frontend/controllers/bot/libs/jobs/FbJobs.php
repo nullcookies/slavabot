@@ -286,8 +286,9 @@ class FbJobs implements SocialJobs
                             [
                                 'data' => [
                                     'callback_tlg_message_status' => $post->callback_tlg_message_status,
-                                    'count' => $count
-                                ]
+
+                                ],
+                                'count' => $count
                             ]
                         )
                     );
