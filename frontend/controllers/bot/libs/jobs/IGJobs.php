@@ -174,7 +174,15 @@ class IGJobs implements SocialJobs
                 $post->job_status = Post::JOB_STATUS_POSTED;
                 $post->job_result = json_encode('posted');
                 $post->save(false);
+                $data =  [
+                    'callback_tlg_message_status' => $post->callback_tlg_message_status
+                ];
 
+                $elseData = $data;
+                $data['job_status'] = 'POSTED';
+                $elseData['job_status'] = 'FAIL';
+
+                $count = Post::find()->where(['OR', $data, $elseData])->count();
                 //отправляем в api
                 $arParam = ['data' => json_encode($post->toArray()), 'type' => SocialNetworks::IG, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
@@ -216,6 +224,21 @@ class IGJobs implements SocialJobs
                 //отправляем в api
                 $arParam = ['data' => json_encode($jobPost->getAttributes()), 'type' => SocialNetworks::IG, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
+            } else {
+                try {
+                    \Yii::$app->commandBus->handle(
+                        new CheckStatusNotificationCommand(
+                            [
+                                'data' => [
+                                    'callback_tlg_message_status' => $post->callback_tlg_message_status
+                                ],
+                                'count' => $count
+                            ]
+                        )
+                    );
+                } catch (\Exception $e) {
+                    Logger::error($e->getMessage());
+                }
             }
 
             Logger::info('Публикация IG завершена');
