@@ -209,7 +209,16 @@ class VkJobs implements SocialJobs
             if ($post) {
                 $post->job_status = Post::JOB_STATUS_FAIL;
                 $post->job_error = $e->getTraceAsString();
+                $post->save(false);
+                $data =  [
+                    'callback_tlg_message_status' => $post->callback_tlg_message_status
+                ];
 
+                $elseData = $data;
+                $data['job_status'] = 'POSTED';
+                $elseData['job_status'] = 'FAIL';
+
+                $count = Post::find()->where(['OR', $data, $elseData])->count();
                 //отправляем в api
                 $arParam = ['data' => json_encode($post->getAttributes()), 'type' => SocialNetworks::VK, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
@@ -255,7 +264,8 @@ class VkJobs implements SocialJobs
                             [
                                 'data' => [
                                     'callback_tlg_message_status' => $post->callback_tlg_message_status
-                                ]
+                                ],
+                                'count' => $count
                             ]
                         )
                     );

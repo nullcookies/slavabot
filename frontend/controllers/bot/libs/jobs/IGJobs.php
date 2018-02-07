@@ -241,6 +241,15 @@ class IGJobs implements SocialJobs
                 $post->job_error = $e->getTraceAsString();
                 $post->save(false);
 
+                $data =  [
+                    'callback_tlg_message_status' => $post->callback_tlg_message_status
+                ];
+
+                $elseData = $data;
+                $data['job_status'] = 'POSTED';
+                $elseData['job_status'] = 'FAIL';
+
+                $count = Post::find()->where(['OR', $data, $elseData])->count();
                 //отправляем в api
                 $arParam = ['data' => json_encode($post->toArray()), 'type' => SocialNetworks::IG, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
@@ -273,7 +282,8 @@ class IGJobs implements SocialJobs
                             [
                                 'data' => [
                                     'callback_tlg_message_status' => $post->callback_tlg_message_status
-                                ]
+                                ],
+                                'count' => $count
                             ]
                         )
                     );
