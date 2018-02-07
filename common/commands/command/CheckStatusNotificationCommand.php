@@ -70,7 +70,7 @@ class CheckStatusNotificationCommand extends BaseObject implements SelfHandlingC
                 $result = Request::sendMessage([
                     'chat_id' => $chat,
                     'user_id' => $chat,
-                    'text' => 'Отправьте сообщение для публикации'
+                    'text' => 'Чтобы создать новый пост пришлите мне текст, фото или видео.'
                 ]);
 
                 return $result;

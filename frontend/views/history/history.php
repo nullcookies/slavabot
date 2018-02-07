@@ -194,9 +194,7 @@
         </div>
         <div class="wizard-card" data-cardname="tlgcard">
             <h3>Подключение Telegram</h3>
-            <p>Перейдите по ссылке в Telegram и подключитесь к <a href="<?=\common\services\StaticConfig::botUrl()?>" target="_blank">Славаботу</a>
-
-            </p>
+            <p>Кликните на <a href="<?=\common\services\StaticConfig::botUrl()?>" target="_blank">ссылку</a>, в открывшемся окне Телеграм следуйте инструкциям Славабота</p>
         </div>
         <div class="wizard-card" data-cardname="lastcard">
             <h3>Настройка закончена</h3>

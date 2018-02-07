@@ -209,17 +209,24 @@ class PostCommand extends UserCommand
 
                     $inline_keyboard = new InlineKeyboard([]);
 
-                    if(!isset($notes['Text']) || (!isset($notes['Photo']) && !isset($notes['Video']))){
+                    if(!isset($notes['Text'])){
                         $buttonsArray = [
-                            ['text' => 'Добавить', 'callback_data' => 'addpost'],
-                            ['text' => 'Опубликовать', 'callback_data' => 'sendpost'],
-                            ['text' => 'Запланировать', 'callback_data' => 'planpost'],
+                            ['text' => 'Добавить текст', 'callback_data' => 'addpost'],
+                            ['text' => 'Опубликовать сейчас', 'callback_data' => 'sendpost'],
+                            ['text' => 'Задать время публикации', 'callback_data' => 'planpost'],
+                            ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
+                        ];
+                    }elseif(!isset($notes['Photo']) && !isset($notes['Video'])){
+                        $buttonsArray = [
+                            ['text' => 'Добавить фото/видео', 'callback_data' => 'addpost'],
+                            ['text' => 'Опубликовать сейчас', 'callback_data' => 'sendpost'],
+                            ['text' => 'Задать время публикации', 'callback_data' => 'planpost'],
                             ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
                         ];
                     }else{
                         $buttonsArray = [
-                            ['text' => 'Опубликовать', 'callback_data' => 'sendpost'],
-                            ['text' => 'Запланировать', 'callback_data' => 'planpost'],
+                            ['text' => 'Опубликовать сейчас', 'callback_data' => 'sendpost'],
+                            ['text' => 'Задать время публикации', 'callback_data' => 'planpost'],
                             ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
                         ];
                     }
