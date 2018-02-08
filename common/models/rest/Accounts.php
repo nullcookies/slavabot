@@ -45,14 +45,15 @@ class Accounts extends \yii\db\ActiveRecord
                 return $this->userValue->telegram_id;
             },
             'access_token' => function() use ($data) {
-                return $data->access_token;
-            },
-            'group_id' => function() use ($data) {
-                $token = $data->groups->id;
+                $token = isset($data->access_token)? $data->access_token: null;
                 return $token;
             },
+            'group_id' => function() use ($data) {
+                $id = isset($data->groups->id)? $data->groups->id: null;
+                return $id;
+            },
             'group_access_token' => function() use ($data) {
-                $token = $data->groups->access_token;
+                $token = isset($data->groups->access_token)? $data->groups->access_token: null;
                 return $token;
             },
             'ts' => function() use ($data) {

@@ -33,6 +33,11 @@ class Accounts extends \yii\db\ActiveRecord
         ];
     }
 
+    public function getUserValue()
+    {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
     /**
      *
      * 'data' => json данные учетной записи
@@ -105,6 +110,21 @@ class Accounts extends \yii\db\ActiveRecord
         return $model;
     }
 
+    public static function getIg()
+    {
+        $models = static::find()
+            ->where(
+                [
+                    'type' => 'instagram',
+                    'status' => 1,
+                    'processed' => 1
+                ]
+            )
+            ->all();
+
+        return $models;
+    }
+
     public static function processAccount(){
 
         $post = \Yii::$app->request->post();
@@ -149,6 +169,20 @@ class Accounts extends \yii\db\ActiveRecord
 
     public static function getByUser($id){
         return Accounts::find()->where(['user_id' => $id])->all();
+    }
+
+    public static function getByUserId($id, $social)
+    {
+        return Accounts::find()
+            ->andWhere(['user_id' => $id])
+            ->andWhere(
+                [
+                    'type' => $social,
+                    'status' => 1,
+                    'processed' => 1
+                ]
+            )
+            ->one();
     }
 
     public static function remove($id){

@@ -116,4 +116,29 @@ class V1Controller extends Controller
         }
 
     }
+
+    public static function actionIg($user_id = '', $peer_id = '', $message = '')
+    {
+        if($user_id == ''){
+            $user_id = Yii::$app->request->post('user_id');
+            $peer_id = Yii::$app->request->post('peer_id');
+            $message = Yii::$app->request->post('message');
+        }
+
+        if(!$account = \common\models\Accounts::getByUserId($user_id, 'instagram')) {
+            throw new \InvalidArgumentException('Аккаунт не найден');
+        }
+        $fields = $account->fields();
+        $data = $fields['data']();
+
+        try {
+            $ig = new \InstagramAPI\Instagram(false, false);
+            //$ig->setProxy("http://51.15.205.156:3128");
+            $ig->login($data->login, $data->password);
+            $ig->media->comment($peer_id, $message);
+
+        } catch (\Exception $e) {
+            echo $e->getMessage() . PHP_EOL;
+        }
+    }
 }

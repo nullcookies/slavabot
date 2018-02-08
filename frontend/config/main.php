@@ -34,7 +34,8 @@ return [
                     'check',
                     'aviso',
                     'success',
-                    'fail'
+                    'fail',
+                    'ig-callback'
                 ],
                 'allow' => true,
                 'roles' => ['?'],

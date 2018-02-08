@@ -29,15 +29,15 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout', 'signup', 'repassword', 'index', 'getdata'],
+                'only' => ['logout', 'signup', 'repassword', 'index', 'getdata', 'ig-callback'],
                 'rules' => [
                     [
-                        'actions' => ['signup', 'repassword', 'getdata'],
+                        'actions' => ['signup', 'repassword', 'getdata', 'ig-callback'],
                         'allow' => true,
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['logout', 'index'],
+                        'actions' => ['logout', 'index', 'ig-callback'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -61,12 +61,13 @@ class SiteController extends Controller
     }
     public function beforeAction($action)
     {
-        if ($action->id == 'getdata') {
+        if ($action->id == 'getdata' || $action->id == 'ig-callback') {
             $this->enableCsrfValidation = false;
         }
 
         return parent::beforeAction($action);
     }
+
     public function actions()
     {
         return [
@@ -75,6 +76,16 @@ class SiteController extends Controller
                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
             ],
         ];
+    }
+
+    public function actionIgCallback()
+    {
+        $filename = 'ig.txt';
+
+        $data = "Body: ".Yii::$app->request->getRawBody();  // JSON формат сохраняемого значения.
+        file_put_contents($filename, $data);
+
+        echo Yii::$app->request->get('hub_challenge');
     }
 
     public function actionIndex()
@@ -87,7 +98,6 @@ class SiteController extends Controller
         $this->layout = 'error';
         return $this->render('404');
     }
-    
 
     public function actionMain()
     {
