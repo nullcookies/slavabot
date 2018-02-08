@@ -272,9 +272,9 @@
                 $('.active_save_btn').click();
             });
 
-            if(!getCookie('modal')){
+            if(!getCookie("modal_<?= Yii::$app->user->identity['id']?>")){
                 wizard.show();
-                setCookie('modal', true)
+                setCookie("modal_<?= Yii::$app->user->identity['id']?>", true)
             }
         });
     </script>
