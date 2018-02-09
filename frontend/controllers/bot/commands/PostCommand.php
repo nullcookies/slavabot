@@ -299,8 +299,20 @@ class PostCommand extends UserCommand
                     //$notes['MsgId'] = $message->getMessageId();
 
 
-                    if (!self::IsDate($text)) {
+                    /** @var User $user */
+                    $user = User::findOne([
+                        'telegram_id' => $user_id,
+                    ]);
+
+                    //по умолчанию ставим
+                    $timeZone = 'Europe/Moscow';
+                    if ($user) {
+                        $timeZone = $user->timezone;
+                    }
+
+                    if (!self::IsDate($text) || (Carbon::now()->timezone($timeZone)->diff(\Carbon\Carbon::parse($text, $timeZone))->invert==1)) {
                         $data['text'] = "Не верный формат: " . $text;
+                        Request::sendMessage($data);
                     } else {
 
                         //часовой пояс пользователя
@@ -639,10 +651,14 @@ class PostCommand extends UserCommand
 
     private static function IsDate($_value, $_format = 'd.m.Y H:i')
     {
+        try{
+            $d = \DateTime::createFromFormat($_format, $_value);
 
-        $d = \DateTime::createFromFormat($_format, $_value);
+            return $d/* && $d->format($_format) == $_value*/
+                ;
+        } catch (TelegramException $e) {
+            return false;
+        }
 
-        return $d/* && $d->format($_format) == $_value*/
-            ;
     }
 }
