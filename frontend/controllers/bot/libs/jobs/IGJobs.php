@@ -62,6 +62,7 @@ class IGJobs implements SocialJobs
 
             $ig = new \InstagramAPI\Instagram($debug, $truncatedDebug);
             $ig->login($username, $password);
+            sleep(1);
 
             if (isset($notes['Text']) && !empty($notes['Text'])) {
                 $messages = $notes['Text'];
@@ -306,6 +307,8 @@ class IGJobs implements SocialJobs
                 $arParam = ['data' => json_encode($jobPost->getAttributes()), 'type' => SocialNetworks::IG, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
             }else{
+                $notes['response_data']['text'] = 'Instagram - ошибка';
+
                 try{
                     \Yii::$app->commandBus->handle(
                         new CheckStatusNotificationCommand(
