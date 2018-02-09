@@ -27,6 +27,10 @@ class IGJobs implements SocialJobs
     public function run(\Kicken\Gearman\Job\WorkerJob $job)
     {
         try {
+
+            $command = 'sudo chown -R apache:apache /var/www/salesbot/vendor/mgp25/instagram-php/sessions';
+            echo shell_exec($command);
+
             $notes = json_decode($job->getWorkload(), true);
 
             $job->sendComplete();
@@ -242,6 +246,9 @@ class IGJobs implements SocialJobs
             }
 
             Logger::info('Публикация IG завершена');
+
+            $command = 'sudo chown -R apache:apache /var/www/salesbot/vendor/mgp25/instagram-php/sessions';
+            echo shell_exec($command);
 
             return true;
 
