@@ -61,7 +61,11 @@ class IGJobs implements SocialJobs
             $truncatedDebug = false;
 
             $ig = new \InstagramAPI\Instagram($debug, $truncatedDebug);
+
+            sleep(1);
+
             $ig->login($username, $password);
+
             sleep(1);
 
             if (isset($notes['Text']) && !empty($notes['Text'])) {
@@ -285,6 +289,19 @@ class IGJobs implements SocialJobs
                 $arParam = ['data' => json_encode($post->toArray()), 'type' => SocialNetworks::IG, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
 
+                try{
+                    $notes['response_data']['text'] = 'Instagram - ошибка';
+                    \Yii::$app->commandBus->handle(
+                        new EditTelegramNotificationCommand(
+                            [
+                                'data' => $notes['response_data']
+                            ]
+                        )
+                    );
+                }catch (\Exception $e){
+                    Logger::error($e->getMessage());
+                }
+
                 $arParam = [
                     'wall_id' => $post->wall_id,
                     'status' => 0
@@ -307,8 +324,6 @@ class IGJobs implements SocialJobs
                 $arParam = ['data' => json_encode($jobPost->getAttributes()), 'type' => SocialNetworks::IG, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
             }else{
-                $notes['response_data']['text'] = 'Instagram - ошибка';
-
                 try{
                     \Yii::$app->commandBus->handle(
                         new CheckStatusNotificationCommand(
