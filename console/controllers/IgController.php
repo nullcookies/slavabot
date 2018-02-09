@@ -44,7 +44,7 @@ class IgController extends Controller
 
     public function actionComments()
     {
-        while (true) {
+        //while (true) {
 
 
 
@@ -79,10 +79,11 @@ class IgController extends Controller
                     echo $e->getMessage() . PHP_EOL;
                 }
 
+                sleep(5);
             }
 
             sleep(5);
-        }
+        //}
     }
 
     protected function getComments(\InstagramAPI\Instagram $ig, $userId, $telegramId)
@@ -144,7 +145,7 @@ class IgController extends Controller
                             'tid' => $telegramId,
                             'message' => $user->username.":\n".$item->text,
                         ]);
-                        $command->execute();
+                        $command->execute($id);
 
                         echo 'sended' . PHP_EOL;
                     }
