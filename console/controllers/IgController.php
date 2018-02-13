@@ -14,6 +14,7 @@ use common\models\SocialDialoguesInstagram;
 use common\models\SocialDialoguesPeerInstagram;
 use frontend\controllers\bot\Bot;
 use frontend\controllers\bot\commands\FrontendNotificationCommand;
+use frontend\controllers\rest\send\V1Controller;
 use yii\console\Controller;
 
 class IgController extends Controller
@@ -22,7 +23,9 @@ class IgController extends Controller
 
     public function actionSend()
     {
-        $userId = 30;
+        V1Controller::actionIg(30, '1709599968191611677_7065861496', 'Server send test');
+
+        /*$userId = 30;
         $mediaId = '1709599968191611677_7065861496';
         $text = 'Server send test';
 
@@ -39,7 +42,7 @@ class IgController extends Controller
         } catch (\Exception $e) {
             echo "Не удалось отпрвить" . PHP_EOL;
             echo $e->getMessage() . PHP_EOL;
-        }
+        }*/
     }
 
     public function actionComments()
@@ -145,7 +148,7 @@ class IgController extends Controller
                             'tid' => $telegramId,
                             'message' => $user->username.":\n".$item->text,
                         ]);
-                        $command->execute($id);
+                        $command->execute($user->pk, $id);
 
                         echo 'sended' . PHP_EOL;
                     }

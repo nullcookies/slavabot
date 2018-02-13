@@ -17,8 +17,10 @@ use Longman\TelegramBot\Commands\UserCommands\MainCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\Keyboard;
 use Longman\TelegramBot\Entities\Update;
+use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Conversation;
+use Yii;
 
 
 class FrontendNotificationCommand extends UserCommand
@@ -37,7 +39,7 @@ class FrontendNotificationCommand extends UserCommand
      * @return \Longman\TelegramBot\Entities\ServerResponse
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    public function execute($peer_id = 0, $state = 0, $new = false)
+    public function execute($peer_id = 0, $media_id = 0, $state = 0, $new = false)
     {
         $chat_id = $this->_params['tid'];
         $message = $this->_params['message'];
@@ -81,7 +83,7 @@ class FrontendNotificationCommand extends UserCommand
                 case 0:
 
                     $buttonsArray = [
-                        ['text' => 'Ответить', 'callback_data' => 'answer_'.$peer_id]
+                        ['text' => 'Ответить', 'callback_data' => 'answer_'.$peer_id.'_'.$media_id]
                     ];
 
                     $data = [
@@ -108,10 +110,12 @@ class FrontendNotificationCommand extends UserCommand
                         $notes['state'] = 1;
                         $notes['debug'] = false;
                         $notes['peer'] = $peer_id;
+                        $notes['media'] = $media_id;
 
                         $this->conversation->update();
 
                         $peer = SocialDialoguesPeer::getPeerByID($peer_id);
+
                         $conf = new TelegramWrap();
                         $keyboard = new Keyboard(
                             [
@@ -132,15 +136,28 @@ class FrontendNotificationCommand extends UserCommand
 
                     }else{
 
+                        $user = User::findByTIG($chat_id);
+
+                        $peer = SocialDialoguesPeer::findOne(['peer_id' => $notes['peer']]);
+
                         $data = [
                             'chat_id' => $chat_id,
                             'user_id' => $chat_id,
-                            'text' => "Отправлен"
+                            'text' => "Отправлен",
                         ];
 
-                        $user = User::findByTIG($chat_id);
 
-                        V1Controller::actionVk($user->id, $notes['peer'], $text);
+
+                        switch ($peer->social) {
+                            case SocialDialoguesPeer::SOCIAL_VK:
+                                V1Controller::actionVk($user->id, $notes['peer'], $text);
+                                break;
+                            case SocialDialoguesPeer::SOCIAL_IG:
+                                V1Controller::actionIg($user->id, $notes['peer'], $notes['media'], $text);
+                                break;
+                            default: null;
+                        }
+
                         Request::sendMessage($data);
                         $this->conversation->stop();
 

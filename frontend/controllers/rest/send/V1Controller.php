@@ -2,6 +2,7 @@
 namespace frontend\controllers\rest\send;
 
 use common\models\rest\Accounts;
+use common\models\SocialDialoguesInstagram;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -117,10 +118,11 @@ class V1Controller extends Controller
 
     }
 
-    public static function actionIg($user_id = '', $peer_id = '', $message = '')
+    public static function actionIg($user_id = '', $peer_id = '', $media_id = '', $message = '')
     {
         if($user_id == ''){
             $user_id = Yii::$app->request->post('user_id');
+            $media_id = Yii::$app->request->post('media_id');
             $peer_id = Yii::$app->request->post('peer_id');
             $message = Yii::$app->request->post('message');
         }
@@ -133,10 +135,16 @@ class V1Controller extends Controller
 
         try {
             $ig = new \InstagramAPI\Instagram(false, false);
-            //$ig->setProxy("http://51.15.205.156:3128");
             $ig->login($data->login, $data->password);
-            $ig->media->comment($peer_id, $message);
+            $ig->media->comment($media_id, $message);
 
+            SocialDialoguesInstagram::newIgComment(
+                $user_id,
+                0,
+                $message,
+                $peer_id,
+                SocialDialoguesInstagram::DIRECTION_OUTBOX
+            );
         } catch (\Exception $e) {
             echo $e->getMessage() . PHP_EOL;
         }
