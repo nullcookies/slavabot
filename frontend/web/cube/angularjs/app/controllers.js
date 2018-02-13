@@ -1249,6 +1249,8 @@ angular.module('cubeWebApp')
         $scope.getList = function($data){
             $data = $data || [];
             $http.post('/history/get-list', $data, config).then(function success(response) {
+                console.log(response.data.history);
+                console.log($scope.parJson(response.data.history[0].data.video)[0].file_path);
                 $scope.history = response.data.history;
                 $scope.pages = response.data.pages;
                 $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
@@ -1550,6 +1552,12 @@ angular.module('cubeWebApp')
             return input;
         };
     });
+
+    app.filter("trustUrl", ['$sce', function ($sce) {
+        return function (recordingUrl) {
+            return '/storage/download/'+$sce.trustAsResourceUrl(recordingUrl);
+        };
+    }]);
 
 
 
