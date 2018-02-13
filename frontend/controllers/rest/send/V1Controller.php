@@ -2,6 +2,7 @@
 namespace frontend\controllers\rest\send;
 
 use common\models\rest\Accounts;
+use common\models\SocialDialoguesInstagram;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -115,5 +116,37 @@ class V1Controller extends Controller
             echo $e->getMessage();
         }
 
+    }
+
+    public static function actionIg($user_id = '', $peer_id = '', $media_id = '', $message = '')
+    {
+        if($user_id == ''){
+            $user_id = Yii::$app->request->post('user_id');
+            $media_id = Yii::$app->request->post('media_id');
+            $peer_id = Yii::$app->request->post('peer_id');
+            $message = Yii::$app->request->post('message');
+        }
+
+        if(!$account = \common\models\Accounts::getByUserId($user_id, 'instagram')) {
+            throw new \InvalidArgumentException('Аккаунт не найден');
+        }
+        $fields = $account->fields();
+        $data = $fields['data']();
+
+        try {
+            $ig = new \InstagramAPI\Instagram(false, false);
+            $ig->login($data->login, $data->password);
+            $ig->media->comment($media_id, $message);
+
+            SocialDialoguesInstagram::newIgComment(
+                $user_id,
+                0,
+                $message,
+                $peer_id,
+                SocialDialoguesInstagram::DIRECTION_OUTBOX
+            );
+        } catch (\Exception $e) {
+            echo $e->getMessage() . PHP_EOL;
+        }
     }
 }

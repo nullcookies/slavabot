@@ -84,8 +84,8 @@ class CallbackqueryCommand extends SystemCommand
         $data = $callback_query->getData();
 
         $command = explode('_', $data);
-        $param = $command[1];
         $command = $command[0];
+
 
 
 
@@ -102,7 +102,9 @@ class CallbackqueryCommand extends SystemCommand
         ]);
 
         if ($command == 'answer') {
-
+            $explodedCommand = explode('_', $data);
+            $param = $explodedCommand[1];
+            $media = $explodedCommand[2].'_'.$explodedCommand[3];
             $this->conversation = new Conversation($user_id, $chat_id, 'notification');
             $notes = &$this->conversation->notes;
             $notes['state'] = 1;
@@ -110,7 +112,7 @@ class CallbackqueryCommand extends SystemCommand
             $this->conversation->update();
 
             return (new NotificationCommand($this->telegram,
-                new Update(json_decode($this->update->toJson(), true))))->execute($param);
+                new Update(json_decode($this->update->toJson(), true))))->execute($param, $media);
 
         }
 
