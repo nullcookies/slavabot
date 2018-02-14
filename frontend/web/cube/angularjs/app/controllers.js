@@ -945,6 +945,11 @@ angular.module('cubeWebApp')
         $scope.activeVKID;
         $scope.sce = $sce;
 
+        $scope.InstaWaitBox = false;
+        $scope.InstaFormBox = true;
+        $scope.VkWaitBox = false;
+        $scope.VkFormBox = true;
+
         $scope.available = {
             'instagram' : true,
             'facebook' : true,
@@ -1061,8 +1066,11 @@ angular.module('cubeWebApp')
             }
 
             if(checkData($scope.vkLogin, 9) && checkData($scope.vkPassword, 2)){
+                $scope.VkWaitBox = true;
+                $scope.VkFormBox = false;
                 $http.post('/social/vk-auth', $.param($scope.data), config).then(function success(response) {
-
+                    $scope.VkWaitBox = false;
+                    $scope.VkFormBox = true;
 
                     if(response.data.status){
                         $scope.vkError = false;
@@ -1139,8 +1147,17 @@ angular.module('cubeWebApp')
                 };
             }
 
+
             if(checkData($scope.InstaLogin, 2) && checkData($scope.InstaPassword, 2)){
+
+                $scope.InstaWaitBox = true;
+                $scope.InstaFormBox = false;
+
                 $http.post('/social/instagram', $.param($scope.data), config).then(function success(response) {
+
+                    $scope.InstaWaitBox = false;
+                    $scope.InstaFormBox = true;
+
                     if(response.data.error){
                         $scope.instaError = response.data.error;
                         $timeout($scope.ClearError, 5000);
@@ -1148,9 +1165,11 @@ angular.module('cubeWebApp')
                     }else{
                         $scope.instaError = '';
                     }
+
                     document.getElementById('closeInstaModal').click();
                     $scope.clearInstaForm();
                     $scope.getAccounts();
+
                 });
             }
 
@@ -1249,8 +1268,6 @@ angular.module('cubeWebApp')
         $scope.getList = function($data){
             $data = $data || [];
             $http.post('/history/get-list', $data, config).then(function success(response) {
-                console.log(response.data.history);
-                console.log($scope.parJson(response.data.history[0].data.video)[0].file_path);
                 $scope.history = response.data.history;
                 $scope.pages = response.data.pages;
                 $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
