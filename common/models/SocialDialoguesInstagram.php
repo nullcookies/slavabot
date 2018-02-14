@@ -11,7 +11,7 @@ namespace common\models;
 
 class SocialDialoguesInstagram extends SocialDialogues
 {
-    public static function newIgComment($userId, $commentId, $comment, $peerId, $direction = self::DIRECTION_INBOX)
+    public static function newIgComment($media_id=0, $userId, $commentId, $comment, $peerId, $direction = self::DIRECTION_INBOX)
     {
         $social = static::SOCIAL_IG;
         $type = static::TYPE_MESSAGE;
@@ -24,7 +24,7 @@ class SocialDialoguesInstagram extends SocialDialogues
         $model->peer_id = $peerId;
         $model->message_id = $commentId;
         $model->text = $comment;
-        $model->message = '';
+        $model->message = $media_id;
         $model->attaches = null;
 
         if(!$model->save(false)) {

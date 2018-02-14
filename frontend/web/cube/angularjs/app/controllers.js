@@ -1437,6 +1437,9 @@ angular.module('cubeWebApp')
     .controller('userNotificationCtrl', function($scope, $http, $sce, $interval, $routeParams){
 
         $scope.message = '';
+        $scope.social = '';
+        $scope.mediaID = 0;
+
         var config = {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
@@ -1457,6 +1460,9 @@ angular.module('cubeWebApp')
                 $scope.userName = $scope.data.title;
                 $scope.user_id = response.data.user;
                 $scope.peer_id = $scope.data.peer_id;
+                $scope.mediaID = $scope.data.media_id.info;
+                $scope.social = $scope.data.social;
+
                 document.getElementById('refresh').click();
 
             });
@@ -1465,12 +1471,23 @@ angular.module('cubeWebApp')
 
 
         $scope.sendMessage = function(){
-            $data = $.param({'user_id' : $scope.user_id, 'peer_id' : $scope.peer_id, 'message': $scope.message});
-
-            $http.post('/rest/send/v1/vk', $data, config).then(function success(response) {
+            if($scope.social=='VK'){
+                $data = $.param({'user_id' : $scope.user_id, 'peer_id' : $scope.peer_id, 'message': $scope.message});
                 $scope.message = '';
+                $http.post('/rest/send/v1/vk', $data, config).then(function success(response) {
 
-            });
+
+                });
+            }else if($scope.social=='IG'){
+
+                $data = $.param({'user_id' : $scope.user_id, 'peer_id' : $scope.peer_id, 'media_id' : $scope.mediaID, 'message': $scope.message});
+                $scope.message = '';
+                $http.post('/rest/send/v1/ig', $data, config).then(function success(response) {
+
+
+                });
+            }
+
         };
 
         $scope.getNotificationsForUser();
