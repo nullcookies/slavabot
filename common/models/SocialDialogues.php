@@ -14,6 +14,8 @@ use Carbon\Carbon;
  * @property integer $user_id
  * @property string $social
  * @property string $type
+ * @property string $account_id
+ * @property string $post_id
  * @property integer $peer_id
  * @property integer $message_id
  * @property integer $edited
@@ -30,6 +32,7 @@ class SocialDialogues extends ActiveRecord
     const SOCIAL_IG = "IG"; // instagram
 
     const TYPE_MESSAGE = 'message';
+    const TYPE_COMMENT = 'comment';
 
     const DIRECTION_INBOX = 1;
     const DIRECTION_OUTBOX = 2;
@@ -50,7 +53,7 @@ class SocialDialogues extends ActiveRecord
         return [
             [['user_id', 'peer_id', 'text', 'type', 'social', 'message'], 'required'],
             [['user_id', 'peer_id', 'message_id', 'edited', 'direction'], 'integer'],
-            [['message', 'text', 'type', 'attaches'], 'string'],
+            [['message', 'text', 'type', 'attaches', 'account_id', 'post_id'], 'string'],
             [['social'], 'string', 'max' => 2],
             [['created_at'], 'safe']
         ];
@@ -65,6 +68,8 @@ class SocialDialogues extends ActiveRecord
             'id' => 'ID',
             'user_id' => 'User ID',
             'peer_id' => 'Peer ID',
+            'account_id' => 'Account ID',
+            'post_id' => 'Post ID',
             'text' => 'Text',
             'message_id' => 'Message ID',
             'edited' => 'Edited',

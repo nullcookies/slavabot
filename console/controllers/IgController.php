@@ -23,8 +23,6 @@ class IgController extends Controller
 
     public function actionSend()
     {
-        V1Controller::actionIg(30, '1709599968191611677_7065861496', 'Server send test');
-
         /*$userId = 30;
         $mediaId = '1709599968191611677_7065861496';
         $text = 'Server send test';
@@ -65,7 +63,7 @@ class IgController extends Controller
                     //$ig->setProxy("http://51.15.205.156:3128");
                     $ig->login($data->login, $data->password);
 
-
+                    echo "ACC: " . $ig->account_id . PHP_EOL;
                 } catch (\Exception $e) {
                     echo "Не удалось подключить user ID: " . $account->user_id . PHP_EOL;
                     echo $e->getMessage() . PHP_EOL;
@@ -99,6 +97,7 @@ class IgController extends Controller
         $feeds = $ig->timeline->getSelfUserFeed($maxId, $minTimestamp);
         while ($feeds->items) {
             foreach ($feeds->items as $key => $item) {
+                //var_dump($item);
                 echo date('d.m.Y', $item->taken_at) . ': ' . $item->id . PHP_EOL;
                 $mediaIds[] = $item->id;
                 $maxId = $item->id;
@@ -130,6 +129,8 @@ class IgController extends Controller
                         SocialDialoguesInstagram::newIgComment(
                             $id,
                             $userId,
+                            $ig->account_id,
+                            $id,
                             $item->pk,
                             $item->text,
                             $user->pk
