@@ -51,6 +51,7 @@ class SocialDialoguesPeer extends ActiveRecord
 
     }
 
+
     public function fields()
     {
         return [
@@ -192,5 +193,16 @@ class SocialDialoguesPeer extends ActiveRecord
             ->where(['peer_id' => $peerId])
             ->one();
         return $peer->title;
+    }
+
+    public static function getPostsByPeerAction($peerId){
+        $comments = SocialDialogues::find()
+            ->select('post_id')
+            ->where(['peer_id' => $peerId])
+            ->andWhere(['is not', 'post_id', null])
+            ->distinct()
+            ->asArray()
+            ->all();
+        return $comments;
     }
 }

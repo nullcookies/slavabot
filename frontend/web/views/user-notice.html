@@ -66,12 +66,14 @@
         <div class="col-lg-9 col-md-8 col-sm-8">
             <div class="main-box clearfix">
                 <div class="tabs-wrapper profile-tabs">
+
                     <ul class="nav nav-tabs">
-                        <li class="active"><a href="#tab-chat" data-toggle="tab">Сообщения</a></li>
+                        <li ng-class="{'active' : chatPane}"><a ng-click="setChat()">Сообщения</a></li>
+                        <li ng-class="{'active' : postsPane}"><a ng-click="setPosts()">Посты</a></li>
                     </ul>
 
                     <div class="tab-content">
-                        <div class="tab-pane fade in active" id="tab-chat">
+                        <div class="tab-pane" ng-class="{'active fade in' : chatPane}" id="tab-chat">
                             <div class="conversation-wrapper">
                                 <div class="conversation-content">
                                     <div class="conversation-inner">
@@ -109,7 +111,75 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="tab-pane" ng-class="{'active fade in' : postsPane}" id="tab-posts">
+                            <div id="newsfeed">
+                                <div class="story" ng-repeat="post in posts track by $index">
+                                    <div class="story-user">
+                                        <a href="#">
+                                            <!--<img src="img/samples/robert-300.jpg" alt=""/>-->
+                                        </a>
+                                    </div>
 
+                                    <div class="story-content" style="padding-left:0px;">
+                                        <!--<header class="story-header">-->
+                                            <!--<div class="story-author">-->
+                                                <!--<a href="#" class="story-author-link">-->
+                                                <!--</a>-->
+                                            <!--</div>-->
+                                            <!--<div class="story-time">-->
+                                                <!--<i class="fa fa-clock-o"></i> два дня назад-->
+                                            <!--</div>-->
+                                        <!--</header>-->
+                                        <div class="story-inner-content" style="text-align: center;">
+                                            <img style="width: 25%;" src="/storage/download/{{parJson(post.photo)[0].file_path}}" alt="" ng-If="post.photo">
+                                            <video style="width: 25%;" controls ng-If="post.video">
+                                                <source src="{{parJson(post.video)[0].file_path | trustUrl}}">
+                                            </video>
+                                            <p style="margin-top:20px">{{post.message}}</p>
+
+                                        </div>
+                                        <footer class="story-footer">
+                                            <div class="conversation-wrapper">
+                                                <div class="conversation-content">
+                                                    <div class="conversation-inner_small">
+                                                        <div ng-repeat="comment in post.comments" ng-class="{'item-right' : comment.direction==2}" class="conversation-item item-left clearfix">
+                                                            <div class="conversation-user" ng-show="comment.direction==1">
+                                                                <img src="{{userAvatar}}" alt="" style="width:100%">
+                                                            </div>
+                                                            <div class="conversation-body">
+                                                                <div class="name" ng-show="comment.direction==1">
+                                                                    {{userName}}
+                                                                </div>
+                                                                <div class="name" ng-show="comment.direction==2">
+                                                                    Вы
+                                                                </div>
+                                                                <div class="time hidden-xs">
+                                                                    <time title="{{ comment.created_at | amDateFormat: 'dddd, MMMM Do YYYY, h:mm a' }}">{{ comment.created_at | amCalendar }}</time>
+                                                                </div>
+                                                                <div class="text">
+                                                                    {{comment.message}}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="conversation-new-message">
+                                                    <form ng-submit="sendComment(post.result_post_id)">
+                                                        <div class="form-group">
+                                                            <input class="form-control" rows="2" ng-model="comment[post.result_post_id]" placeholder="Введите сообщение..."></input>
+                                                        </div>
+
+                                                        <div class="clearfix">
+                                                            <button type="submit" class="btn btn-success pull-right">Отправить сообщение</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </footer>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

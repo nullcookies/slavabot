@@ -51,18 +51,6 @@ class DevController extends Controller
 
     public function actionIndex(){
 
-        try{
-            return \Yii::$app->commandBus->handle(
-                new CheckStatusNotificationCommand(
-                    [
-                        'data' => [
-                            'callback_tlg_message_status' => 17045
-                        ]
-                    ]
-                )
-            );
-        }catch (\Exception $e){
-            return ($e->getMessage());
-        }
+        return 1;
     }
 }

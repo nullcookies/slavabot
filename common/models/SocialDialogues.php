@@ -77,7 +77,7 @@ class SocialDialogues extends ActiveRecord
             'social' => 'Social',
             'type' => 'Type',
             'message' => 'Message',
-            'created_at' => 'Created At'
+            'created_at' => 'Created At',
         ];
     }
 
@@ -100,8 +100,10 @@ class SocialDialogues extends ActiveRecord
             'social',
             'peer' =>'dataPeer',
             'message'=>'text',
+            'direction',
             'created_at',
-            'type'
+            'type',
+            'post_id'
         ];
     }
 

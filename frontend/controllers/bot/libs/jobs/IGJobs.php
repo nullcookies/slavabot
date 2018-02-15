@@ -139,9 +139,9 @@ class IGJobs implements SocialJobs
                      *
                      */
 
-                    $format = new X264();
+                    //$format = new X264();
 
-                    //$format = new X264('libfdk_aac');
+                    $format = new X264('libfdk_aac');
 
 
                     $output =  self::checkPressPath($notes['video_path']);
@@ -182,6 +182,7 @@ class IGJobs implements SocialJobs
             if ($post) {
                 $post->job_status = Post::JOB_STATUS_POSTED;
                 $post->job_result = json_encode('posted');
+                $post->result_post_id = $result->media->id;
                 $post->save(false);
                 $data =  [
                     'callback_tlg_message_status' => $post->callback_tlg_message_status

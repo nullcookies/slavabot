@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\models\Post;
 use common\models\SocialDialogues;
 use common\models\SocialDialoguesPeer;
 use Yii;
@@ -103,12 +104,25 @@ class NotificationController extends Controller
 
     public function actionUserNotifications()
     {
-        return [
-            'user' => \Yii::$app->user->identity->id,
-            'peer' => SocialDialoguesPeer::find()
+        $peer = SocialDialoguesPeer::find()
             ->where(['id'=> Yii::$app->request->post('id')])
             ->orderBy(['id' => SORT_DESC])
-            ->all()
+            ->one();
+
+        $filter = [];
+
+        foreach(SocialDialoguesPeer::getPostsByPeerAction($peer->peer_id) as $post_id){
+            $filter[] = $post_id['post_id'];
+        }
+
+        $posts = Post::find()
+            ->where(['IN', 'result_post_id', $filter])
+            ->all();
+
+        return [
+            'user' => \Yii::$app->user->identity->id,
+            'peer' => $peer,
+            'posts' => $posts
         ];
     }
 

@@ -46,6 +46,32 @@ class Post extends ActiveRecord
         return 'table_posts';
     }
 
+    public function getDataComments()
+    {
+        return $this->hasMany(SocialDialogues::className(), ['post_id' => 'result_post_id']);
+    }
+
+    public function fields()
+    {
+        return [
+            'callback_tlg_message_status',
+            'external_uid',
+            'id',
+            'internal_uid',
+            'job_error',
+            'job_result',
+            'job_status',
+            'message',
+            'photo',
+            'social',
+            'video',
+            'wall_id',
+            'comments' => "dataComments",
+            'result_post_id'
+        ];
+    }
+
+
     /**
      * @inheritdoc
      */
@@ -53,8 +79,7 @@ class Post extends ActiveRecord
     {
         return [
             ['id', 'integer'],
-            [['internal_uid', 'social', 'external_uid', 'callback_tlg_message_status', 'wall_id', 'video', 'photo', 'message', 'job_status', 'job_result', 'job_error'], 'string']
+            [['internal_uid', 'social', 'external_uid', 'callback_tlg_message_status', 'wall_id', 'video', 'photo', 'message', 'job_status', 'job_result', 'job_error', 'result_post_id'], 'string']
         ];
     }
-
 }

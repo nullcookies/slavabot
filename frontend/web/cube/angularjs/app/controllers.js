@@ -1369,6 +1369,7 @@ angular.module('cubeWebApp')
 
         $scope.userNotifications = [];
         $scope.notificationMessage = [];
+
         moment.locale('ru');
 
         // Пагинация
@@ -1436,7 +1437,22 @@ angular.module('cubeWebApp')
     })
     .controller('userNotificationCtrl', function($scope, $http, $sce, $interval, $routeParams){
 
+        $scope.chatPane = true;
+        $scope.postsPane = false;
+
+        $scope.setChat = function(){
+            $scope.chatPane = true;
+            $scope.postsPane = false;
+        }
+
+        $scope.setPosts = function(){
+            $scope.chatPane = false;
+            $scope.postsPane = true;
+        }
+
         $scope.message = '';
+        $scope.comment = [];
+        $scope.posts = [];
         $scope.social = '';
         $scope.mediaID = 0;
 
@@ -1446,6 +1462,19 @@ angular.module('cubeWebApp')
                 'X-CSRF-Token': getCSRF()
             }
         };
+        $scope.parJson = function (json) {
+            var res;
+            try{
+                res = JSON.parse(JSON.parse(json));
+            }catch(e){
+                try{
+                    res = JSON.parse(json);
+                }catch(e){
+                    res = json;
+                }
+            }
+            return res;
+        }
         $scope.getNotificationsForUser = function(){
             moment.locale('ru');
 
@@ -1454,7 +1483,7 @@ angular.module('cubeWebApp')
 
 
             $http.post('/notification/user-notifications', data, config).then(function success(response) {
-                $scope.data = response.data.peer[0];
+                $scope.data = response.data.peer;
                 $scope.userNotification = $scope.data.notification;
                 $scope.userAvatar = $scope.data.avatar;
                 $scope.userName = $scope.data.title;
@@ -1462,9 +1491,8 @@ angular.module('cubeWebApp')
                 $scope.peer_id = $scope.data.peer_id;
                 $scope.mediaID = $scope.data.media_id.info;
                 $scope.social = $scope.data.social;
-
+                $scope.posts = response.data.posts;
                 document.getElementById('refresh').click();
-
             });
         };
 
@@ -1488,6 +1516,18 @@ angular.module('cubeWebApp')
                 });
             }
 
+        };
+
+        $scope.sendComment = function(post_id){
+
+
+                $data = $.param({'user_id' : $scope.user_id, 'peer_id' : $scope.peer_id, 'media_id' : post_id, 'message': $scope.comment[post_id]});
+
+                $scope.comment[post_id] = '';
+
+                $http.post('/rest/send/v1/ig', $data, config).then(function success(response) {
+                    $scope.getNotificationsForUser();
+                });
         };
 
         $scope.getNotificationsForUser();
