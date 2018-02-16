@@ -40,7 +40,8 @@ class SocialDialoguesPeer extends ActiveRecord
     {
         return $this->hasMany(SocialDialoguesSimple::className(), [
             'peer_id' => 'peer_id',
-        ]);
+        ])            ->where(['type'=>'message'])
+            ;
     }
 
     public function getDataMediaId()

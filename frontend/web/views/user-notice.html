@@ -131,8 +131,8 @@
                                             <!--</div>-->
                                         <!--</header>-->
                                         <div class="story-inner-content" style="text-align: center;">
-                                            <img style="width: 25%;" src="/storage/download/{{parJson(post.photo)[0].file_path}}" alt="" ng-If="post.photo">
-                                            <video style="width: 25%;" controls ng-If="post.video">
+                                            <img style="width: 45%;" src="/storage/download/{{parJson(post.photo)[0].file_path}}" alt="" ng-If="post.photo">
+                                            <video style="width: 45%;" controls ng-If="post.video">
                                                 <source src="{{parJson(post.video)[0].file_path | trustUrl}}">
                                             </video>
                                             <p style="margin-top:20px">{{post.message}}</p>
@@ -144,11 +144,11 @@
                                                     <div class="conversation-inner_small">
                                                         <div ng-repeat="comment in post.comments" ng-class="{'item-right' : comment.direction==2}" class="conversation-item item-left clearfix">
                                                             <div class="conversation-user" ng-show="comment.direction==1">
-                                                                <img src="{{userAvatar}}" alt="" style="width:100%">
+                                                                <img src="{{comment.peer.avatar}}" alt="" style="width:100%">
                                                             </div>
                                                             <div class="conversation-body">
                                                                 <div class="name" ng-show="comment.direction==1">
-                                                                    {{userName}}
+                                                                    {{comment.peer.title}}
                                                                 </div>
                                                                 <div class="name" ng-show="comment.direction==2">
                                                                     Вы

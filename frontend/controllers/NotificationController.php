@@ -117,6 +117,7 @@ class NotificationController extends Controller
 
         $posts = Post::find()
             ->where(['IN', 'result_post_id', $filter])
+            ->orderBy(['id' => SORT_DESC])
             ->all();
 
         return [
