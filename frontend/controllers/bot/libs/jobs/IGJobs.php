@@ -12,6 +12,8 @@ use common\models\Post;
 use common\services\StaticConfig;
 use FFMpeg\Coordinate\Dimension;
 use FFMpeg\FFMpeg;
+use FFMpeg\FFProbe;
+use FFMpeg\Filters\Video\ResizeFilter;
 use FFMpeg\Format\Video\X264;
 use frontend\controllers\bot\libs\Files;
 use frontend\controllers\bot\libs\Logger;
@@ -126,12 +128,12 @@ class IGJobs implements SocialJobs
                      */
 
                     $ffmpeg = FFMpeg::create();
-
                     $video = $ffmpeg->open($videoFile);
                     $video
                         ->filters()
-                        ->resize(new Dimension(640, 480))
+                        ->pad(new Dimension(640, 640))
                         ->synchronize();
+
 
                     /**
                      * Для работы конвертера для дева запускать как
