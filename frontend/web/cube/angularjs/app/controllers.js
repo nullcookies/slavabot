@@ -1433,7 +1433,7 @@ angular.module('cubeWebApp')
 
         $scope.Timer = $interval(function () {
             $scope.setPage($scope.currentPage);
-        }, 1000);
+        }, 10000);
     })
     .controller('userNotificationCtrl', function($scope, $http, $sce, $interval, $routeParams){
 
@@ -1534,7 +1534,7 @@ angular.module('cubeWebApp')
 
         $scope.Timer = $interval(function () {
             $scope.getNotificationsForUser();
-        }, 1000);
+        }, 10000);
 
 
     })
