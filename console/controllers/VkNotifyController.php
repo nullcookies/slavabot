@@ -31,6 +31,7 @@ class VkNotifyController extends Controller
             foreach ($users as $user) {
                 $user = $user->toArray();
                 if(!empty($user['telegram_id'] && !empty($user['access_token']))) {
+                    //TODO проверить, что это пользователь. Для групп не запускать
                     $access_token = $user['access_token'];
                     $options = [
                         'access_token' => $access_token,
@@ -55,35 +56,48 @@ class VkNotifyController extends Controller
 
     public function actionNotify()
     {
-        $users = \common\models\rest\Accounts::find()
-            ->andWhere([
-                'type' => 'vkontakte',
-                'status' => 1,
-                'processed' => 1,
-                'user_id' => 30
-            ])
-            ->all();
+        $count = 0;
+        while (true) {
 
-        if($users) {
-            foreach ($users as $user) {
-                $user = $user->toArray();
-                if(!empty($user['telegram_id'] && !empty($user['access_token']))) {
-                    $access_token = $user['access_token'];
-                    $options = [
-                        'access_token' => $access_token,
-                    ];
-                    try {
-                        $vk = new \frontend\controllers\bot\libs\Vk($options);
-                        echo $user['user_id'] . PHP_EOL;
-                        $this->getNotify($vk, $user['user_id']);
-                    } catch(\Exception $e) {
-                        echo $e->getMessage() . PHP_EOL;
+
+
+            $users = \common\models\rest\Accounts::getVk();
+
+            /*$users = \common\models\rest\Accounts::find()
+                ->andWhere([
+                    'type' => 'vkontakte',
+                    'status' => 1,
+                    'processed' => 1,
+                    'user_id' => 30
+                ])
+                ->all();*/
+
+            if ($users) {
+                foreach ($users as $user) {
+                    $user = $user->toArray();
+                    if (!empty($user['telegram_id'] && !empty($user['access_token']))) {
+                        $access_token = $user['access_token'];
+                        $options = [
+                            'access_token' => $access_token,
+                        ];
+                        try {
+                            $vk = new \frontend\controllers\bot\libs\Vk($options);
+                            echo $user['user_id'] . PHP_EOL;
+                            $this->getNotify($vk, $user['user_id']);
+                        } catch (\Exception $e) {
+                            echo $e->getMessage() . PHP_EOL;
+                        }
+                        sleep(1);
                     }
                 }
+            } else {
+                echo 'Нет пользователей' . PHP_EOL;
+                Yii::$app->end();
             }
-        } else {
-            echo 'Нет пользователей' . PHP_EOL;
-            Yii::$app->end();
+
+
+
+            echo 'COUNT: ' . ++$count . PHP_EOL;
         }
     }
 

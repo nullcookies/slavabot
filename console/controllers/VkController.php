@@ -12,27 +12,63 @@ namespace console\controllers;
 use common\models\SocialDialoguesPeerVk;
 use common\models\SocialDialoguesPostVk;
 use common\models\SocialDialoguesVkComments;
+use frontend\controllers\bot\Bot;
+use frontend\controllers\bot\commands\FrontendNotificationCommand;
 use Yii;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
 
 class VkController extends Controller
 {
+    public function actionSend()
+    {
+        $user = \common\models\rest\Accounts::find()
+            ->andWhere([
+                'type' => 'vkontakte',
+                'status' => 1,
+                'processed' => 1,
+                'user_id' => 30
+            ])
+            ->one();
+        $user = $user->toArray();
+
+        $access_token = $user['access_token'];
+        $options = [
+            'access_token' => $access_token,
+        ];
+
+        try {
+            $vk = new \frontend\controllers\bot\libs\Vk($options);
+            $vk->api('wall.createComment', [
+                'owner_id' => -160368639,
+                'post_id' => 43,
+                'from_group' => 160368639,
+                'message' => 'Sended comment'
+            ]);
+
+
+        } catch(\Exception $e) {
+            echo $e->getMessage() . PHP_EOL;
+        }
+
+    }
+
     public function actionComments()
     {
-        //$users = \common\models\rest\Accounts::getVk();
+
         $count = 0;
         while (true) {
 
+            $users = \common\models\rest\Accounts::getVk();
 
-            $users = \common\models\rest\Accounts::find()
+            /*$users = \common\models\rest\Accounts::find()
                 ->andWhere([
                     'type' => 'vkontakte',
                     'status' => 1,
                     'processed' => 1,
                     'user_id' => 30
                 ])
-                ->all();
+                ->all();*/
 
             if($users) {
                 foreach ($users as $user) {
@@ -50,10 +86,12 @@ class VkController extends Controller
                             } else {
                                 $ownerId = $user['group_id'];
                             }
-                            $this->getComments($vk, $user['user_id'], $ownerId);
+                            $this->getComments($vk, $user['user_id'], $ownerId, $user['telegram_id']);
                         } catch(\Exception $e) {
                             echo $e->getMessage() . PHP_EOL;
                         }
+
+                        sleep(3);
                     }
                 }
             } else {
@@ -66,7 +104,7 @@ class VkController extends Controller
 
     }
 
-    protected function getComments(\frontend\controllers\bot\libs\Vk $vk, $userId, $ownerId)
+    protected function getComments(\frontend\controllers\bot\libs\Vk $vk, $userId, $ownerId, $telegramId)
     {
         echo $ownerId . PHP_EOL;
         $postIds = [];
@@ -116,11 +154,12 @@ class VkController extends Controller
             }*/
         }
 
-
         foreach ($postIds as $postId) {
             $commentsHashes = SocialDialoguesVkComments::getCommentsHashByPostId($postId, $ownerId);
             $offset = 0;
             do {
+                sleep(3);
+
                 $comments = $vk->api('wall.getComments', [
                     'owner_id' => $ownerId,
                     'post_id' => $postId,
@@ -163,6 +202,18 @@ class VkController extends Controller
                             SocialDialoguesPeerVk::saveVkPeer(
                                 $peerId, $peerInfo['title'], $peerInfo['avatar'], $peerInfo['type']
                             );
+
+                            $bot = new Bot();
+                            $telegram = $bot->GetTelegram();
+
+                            $command = new FrontendNotificationCommand($telegram);
+                            $command->prepareParams([
+                                'tid' => $telegramId,
+                                'message' => $peerInfo['title'].":\n".$comment['text'],
+                            ]);
+                            $command->execute($ownerId, $postId);
+
+                            echo 'sended' . PHP_EOL;
                         } else {
                             echo 'Исходящий' . PHP_EOL;
                         }
@@ -176,12 +227,8 @@ class VkController extends Controller
                 } else {
                     break;
                 }
-
-                sleep(1);
             } while (true);
 
         }
-
-        sleep(1);
     }
 }

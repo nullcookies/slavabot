@@ -21,28 +21,6 @@ class IgController extends Controller
 {
     private $commentPks = [];
 
-    public function actionSend()
-    {
-        /*$userId = 30;
-        $mediaId = '1709599968191611677_7065861496';
-        $text = 'Server send test';
-
-        $account = Accounts::getByUserId($userId, 'instagram');
-        $fields = $account->fields();
-        $data = $fields['data']();
-
-        try {
-            $ig = new \InstagramAPI\Instagram(false, false);
-            //$ig->setProxy("http://51.15.205.156:3128");
-            $ig->login($data->login, $data->password);
-            $ig->media->comment($mediaId, $text);
-
-        } catch (\Exception $e) {
-            echo "Не удалось отпрвить" . PHP_EOL;
-            echo $e->getMessage() . PHP_EOL;
-        }*/
-    }
-
     public function actionComments()
     {
         //while (true) {
