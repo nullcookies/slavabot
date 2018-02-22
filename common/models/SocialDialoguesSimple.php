@@ -81,6 +81,7 @@ class SocialDialoguesSimple extends ActiveRecord
             'message'=>'text',
             'created_at',
             'direction',
+            'info' => 'message'
         ];
     }
 

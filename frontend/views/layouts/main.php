@@ -153,7 +153,7 @@ AppAsset::register($this);
                                 </li>
                                 <li class="header-nav__item" data-match-route="/pages/notice"><a
                                             href="#/pages/notice"><i
-                                                class="fa fa-bell-o"></i><span>Уведомления</span></a>
+                                                class="fa fa-bell-o"></i><span>Диалоги</span></a>
                                 </li>
 
                             </ul>

@@ -4,6 +4,8 @@
  * User: lexgorbachev
  * Date: 12.01.2018
  * Time: 09:16
+ *
+ * Редактирование сообщения отправленного пользователю.
  */
 
 namespace common\commands\command;
@@ -16,6 +18,15 @@ use Longman\TelegramBot\Request;
 
 class EditTelegramNotificationCommand extends BaseObject implements SelfHandlingCommand
 {
+    /**
+     * $data обязательно содержит:
+     *
+     * 'chat_id', 'user_id' - идентификаторы диалога
+     * 'message_id' - id редактируемого сообщения
+     * 'text' - текст, которым мы заменим существующий
+     *
+     */
+
     public $data;
 
     protected function GetCommand()

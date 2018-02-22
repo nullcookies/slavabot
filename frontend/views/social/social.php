@@ -22,7 +22,7 @@ use frontend\controllers\SocialController;
                                             );
                                         ?>
                                     </li>
-                                    <li><a data-toggle="modal" id="vkontakte" data-target="#myModalVK">Вконтакте</a></li>
+                                    <li ng-show="available.vkontakte"><a data-toggle="modal" id="vkontakte" data-target="#myModalVK">Вконтакте</a></li>
                                     <li ng-show="available.instagram"><a data-toggle="modal" id="instagram" data-target="#myModal">Instagram</a></li>
                                 </ul>
                             </div>
@@ -122,7 +122,7 @@ use frontend\controllers\SocialController;
                             <i class="fa fa-times-circle fa-fw fa-lg"></i>
                             <span ng-bind-html="sce.trustAsHtml(instaError)"></span>
                         </div>
-                        <form role="form" class="ng-pristine ng-valid">
+                        <form role="form" class="ng-pristine ng-valid" ng-show="InstaFormBox">
                             <div class="form-group">
                                 <label for="exampleInputEmail1">Логин</label>
                                 <input type="text" class="form-control" ng-model="InstaLogin" placeholder="Номер телефона, имя пользователя или эл. адрес">
@@ -132,6 +132,9 @@ use frontend\controllers\SocialController;
                                 <input type="password" class="form-control" ng-model="InstaPassword" placeholder="Пароль">
                             </div>
                         </form>
+                        <div class="vkcard__content" ng-show="InstaWaitBox">
+                            Подождите. Идёт привязка аккаунта. Это может занять несколько секунд
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-success" ng-click="InstaSave()">Сохранить</button>
@@ -153,14 +156,19 @@ use frontend\controllers\SocialController;
                             <i class="fa fa-times-circle fa-fw fa-lg"></i>
                             <strong>Ошибка!</strong> {{vkErrorText}}
                         </div>
-                        <div class="form-group" ng-class="{'has-error' : vkError || vkLoginError}">
+                        <div class="form-group" ng-class="{'has-error' : vkError || vkLoginError}" ng-show="VkFormBox">
                             <label for="exampleInputEmail1">Логин (Номер телефона)</label>
                             <input type="text" class="form-control" ng-model="vkLogin" ui-mask="9 (999) 999-99-99" required>
                         </div>
-                        <div class="form-group" ng-class="{'has-error' : vkError || vkPasswordError}">
+                        <div class="form-group" ng-class="{'has-error' : vkError || vkPasswordError}" ng-show="VkFormBox">
                             <label for="exampleInputPassword1">Пароль</label>
                             <input type="password" class="form-control"  ng-model="vkPassword"  placeholder="Пароль">
                         </div>
+
+                        <div class="vkcard__content" ng-show="VkWaitBox">
+                            Подождите. Идёт привязка аккаунта. Это может занять несколько секунд
+                        </div>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-success" ng-click="VkSave()">Сохранить</button>

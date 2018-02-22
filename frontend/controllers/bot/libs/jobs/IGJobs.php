@@ -10,11 +10,18 @@ namespace frontend\controllers\bot\libs\jobs;
 use common\models\JobPost;
 use common\models\Post;
 use common\services\StaticConfig;
+use FFMpeg\Coordinate\Dimension;
+use FFMpeg\FFMpeg;
+use FFMpeg\FFProbe;
+use FFMpeg\Filters\Video\ResizeFilter;
+use FFMpeg\Format\Video\X264;
 use frontend\controllers\bot\libs\Files;
 use frontend\controllers\bot\libs\Logger;
 use frontend\controllers\bot\libs\SalesBotApi;
 use frontend\controllers\bot\libs\SocialNetworks;
 use common\commands\command\EditTelegramNotificationCommand;
+use common\commands\command\CheckStatusNotificationCommand;
+
 
 
 class IGJobs implements SocialJobs
@@ -22,6 +29,10 @@ class IGJobs implements SocialJobs
     public function run(\Kicken\Gearman\Job\WorkerJob $job)
     {
         try {
+
+            $command = 'sudo chown -R apache:apache /var/www/salesbot/vendor/mgp25/instagram-php/sessions';
+            echo shell_exec($command);
+
             $notes = json_decode($job->getWorkload(), true);
 
             $job->sendComplete();
@@ -52,7 +63,12 @@ class IGJobs implements SocialJobs
             $truncatedDebug = false;
 
             $ig = new \InstagramAPI\Instagram($debug, $truncatedDebug);
+
+            sleep(1);
+
             $ig->login($username, $password);
+
+            sleep(1);
 
             if (isset($notes['Text']) && !empty($notes['Text'])) {
                 $messages = $notes['Text'];
@@ -86,11 +102,70 @@ class IGJobs implements SocialJobs
 
             }
 
+            /**
+             * Обработка прикрепленного видео инстаграм.
+             */
+
             if (isset($notes['Videos']) && is_array($notes['Videos'])) {
+
                 $waitExists = Files::WaitExists($notes['Videos']);
+                /**
+                 * Ждем, пока исходный файл сохранится на сервере
+                 */
                 if ($waitExists == true) {
-                    $videoFilename = $notes['Videos'][0];
-                    $result = $ig->timeline->uploadVideo($videoFilename, ['caption' => $messages]);
+
+
+                    /**
+                     * Проверяем видео на наличие расширения.
+                     * Если оно отсутствует, то проставляем его.
+                     */
+
+                    $videoFile = self::checkVideo($notes['Videos'][0]);
+
+                    /**
+                     * Сжимаем видео, т.к. инстаграм принимает видео только
+                     * от 480 до 720p
+                     */
+
+                    $ffmpeg = FFMpeg::create();
+                    $video = $ffmpeg->open($videoFile);
+                    $video
+                        ->filters()
+                        ->pad(new Dimension(640, 640))
+                        ->synchronize();
+
+
+                    /**
+                     * Для работы конвертера для дева запускать как
+                     * new X264('libfdk_aac');
+                     *
+                     */
+
+                    $format = new X264();
+
+                    //$format = new X264('libfdk_aac');
+
+
+                    $output =  self::checkPressPath($notes['video_path']);
+
+                    $res = $video->save($format, $output);
+
+                    /**
+                     * Ждем, пока будет сохранен сконвертированный файл
+                     */
+                    $waitExistsPress = Files::WaitExists([$output]);
+
+                    if ($waitExistsPress == true) {
+                        /**
+                         * Отправляем сжатый файл в инстаграм
+                         */
+                        $result = $ig->timeline->uploadVideo($output, ['caption' => $messages]);
+                    }else {
+                        Logger::error('Ошибка сжатия видео из Telegram', [
+                            'notes' => $notes
+                        ]);
+                        throw new \Exception('Ошибка сжатия видео из Telegram');
+                    }
                 } else {
                     Logger::error('Ошибка получения видео из Telegram', [
                         'notes' => $notes
@@ -110,10 +185,26 @@ class IGJobs implements SocialJobs
                 $post->job_status = Post::JOB_STATUS_POSTED;
                 $post->job_result = json_encode('posted');
                 $post->save(false);
+                $data =  [
+                    'callback_tlg_message_status' => $post->callback_tlg_message_status
+                ];
 
+                $elseData = $data;
+                $data['job_status'] = 'POSTED';
+                $elseData['job_status'] = 'FAIL';
+
+                $count = Post::find()->where(['OR', $data, $elseData])->count();
                 //отправляем в api
                 $arParam = ['data' => json_encode($post->toArray()), 'type' => SocialNetworks::IG, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
+
+                /**
+                 * Отправляем клиенту уведомление об удачной отправке
+                 * $notes['response_data'] - содержит в себе:
+                 * - id пользователя
+                 * - id чата
+                 * - id сообщений вида "instagam - ...", которое мы заменяем на "instagam - готово"
+                 */
 
                 try{
                     \Yii::$app->commandBus->handle(
@@ -126,6 +217,7 @@ class IGJobs implements SocialJobs
                 }catch (\Exception $e){
                     Logger::error($e->getMessage());
                 }
+
             }
 
 
@@ -143,9 +235,27 @@ class IGJobs implements SocialJobs
                 //отправляем в api
                 $arParam = ['data' => json_encode($jobPost->getAttributes()), 'type' => SocialNetworks::IG, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
+            } else {
+                try {
+                    \Yii::$app->commandBus->handle(
+                        new CheckStatusNotificationCommand(
+                            [
+                                'data' => [
+                                    'callback_tlg_message_status' => $post->callback_tlg_message_status
+                                ],
+                                'count' => $count
+                            ]
+                        )
+                    );
+                } catch (\Exception $e) {
+                    Logger::error($e->getMessage());
+                }
             }
 
             Logger::info('Публикация IG завершена');
+
+            $command = 'sudo chown -R apache:apache /var/www/salesbot/vendor/mgp25/instagram-php/sessions';
+            echo shell_exec($command);
 
             return true;
 
@@ -168,9 +278,31 @@ class IGJobs implements SocialJobs
                 $post->job_error = $e->getTraceAsString();
                 $post->save(false);
 
+                $data =  [
+                    'callback_tlg_message_status' => $post->callback_tlg_message_status
+                ];
+
+                $elseData = $data;
+                $data['job_status'] = 'POSTED';
+                $elseData['job_status'] = 'FAIL';
+
+                $count = Post::find()->where(['OR', $data, $elseData])->count();
                 //отправляем в api
                 $arParam = ['data' => json_encode($post->toArray()), 'type' => SocialNetworks::IG, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
+
+                try{
+                    $notes['response_data']['text'] = 'Instagram - ошибка';
+                    \Yii::$app->commandBus->handle(
+                        new EditTelegramNotificationCommand(
+                            [
+                                'data' => $notes['response_data']
+                            ]
+                        )
+                    );
+                }catch (\Exception $e){
+                    Logger::error($e->getMessage());
+                }
 
                 $arParam = [
                     'wall_id' => $post->wall_id,
@@ -193,10 +325,55 @@ class IGJobs implements SocialJobs
                 //отправляем в api
                 $arParam = ['data' => json_encode($jobPost->getAttributes()), 'type' => SocialNetworks::IG, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
+            }else{
+                try{
+                    \Yii::$app->commandBus->handle(
+                        new CheckStatusNotificationCommand(
+                            [
+                                'data' => [
+                                    'callback_tlg_message_status' => $post->callback_tlg_message_status
+                                ],
+                                'count' => $count
+                            ]
+                        )
+                    );
+                }catch (\Exception $e){
+                    return ($e->getMessage());
+                }
             }
 
             $job->sendComplete();
             return "Error jobs IG";
+        }
+    }
+
+    public static function getExtension($filename) {
+        $path_info = pathinfo($filename);
+        return $path_info['extension'];
+    }
+
+
+    public static function checkVideo($file){
+        if(self::getExtension($file)===null){
+
+            $newFile = $file.'.'.explode("/", mime_content_type($file))[1];
+
+            if (!copy($file, $newFile)) {
+                return false;
+            }
+
+            $file = $newFile;
+        }
+
+        return $file;
+    }
+
+    public static function checkPressPath($file){
+
+        if(strlen(array_pop(explode(".", $file)))>4){
+            return $file.'.mp4';
+        }else{
+            return $file;
         }
     }
 }

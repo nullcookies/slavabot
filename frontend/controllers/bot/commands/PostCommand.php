@@ -80,6 +80,19 @@ class PostCommand extends UserCommand
                 json_encode($this->conversation) . "\n", FILE_APPEND);
 
             $notes = &$this->conversation->notes;
+
+            if($notes['state'] == 5){
+
+                $this->conversation->stop();
+
+                $this->conversation = new Conversation($user_id, $chat_id, $this->getName());
+
+                file_put_contents(\Yii::getAlias('@frontend') . '/runtime/logs/cbb.log',
+                    json_encode($this->conversation) . "\n", FILE_APPEND);
+
+                $notes = &$this->conversation->notes;
+            }
+
             !is_array($notes) && $notes = [];
             //cache data from the tracking session if any
 
@@ -90,7 +103,10 @@ class PostCommand extends UserCommand
             if (isset($notes['state'])) {
                 $state = $notes['state'];
             }
-
+//            $data['text'] = $notes['state'];
+//
+//
+//            Request::sendMessage($data);
             switch ($state) {
                 case 0:
                     /**
@@ -107,10 +123,7 @@ class PostCommand extends UserCommand
 
                         $this->conversation->update();
 
-                        //$data['text'] = 'Введите данные: ';
 
-
-//                        Request::sendMessage($data);
 
                         break;
                     }else{
@@ -194,23 +207,41 @@ class PostCommand extends UserCommand
 
                     // Проверяем на возможность добавления в пост текста/медиа
 
-                    if(!isset($notes['Text']) || !isset($notes['Photo'])){
+                    $inline_keyboard = new InlineKeyboard([]);
+
+                    if(!isset($notes['Text'])){
                         $buttonsArray = [
-                            ['text' => 'Добавить', 'callback_data' => 'addpost'],
-                            ['text' => 'Опубликовать', 'callback_data' => 'sendpost'],
-                            ['text' => 'Запланировать', 'callback_data' => 'planpost'],
+                            ['text' => 'Добавить текст', 'callback_data' => 'addpost'],
+                            ['text' => 'Опубликовать сейчас', 'callback_data' => 'sendpost'],
+                            ['text' => 'Задать время публикации', 'callback_data' => 'planpost'],
+                            ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
+                        ];
+                    }elseif(!isset($notes['Photo']) && !isset($notes['Video'])){
+                        $buttonsArray = [
+                            ['text' => 'Добавить фото/видео', 'callback_data' => 'addpost'],
+                            ['text' => 'Опубликовать сейчас', 'callback_data' => 'sendpost'],
+                            ['text' => 'Задать время публикации', 'callback_data' => 'planpost'],
                             ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
                         ];
                     }else{
                         $buttonsArray = [
-                            ['text' => 'Опубликовать', 'callback_data' => 'sendpost'],
-                            ['text' => 'Запланировать', 'callback_data' => 'planpost'],
+                            ['text' => 'Опубликовать сейчас', 'callback_data' => 'sendpost'],
+                            ['text' => 'Задать время публикации', 'callback_data' => 'planpost'],
                             ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
                         ];
                     }
 
+                    foreach($buttonsArray as $button){
+                        $inline_keyboard->addRow(
+                            [
+                                'text' => $button['text'],
+                                'callback_data' => $button['callback_data']
+                            ]
+                        );
 
-                    $inline_keyboard = new InlineKeyboard($buttonsArray);
+                    }
+
+                    $inline_keyboard->setResizeKeyboard(true);
 
                     $data['reply_markup'] = $inline_keyboard;
 
@@ -265,11 +296,23 @@ class PostCommand extends UserCommand
                      * Если данные корректны, отправляем пост в очередь на публикацию.
                      */
 
-                    $notes['MsgId'] = $message->getMessageId();
+                    //$notes['MsgId'] = $message->getMessageId();
 
 
-                    if (!self::IsDate($text)) {
+                    /** @var User $user */
+                    $user = User::findOne([
+                        'telegram_id' => $user_id,
+                    ]);
+
+                    //по умолчанию ставим
+                    $timeZone = 'Europe/Moscow';
+                    if ($user) {
+                        $timeZone = $user->timezone;
+                    }
+
+                    if (!self::IsDate($text) || (Carbon::now()->timezone($timeZone)->diff(\Carbon\Carbon::parse($text, $timeZone))->invert==1)) {
                         $data['text'] = "Не верный формат: " . $text;
+                        Request::sendMessage($data);
                     } else {
 
                         //часовой пояс пользователя
@@ -288,42 +331,29 @@ class PostCommand extends UserCommand
                         $notes['state'] = 5;
                         $notes['schedule_dt'] = Carbon::parse($text,
                             $timeZone)->setTimezone('Europe/London')->toDateTimeString();
+                        $this->conversation->update();
                         //Carbon::parse($text)->timezone($timeZone)->timezone('Europe/London')->toDateTimeString();
 
-                        $this->conversation->update();
+
                         $inline_keyboard = new InlineKeyboard([
                             ['text' => 'Опубликовать', 'callback_data' => 'sendpost'],
                             ['text' => 'Отменить', 'callback_data' => 'cancelpost'],
                         ]);
 
                         Carbon::setLocale('ru');
-                        $td = Carbon::now()->timezone($timeZone)->diff(\Carbon\Carbon::parse($text, $timeZone));
+                        $dateText = Carbon::parse($text, $timeZone)->format('d.m.Y');
+                        $timeText = Carbon::parse($text, $timeZone)->format('H:i');
 
-                        $dif = "";
 
-                        if ($td->y > 0) {
-                            $dif .= Utils::human_plural_form($td->y, ["год", "года", "лет"]) . " ";
-                        }
-                        if ($td->m > 0) {
-                            $dif .= Utils::human_plural_form($td->m, ["месяц", "месяц", "месяцев"]) . " ";
-                        }
-                        if ($td->d > 0) {
-                            $dif .= Utils::human_plural_form($td->d, ["день", "дня", "дней"]) . " ";
-                        }
-                        if ($td->h > 0) {
-                            $dif .= Utils::human_plural_form($td->h, ["час", "часа", "часов"]) . " ";
-                        }
-                        if ($td->i > 0) {
-                            $dif .= Utils::human_plural_form($td->i, ["минуту", "минуты", "минут"]) . " ";
-                        }
-                        if ($td->s > 0) {
-                            $dif .= Utils::human_plural_form($td->s, ["секунду", "секунды", "секунд"]);
-                        }
+                        $data['text'] = 'Публикация запланирована на '.$dateText.' в '. $timeText. "\nОтправьте сообщение для публикации";
 
-                        $data['text'] = "Ваш пост будет опубликован через " . $dif;
+                        //
+
+
 
                         return (new SendpostCommand($this->telegram,
-                            new Update(json_decode($this->update->toJson(), true))))->executeNow($data['text']);
+                            new Update(json_decode($this->update->toJson(), true))))->executeNow($data['text'], $notes);
+
                     }
             }
 //            switch ($state) {
@@ -621,10 +651,14 @@ class PostCommand extends UserCommand
 
     private static function IsDate($_value, $_format = 'd.m.Y H:i')
     {
+        try{
+            $d = \DateTime::createFromFormat($_format, $_value);
 
-        $d = \DateTime::createFromFormat($_format, $_value);
+            return $d/* && $d->format($_format) == $_value*/
+                ;
+        } catch (TelegramException $e) {
+            return false;
+        }
 
-        return $d/* && $d->format($_format) == $_value*/
-            ;
     }
 }

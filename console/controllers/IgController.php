@@ -105,6 +105,7 @@ class IgController extends Controller
                         $user = $item->user;
 
                         SocialDialoguesInstagram::newIgComment(
+                            $id,
                             $userId,
                             $ig->account_id,
                             $id,

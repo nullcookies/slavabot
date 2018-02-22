@@ -253,10 +253,10 @@ angular.module('cubeWebApp')
 
                 // Единоразовый редирект на страницу тарифов, после окончания оплаченного периода
 
-                if(!$scope.tariff.active && !getCookie('payment_' +  $scope.tariff.payment_id)){
-                    setCookie('payment_' +  $scope.tariff.payment_id, true);
-                    $location.path('/tariffs');
-                }
+                // if(!$scope.tariff.active && !getCookie('payment_' +  $scope.tariff.payment_id)){
+                //     setCookie('payment_' +  $scope.tariff.payment_id, true);
+                //     $location.path('/tariffs');
+                // }
 
 
             });
@@ -922,7 +922,7 @@ angular.module('cubeWebApp')
             }
         };
     })
-    .controller('socialCtrl', function($scope, $http, $sce){
+    .controller('socialCtrl', function($scope, $http, $sce, $timeout){
 
         $scope.InstaLogin = '';
         $scope.InstaPassword = '';
@@ -944,6 +944,11 @@ angular.module('cubeWebApp')
         $scope.instaError = '';
         $scope.activeVKID;
         $scope.sce = $sce;
+
+        $scope.InstaWaitBox = false;
+        $scope.InstaFormBox = true;
+        $scope.VkWaitBox = false;
+        $scope.VkFormBox = true;
 
         $scope.available = {
             'instagram' : true,
@@ -1061,8 +1066,11 @@ angular.module('cubeWebApp')
             }
 
             if(checkData($scope.vkLogin, 9) && checkData($scope.vkPassword, 2)){
+                $scope.VkWaitBox = true;
+                $scope.VkFormBox = false;
                 $http.post('/social/vk-auth', $.param($scope.data), config).then(function success(response) {
-
+                    $scope.VkWaitBox = false;
+                    $scope.VkFormBox = true;
 
                     if(response.data.status){
                         $scope.vkError = false;
@@ -1139,21 +1147,37 @@ angular.module('cubeWebApp')
                 };
             }
 
+
             if(checkData($scope.InstaLogin, 2) && checkData($scope.InstaPassword, 2)){
+
+                $scope.InstaWaitBox = true;
+                $scope.InstaFormBox = false;
+
                 $http.post('/social/instagram', $.param($scope.data), config).then(function success(response) {
+
+                    $scope.InstaWaitBox = false;
+                    $scope.InstaFormBox = true;
+
                     if(response.data.error){
                         $scope.instaError = response.data.error;
+                        $timeout($scope.ClearError, 5000);
                         return false;
                     }else{
                         $scope.instaError = '';
                     }
+
                     document.getElementById('closeInstaModal').click();
                     $scope.clearInstaForm();
                     $scope.getAccounts();
+
                 });
             }
 
         }
+
+        $scope.ClearError = function(){
+            $scope.instaError = '';
+        };
     })
     .controller('historyCtrl', function($scope, $http, $sce, $interval){
 
@@ -1413,6 +1437,9 @@ angular.module('cubeWebApp')
     .controller('userNotificationCtrl', function($scope, $http, $sce, $interval, $routeParams){
 
         $scope.message = '';
+        $scope.social = '';
+        $scope.mediaID = 0;
+
         var config = {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
@@ -1433,6 +1460,9 @@ angular.module('cubeWebApp')
                 $scope.userName = $scope.data.title;
                 $scope.user_id = response.data.user;
                 $scope.peer_id = $scope.data.peer_id;
+                $scope.mediaID = $scope.data.media_id.info;
+                $scope.social = $scope.data.social;
+
                 document.getElementById('refresh').click();
 
             });
@@ -1441,12 +1471,23 @@ angular.module('cubeWebApp')
 
 
         $scope.sendMessage = function(){
-            $data = $.param({'user_id' : $scope.user_id, 'peer_id' : $scope.peer_id, 'message': $scope.message});
-
-            $http.post('/rest/send/v1/vk', $data, config).then(function success(response) {
+            if($scope.social=='VK'){
+                $data = $.param({'user_id' : $scope.user_id, 'peer_id' : $scope.peer_id, 'message': $scope.message});
                 $scope.message = '';
+                $http.post('/rest/send/v1/vk', $data, config).then(function success(response) {
 
-            });
+
+                });
+            }else if($scope.social=='IG'){
+
+                $data = $.param({'user_id' : $scope.user_id, 'peer_id' : $scope.peer_id, 'media_id' : $scope.mediaID, 'message': $scope.message});
+                $scope.message = '';
+                $http.post('/rest/send/v1/ig', $data, config).then(function success(response) {
+
+
+                });
+            }
+
         };
 
         $scope.getNotificationsForUser();
@@ -1545,6 +1586,12 @@ angular.module('cubeWebApp')
             return input;
         };
     });
+
+    app.filter("trustUrl", ['$sce', function ($sce) {
+        return function (recordingUrl) {
+            return '/storage/download/'+$sce.trustAsResourceUrl(recordingUrl);
+        };
+    }]);
 
 
 

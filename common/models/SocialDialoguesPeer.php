@@ -43,6 +43,14 @@ class SocialDialoguesPeer extends ActiveRecord
         ]);
     }
 
+    public function getDataMediaId()
+    {
+        return $this->hasOne(SocialDialoguesSimple::className(),
+            ['peer_id' => 'peer_id'])
+            ->orderBy(['id'=>SORT_DESC]);
+
+    }
+
     public function fields()
     {
         return [
@@ -51,7 +59,9 @@ class SocialDialoguesPeer extends ActiveRecord
             'avatar',
             'peer_id',
             'title',
+            'social',
             'notification' => 'dataNotifications',
+            'media_id' => 'dataMediaId'
         ];
     }
 

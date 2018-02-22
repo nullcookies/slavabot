@@ -57,54 +57,39 @@ class SendpostCommand extends UserCommand
         ];
         Request::editMessageText($data_edit);
 
-        try{
+        //try{
             $this->prepareVkJob($notes, $user_id, $responseData);
             $this->prepareFbJob($notes, $user_id, $responseData);
             $this->prepareIgJob($notes, $user_id, $responseData);
 
             $this->conversation->stop();
-        }catch (\Exception $e){
-
-            $data_edit['text'] = 'Ошибка: '.$e->getMessage();
-            Request::editMessageText($data_edit);
-
-        }
+//        }catch (\Exception $e){
+//
+//            $data_edit['text'] = 'Ошибка: '.$e->getMessage();
+//            Request::editMessageText($data_edit);
+//
+//        }
         return (new PostCommand($this->telegram,
-            new Update(json_decode($this->update->toJson(), true))))->execute(true, 'Отправьте сообщение для публикации');
+            new Update(json_decode($this->update->toJson(), true))))->execute(true, '');
 
     }
 
-    public function executeNow($text){
-        //\frontend\controllers\bot\libs\Logger::info(__METHOD__);
+    public function executeNow($text, $notes){
 
         $chat_id = $this->getMessage()->getFrom()->getId();
         $user_id = $this->getMessage()->getFrom()->getId();
 
-        $this->conversation = new Conversation($user_id, $chat_id, 'post');
-        $notes = &$this->conversation->notes;
-
-        $res = [
-            'vk' => $this->prepareVkJob($notes, $user_id),
-            'facebook' => $this->prepareFbJob($notes, $user_id),
-            'instagram' => $this->prepareIgJob($notes, $user_id)
-        ];
+        //$mid = $notes['fm']['result']['message_id'];
 
 
-        $mid = $notes['fm']['result']['message_id'];
-        $mtext = $notes['state'] != 5 ?  json_encode($res) : $text ;
+        $this->prepareVkJob($notes, $user_id);
+        $this->prepareFbJob($notes, $user_id);
+        $this->prepareIgJob($notes, $user_id);
 
-        $data_edit = [
-            'chat_id' => $chat_id,
-            'user_id' => $user_id,
-            'message_id' => $mid,
-            'text' => $mtext,
+        //$this->conversation->stop();
 
-        ];
-        Request::sendMessage($data_edit);
-
-        $this->conversation->stop();
         return (new PostCommand($this->telegram,
-            new Update(json_decode($this->update->toJson(), true))))->execute(true, 'Отправьте сообщение для публикации');
+            new Update(json_decode($this->update->toJson(), true))))->execute(true, $text);
 
     }
 
@@ -247,7 +232,7 @@ class SendpostCommand extends UserCommand
      * @param $user_id
      * @return string
      */
-    public function prepareFbJob($notes, $user_id, $responseData)
+    public function prepareFbJob($notes, $user_id, $responseData = [])
     {
 
         $user = $this->getUserCredentialsBySocial($user_id, SocialNetworks::FB);
@@ -364,7 +349,7 @@ class SendpostCommand extends UserCommand
      * @param $user_id
      * @return string
      */
-    public function prepareIgJob($notes, $user_id, $responseData)
+    public function prepareIgJob($notes, $user_id, $responseData = [])
     {
 
         $user = $this->getUserCredentialsBySocial($user_id, SocialNetworks::IG);
@@ -398,7 +383,7 @@ class SendpostCommand extends UserCommand
         $arr['page_id'] = $user['username'];
         $arr['post_model_id'] = $post->id;
         $arr['Text'] = $notes['Text'] ?: "";
-
+        $arr['video_path'] = '';
 
         if (isset($notes['Photo']) && !empty($notes['Photo'])) {
             //todo сделать множественную загрузку
@@ -412,6 +397,7 @@ class SendpostCommand extends UserCommand
             }
             $videos[] = StaticConfig::getDownloadDir(true) . $video['file_path'];
             $arr['Videos'] = $videos;
+            $arr['video_path'] = StaticConfig::getDownloadDir(true).'press/'.$video['file_path'];
         }
         if (isset($notes['Audio']) && !empty($notes['Audio'])) {
             $audio = end(json_decode($notes['Audio'], true));

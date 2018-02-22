@@ -185,6 +185,7 @@ class V1Controller extends Controller
             $ig->media->comment($media_id, $message);
 
             SocialDialoguesInstagram::newIgComment(
+                $media_id,
                 $user_id,
                 $ig->account_id,
                 $media_id,

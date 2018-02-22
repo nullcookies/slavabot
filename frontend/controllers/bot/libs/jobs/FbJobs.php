@@ -16,6 +16,8 @@ use frontend\controllers\bot\libs\SalesBotApi;
 use frontend\controllers\bot\libs\SocialNetworks;
 use Facebook\Facebook;
 use common\commands\command\EditTelegramNotificationCommand;
+use common\commands\command\CheckStatusNotificationCommand;
+
 
 
 class FbJobs implements SocialJobs
@@ -146,6 +148,15 @@ class FbJobs implements SocialJobs
                 $post->job_status = Post::JOB_STATUS_POSTED;
                 $post->job_result = json_encode($response->getBody());
                 $post->save(false);
+                $data =  [
+                    'callback_tlg_message_status' => $post->callback_tlg_message_status
+                ];
+
+                $elseData = $data;
+                $data['job_status'] = 'POSTED';
+                $elseData['job_status'] = 'FAIL';
+
+                $count = Post::find()->where(['OR', $data, $elseData])->count();
 
                 //отправляем в api
                 $arParam = ['data' => json_encode($post->toArray()), 'type' => SocialNetworks::FB, 'tid' => 0];
@@ -176,9 +187,25 @@ class FbJobs implements SocialJobs
                 $jobPost->execute_dt = \Carbon\Carbon::now('Europe/London');
                 $jobPost->save(false);
 
+
                 //отправляем в api
                 $arParam = ['data' => json_encode($jobPost->getAttributes()), 'type' => SocialNetworks::FB, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
+            }else{
+                try{
+                    \Yii::$app->commandBus->handle(
+                        new CheckStatusNotificationCommand(
+                            [
+                                'data' => [
+                                    'callback_tlg_message_status' => $post->callback_tlg_message_status
+                                ],
+                                'count' => $count
+                            ]
+                        )
+                    );
+                }catch (\Exception $e){
+                    return ($e->getMessage());
+                }
             }
 
             Logger::info('Публикация FB завершена');
@@ -203,6 +230,15 @@ class FbJobs implements SocialJobs
                 $post->job_status = Post::JOB_STATUS_FAIL;
                 $post->job_error = $e->getTraceAsString();
                 $post->save(false);
+                $data =  [
+                    'callback_tlg_message_status' => $post->callback_tlg_message_status
+                ];
+
+                $elseData = $data;
+                $data['job_status'] = 'POSTED';
+                $elseData['job_status'] = 'FAIL';
+
+                $count = Post::find()->where(['OR', $data, $elseData])->count();
 
                 //отправляем в api
                 $arParam = ['data' => json_encode($post->toArray()), 'type' => SocialNetworks::FB, 'tid' => 0];
@@ -212,6 +248,19 @@ class FbJobs implements SocialJobs
                     'wall_id' => $post->wall_id,
                     'status' => 0
                 ];
+                try{
+                    $notes['response_data']['text'] = 'Facebook - ошибка';
+                    \Yii::$app->commandBus->handle(
+                        new EditTelegramNotificationCommand(
+                            [
+                                'data' => $notes['response_data']
+                            ]
+                        )
+                    );
+                }catch (\Exception $e){
+                    Logger::error($e->getMessage());
+                }
+
                 var_dump($SalesBot->setUserAccountStatus($arParam));
             }
 
@@ -230,6 +279,22 @@ class FbJobs implements SocialJobs
                 //отправляем в api
                 $arParam = ['data' => json_encode($jobPost->getAttributes()), 'type' => SocialNetworks::FB, 'tid' => 0];
                 $SalesBot->newEvent($arParam);
+            }else{
+                try{
+                    \Yii::$app->commandBus->handle(
+                        new CheckStatusNotificationCommand(
+                            [
+                                'data' => [
+                                    'callback_tlg_message_status' => $post->callback_tlg_message_status,
+
+                                ],
+                                'count' => $count
+                            ]
+                        )
+                    );
+                }catch (\Exception $e){
+                    Logger::error($e->getMessage());
+                }
             }
 
             $job->sendComplete();
