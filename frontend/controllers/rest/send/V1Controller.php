@@ -153,8 +153,8 @@ class V1Controller extends Controller
                 'post_id' => $media_id,
                 'message' => $message
             ];
-            if($data->access_token != $data->group_access_token) {
-                $options['from_group'] = $data->group_id;
+            if($data->user_id != $data->groups->id) {
+                $options['from_group'] = $data->groups->id;
             }
             $vk->api('wall.createComment', $options);
 
@@ -185,7 +185,6 @@ class V1Controller extends Controller
             $ig->media->comment($media_id, $message);
 
             SocialDialoguesInstagram::newIgComment(
-                $media_id,
                 $user_id,
                 $ig->account_id,
                 $media_id,

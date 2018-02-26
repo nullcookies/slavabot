@@ -11,6 +11,8 @@ namespace console\controllers;
 
 use common\models\SocialDialoguesPeerVk;
 use common\models\SocialDialoguesVkComments;
+use frontend\controllers\bot\Bot;
+use frontend\controllers\bot\commands\FrontendNotificationCommand;
 use Yii;
 use yii\console\Controller;
 
@@ -83,7 +85,7 @@ class VkNotifyController extends Controller
                         try {
                             $vk = new \frontend\controllers\bot\libs\Vk($options);
                             echo $user['user_id'] . PHP_EOL;
-                            $this->getNotify($vk, $user['user_id']);
+                            $this->getNotify($vk, $user['user_id'], $user['telegram_id']);
                         } catch (\Exception $e) {
                             echo $e->getMessage() . PHP_EOL;
                         }
@@ -101,24 +103,29 @@ class VkNotifyController extends Controller
         }
     }
 
-    protected function getNotify(\frontend\controllers\bot\libs\Vk $vk, $userId)
+    protected function getNotify(\frontend\controllers\bot\libs\Vk $vk, $userId, $telegramId)
     {
         $notifyes = $vk->api('notifications.get', [
             'count' => 100,
             'filters' => 'mentions'
         ]);
 
-        //var_dump($notifys['items']);
+        //var_dump($notifyes['items']);
 
         if($notifyes['items']) {
             foreach ($notifyes['items'] as $notify) {
+                $hashWithDocs = null;
+                $hash = null;
                 if($notify['type'] == 'mention_comments') {
                     $post = $notify['parent'];
                     $postId = $post['id'];
                     $ownerId = $post['from_id'];
                     $commentsHashes = SocialDialoguesVkComments::getCommentsHashByPostId($postId, $ownerId);
                     $comment = $notify['feedback'];
-                    $hash = md5(json_encode($comment));
+
+                    $hash = md5(json_encode($comment['text']));
+
+                    //$hash = md5(json_encode($comment));
                     //echo $hash . PHP_EOL;
                     //var_dump($comment);
                     //если такой комментарий уже есть, то переходим к следующему посту
@@ -127,9 +134,10 @@ class VkNotifyController extends Controller
                         continue;
                     } else {
                         echo $hash . PHP_EOL;
+                        //var_dump($comment['attachments']);
                         $peerId = $comment['from_id'];
 
-                        SocialDialoguesVkComments::newVkComment(
+                        $model = SocialDialoguesVkComments::newVkComment(
                             $userId,
                             $ownerId,
                             $postId,
@@ -147,6 +155,19 @@ class VkNotifyController extends Controller
                         SocialDialoguesPeerVk::saveVkPeer(
                             $peerId, $peerInfo['title'], $peerInfo['avatar'], $peerInfo['type']
                         );
+
+                        $bot = new Bot();
+                        $telegram = $bot->GetTelegram();
+
+                        $command = new FrontendNotificationCommand($telegram);
+                        $command->prepareParams([
+                            'tid' => $telegramId,
+                            'message' => $peerInfo['title'].":\n".$model->getMessageForTelegram(),
+                        ]);
+
+                        $command->execute($ownerId, $postId);
+
+                        echo 'sended' . PHP_EOL;
                     }
 
                 }

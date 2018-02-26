@@ -64,4 +64,45 @@ class SocialDialoguesVkComments extends SocialDialogues
 
         return $ids;
     }
+
+    public function getMessageForTelegram()
+    {
+        $message = $this->text;
+
+        $message .= $this->parseAttaches();
+
+        return $message;
+    }
+
+    protected function parseAttaches()
+    {
+        $urls = [];
+        if($this->attaches) {
+            $attaches = json_decode($this->attaches);
+            foreach($attaches as $attach) {
+                switch ($attach->type) {
+                    case 'photo':
+                        $urls[] = $attach->photo->photo_604;
+                        break;
+                    case 'doc':
+                        $urls[] = $attach->doc->url;
+                        break;
+                    case 'audio':
+                        $urls[] = 'audio: ' . $attach->audio->artist . ' - ' . $attach->audio->title;
+                        break;
+                    case 'video':
+                        $urls[] = 'video: ' . $attach->video->title . "\n" . $attach->video->photo_320;
+                        break;
+                    case 'sticker':
+                        $urls[] = $attach->sticker->photo_128;
+                        break;
+                    case 'link':
+                        $urls[] = $attach->link->url;
+                        break;
+                }
+            }
+        }
+
+        return implode("\n", $urls);
+    }
 }

@@ -104,7 +104,12 @@ class CallbackqueryCommand extends SystemCommand
         if ($command == 'answer') {
             $explodedCommand = explode('_', $data);
             $param = $explodedCommand[1];
-            $media = $explodedCommand[2].'_'.$explodedCommand[3];
+            if($explodedCommand[3]) {
+                $media = $explodedCommand[2].'_'.$explodedCommand[3];
+            } else {
+                $media = $explodedCommand[2];
+            }
+
             $this->conversation = new Conversation($user_id, $chat_id, 'notification');
             $notes = &$this->conversation->notes;
             $notes['state'] = 1;

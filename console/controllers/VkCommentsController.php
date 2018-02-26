@@ -18,41 +18,8 @@ use Yii;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
 
-class VkController extends Controller
+class VkCommentsController extends Controller
 {
-    public function actionSend()
-    {
-        $user = \common\models\rest\Accounts::find()
-            ->andWhere([
-                'type' => 'vkontakte',
-                'status' => 1,
-                'processed' => 1,
-                'user_id' => 30
-            ])
-            ->one();
-        $user = $user->toArray();
-
-        $access_token = $user['access_token'];
-        $options = [
-            'access_token' => $access_token,
-        ];
-
-        try {
-            $vk = new \frontend\controllers\bot\libs\Vk($options);
-            $vk->api('wall.createComment', [
-                'owner_id' => -160368639,
-                'post_id' => 43,
-                'from_group' => 160368639,
-                'message' => 'Sended comment'
-            ]);
-
-
-        } catch(\Exception $e) {
-            echo $e->getMessage() . PHP_EOL;
-        }
-
-    }
-
     public function actionComments()
     {
 
@@ -60,15 +27,6 @@ class VkController extends Controller
         while (true) {
 
             $users = \common\models\rest\Accounts::getVk();
-
-            /*$users = \common\models\rest\Accounts::find()
-                ->andWhere([
-                    'type' => 'vkontakte',
-                    'status' => 1,
-                    'processed' => 1,
-                    'user_id' => 30
-                ])
-                ->all();*/
 
             if($users) {
                 foreach ($users as $user) {
@@ -169,22 +127,22 @@ class VkController extends Controller
                     'extended' => 1
                 ]);
 
-                //var_dump($comments);
 
                 if($comments['items']) {
                     foreach ($comments['items'] as $comment) {
-                        $hash = md5(json_encode($comment));
-                        //echo $hash . PHP_EOL;
-                        //var_dump($comment);
-                        //если такой комментарий уже есть, то переходим к следующему посту
-                        if(in_array($hash, $commentsHashes)) {
-                            echo 'Дубль' . PHP_EOL;
-                            continue;
-                        } elseif($comment['from_id'] != $ownerId) {
+                        if($comment['from_id'] != $ownerId) {
+                            //если такой комментарий уже есть, то переходим к следующему посту
+                            $hash = md5(json_encode($comment['text']));
+
+                            if(in_array($hash, $commentsHashes)) {
+                                echo 'Дубль' . PHP_EOL;
+                                continue;
+                            }
                             echo $hash . PHP_EOL;
+                            //var_dump($comment['attachments']);
                             $peerId = $comment['from_id'];
 
-                            SocialDialoguesVkComments::newVkComment(
+                            $model = SocialDialoguesVkComments::newVkComment(
                                 $userId,
                                 $ownerId,
                                 $postId,
@@ -209,7 +167,7 @@ class VkController extends Controller
                             $command = new FrontendNotificationCommand($telegram);
                             $command->prepareParams([
                                 'tid' => $telegramId,
-                                'message' => $peerInfo['title'].":\n".$comment['text'],
+                                'message' => $peerInfo['title'].":\n".$model->getMessageForTelegram(),
                             ]);
                             $command->execute($ownerId, $postId);
 
