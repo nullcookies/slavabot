@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use common\models\SocialDialogues;
 
 /**
  * This is the model class for table "social_dialogues_post".
@@ -26,6 +27,11 @@ class SocialDialoguesPost extends \yii\db\ActiveRecord
     const SOCIAL_FB = "FB"; // facebook
     const SOCIAL_IG = "IG"; // instagram
 
+    public function getDataComments()
+    {
+        return $this->hasMany(SocialDialogues::className(), ['post_id' => 'post_id']);
+    }
+
     /**
      * @inheritdoc
      */
@@ -34,17 +40,30 @@ class SocialDialoguesPost extends \yii\db\ActiveRecord
         return 'social_dialogues_post';
     }
 
+
+    public function fields()
+    {
+        return [
+            'id',
+            'user_id',
+            'account_id',
+            'social',
+            'post_id',
+            'url',
+            'comments' => "dataComments",
+        ];
+    }
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['user_id', 'account_id', 'social', 'post_id', 'peer_id', 'text'], 'required'],
-            [['user_id', 'peer_id', 'edited', 'related_post_id'], 'integer'],
-            [['text', 'attaches'], 'string'],
+            [['user_id', 'account_id', 'social', 'post_id'], 'required'],
+            [['user_id',], 'integer'],
             [['created_at'], 'safe'],
-            [['account_id', 'social', 'post_id', 'hash'], 'string', 'max' => 255],
+            [['account_id', 'social', 'post_id', 'hash','url'], 'string', 'max' => 255],
         ];
     }
 
@@ -59,13 +78,34 @@ class SocialDialoguesPost extends \yii\db\ActiveRecord
             'account_id' => 'Account ID',
             'social' => 'Social',
             'post_id' => 'Post ID',
-            'peer_id' => 'Peer ID',
-            'text' => 'Text',
-            'attaches' => 'Attaches',
-            'edited' => 'Edited',
-            'hash' => 'Hash',
-            'related_post_id' => 'Related Post ID',
+            'url' => 'Url',
             'created_at' => 'Created At',
         ];
+    }
+
+    public static function saveIgPost($user_id, $account_id, $post_id, $url)
+    {
+        $social = static::SOCIAL_IG;
+
+        $model = static::find()
+            ->andWhere(['social' => $account_id, 'post_id' => $post_id, 'social' => $social])
+            ->one();
+
+        if(!$model) {
+            $model = new static;
+            $model->social = $social;
+
+            $model->user_id = $user_id;
+            $model->account_id = $account_id;
+            $model->post_id = $post_id;
+            $model->url = $url;
+        }
+
+
+        if(!$model->save(false)) {
+            var_dump($model->errors);
+        }
+
+        return $model;
     }
 }

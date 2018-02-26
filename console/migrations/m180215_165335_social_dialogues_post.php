@@ -18,17 +18,9 @@ class m180215_165335_social_dialogues_post extends Migration
             'account_id' => $this->string()->notNull(),
             'social' => $this->string()->notNull(),
             'post_id' => $this->string()->notNull(),
-            'peer_id' => $this->bigInteger()->notNull(),
-            'text' => $this->text()->notNull(),
-            'attaches' => $this->text()->null(),
-            'edited' => $this->integer(1)->notNull()->defaultValue(0),
-            'hash' => $this->string()->null(),
-            'related_post_id' => $this->integer()->null(),
+            'url' => $this->string(8000),
             'created_at' => $this->timestamp()
         ]);
-
-        $this->createIndex('user_id', 'social_dialogues_post', 'user_id');
-        $this->createIndex('peer_id', 'social_dialogues_post', 'peer_id');
     }
 
     /**
@@ -36,8 +28,6 @@ class m180215_165335_social_dialogues_post extends Migration
      */
     public function safeDown()
     {
-        $this->dropIndex('user_id', 'social_dialogues_post');
-        $this->dropIndex('peer_id', 'social_dialogues_post');
         $this->dropTable('social_dialogues_post');
     }
 

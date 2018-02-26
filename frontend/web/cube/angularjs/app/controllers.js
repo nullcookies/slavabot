@@ -1506,16 +1506,7 @@ angular.module('cubeWebApp')
 
 
                 });
-            }else if($scope.social=='IG'){
-
-                $data = $.param({'user_id' : $scope.user_id, 'peer_id' : $scope.peer_id, 'media_id' : $scope.mediaID, 'message': $scope.message});
-                $scope.message = '';
-                $http.post('/rest/send/v1/ig', $data, config).then(function success(response) {
-
-
-                });
             }
-
         };
 
         $scope.sendComment = function(post_id){
@@ -1525,7 +1516,7 @@ angular.module('cubeWebApp')
 
                 $scope.comment[post_id] = '';
 
-                $http.post('/rest/send/v1/ig', $data, config).then(function success(response) {
+                $http.post('/rest/send/v1/ig-comment', $data, config).then(function success(response) {
                     $scope.getNotificationsForUser();
                 });
         };

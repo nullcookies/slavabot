@@ -121,22 +121,8 @@
                                     </div>
 
                                     <div class="story-content" style="padding-left:0px;">
-                                        <!--<header class="story-header">-->
-                                            <!--<div class="story-author">-->
-                                                <!--<a href="#" class="story-author-link">-->
-                                                <!--</a>-->
-                                            <!--</div>-->
-                                            <!--<div class="story-time">-->
-                                                <!--<i class="fa fa-clock-o"></i> два дня назад-->
-                                            <!--</div>-->
-                                        <!--</header>-->
                                         <div class="story-inner-content" style="text-align: center;">
-                                            <img style="width: 45%;" src="/storage/download/{{parJson(post.photo)[0].file_path}}" alt="" ng-If="post.photo">
-                                            <video style="width: 45%;" controls ng-If="post.video">
-                                                <source src="{{parJson(post.video)[0].file_path | trustUrl}}">
-                                            </video>
-                                            <p style="margin-top:20px">{{post.message}}</p>
-
+                                            <a target="_blank" href="{{post.url}}" style="margin-top:20px">{{post.url}}</a>
                                         </div>
                                         <footer class="story-footer">
                                             <div class="conversation-wrapper">
@@ -164,9 +150,9 @@
                                                     </div>
                                                 </div>
                                                 <div class="conversation-new-message">
-                                                    <form ng-submit="sendComment(post.result_post_id)">
+                                                    <form ng-submit="sendComment(post.post_id)">
                                                         <div class="form-group">
-                                                            <input class="form-control" rows="2" ng-model="comment[post.result_post_id]" placeholder="Введите сообщение..."></input>
+                                                            <input class="form-control" rows="2" ng-model="comment[post.post_id]" placeholder="Введите сообщение..."></input>
                                                         </div>
 
                                                         <div class="clearfix">

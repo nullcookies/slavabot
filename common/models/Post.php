@@ -46,11 +46,6 @@ class Post extends ActiveRecord
         return 'table_posts';
     }
 
-    public function getDataComments()
-    {
-        return $this->hasMany(SocialDialogues::className(), ['post_id' => 'result_post_id']);
-    }
-
     public function fields()
     {
         return [
@@ -66,7 +61,6 @@ class Post extends ActiveRecord
             'social',
             'video',
             'wall_id',
-            'comments' => "dataComments",
             'result_post_id'
         ];
     }

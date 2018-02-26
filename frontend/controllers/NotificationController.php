@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use common\models\Post;
 use common\models\SocialDialogues;
 use common\models\SocialDialoguesPeer;
+use common\models\SocialDialoguesPost;
 use Yii;
 use yii\data\Pagination;
 use yii\db\Expression;
@@ -115,8 +116,8 @@ class NotificationController extends Controller
             $filter[] = $post_id['post_id'];
         }
 
-        $posts = Post::find()
-            ->where(['IN', 'result_post_id', $filter])
+        $posts = SocialDialoguesPost::find()
+            ->where(['IN', 'post_id', $filter])
             ->orderBy(['id' => SORT_DESC])
             ->all();
 

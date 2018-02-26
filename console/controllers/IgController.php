@@ -10,8 +10,10 @@ namespace console\controllers;
 
 
 use common\models\Accounts;
+use common\models\SocialDialogues;
 use common\models\SocialDialoguesInstagram;
 use common\models\SocialDialoguesPeerInstagram;
+use common\models\SocialDialoguesPost;
 use frontend\controllers\bot\Bot;
 use frontend\controllers\bot\commands\FrontendNotificationCommand;
 use frontend\controllers\rest\send\V1Controller;
@@ -90,6 +92,7 @@ class IgController extends Controller
             $maxId = null;
             $comments = $ig->media->getComments($id, $maxId);
             //var_dump($comments);
+            $info = $ig->media->getInfo($id);
             $break = false;
             while ($comments->comments) {
                 $maxId = $comments->comments[0]->pk;
@@ -111,6 +114,13 @@ class IgController extends Controller
                             $item->pk,
                             $item->text,
                             $user->pk
+                        );
+
+                        SocialDialoguesPost::saveIgPost(
+                            $userId,
+                            $ig->account_id,
+                            $id,
+                            'https://www.instagram.com/p/'.$info->items[0]->code
                         );
 
                         SocialDialoguesPeerInstagram::saveIgPeer(
