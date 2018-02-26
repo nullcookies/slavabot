@@ -135,7 +135,6 @@ class FrontendNotificationCommand extends UserCommand
                         break;
 
                     }else{
-
                         $user = User::findByTIG($chat_id);
 
                         $peer = SocialDialoguesPeer::findOne(['peer_id' => $notes['peer']]);
@@ -148,12 +147,19 @@ class FrontendNotificationCommand extends UserCommand
 
 
 
+
+                        //TODO не всегда можно будет верно определить сеть по peer_id
                         switch ($peer->social) {
                             case SocialDialoguesPeer::SOCIAL_VK:
-                                V1Controller::actionVk($user->id, $notes['peer'], $text);
+                                if(empty($notes['media'])) {
+                                    V1Controller::actionVkMessage($user->id, $notes['peer'], $text);
+                                } else {
+                                    V1Controller::actionVkComment($user->id, $notes['peer'], $notes['media'], $text);
+                                }
+
                                 break;
                             case SocialDialoguesPeer::SOCIAL_IG:
-                                V1Controller::actionIg($user->id, $notes['peer'], $notes['media'], $text);
+                                V1Controller::actionIgComment($user->id, $notes['peer'], $notes['media'], $text);
                                 break;
                             default: null;
                         }

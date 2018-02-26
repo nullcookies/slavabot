@@ -23,6 +23,7 @@ use Carbon\Carbon;
  * @property string $text
  * @property string $message
  * @property string $attaches
+ * @property string $hash
  * @property integer $created_at
  */
 class SocialDialogues extends ActiveRecord
@@ -53,7 +54,7 @@ class SocialDialogues extends ActiveRecord
         return [
             [['user_id', 'peer_id', 'text', 'type', 'social', 'message'], 'required'],
             [['user_id', 'peer_id', 'message_id', 'edited', 'direction'], 'integer'],
-            [['message', 'text', 'type', 'attaches', 'account_id', 'post_id'], 'string'],
+            [['message', 'text', 'type', 'attaches', 'account_id', 'post_id', 'hash'], 'string'],
             [['social'], 'string', 'max' => 2],
             [['created_at'], 'safe']
         ];
@@ -77,6 +78,7 @@ class SocialDialogues extends ActiveRecord
             'social' => 'Social',
             'type' => 'Type',
             'message' => 'Message',
+            'hash' => 'Hash',
             'created_at' => 'Created At',
         ];
     }
@@ -93,6 +95,7 @@ class SocialDialogues extends ActiveRecord
             'peer_id' => 'peer_id',
         ]);
     }
+
     public function fields()
     {
         return [

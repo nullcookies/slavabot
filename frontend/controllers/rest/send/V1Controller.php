@@ -85,9 +85,9 @@ class V1Controller extends Controller
         return parent::beforeAction($action);
     }
 
-    public static function actionVk($user_id = '', $peer_id = '', $message = '')
+    public static function actionVkMessage($user_id = '', $peer_id = '', $message = '')
     {
-        if($user_id == ''){
+        if($user_id == '') {
             $user_id = Yii::$app->request->post('user_id');
             $peer_id = Yii::$app->request->post('peer_id');
             $message = Yii::$app->request->post('message');
@@ -111,16 +111,62 @@ class V1Controller extends Controller
                 'message' => $message
             ]);
 
-            var_dump($result);
         } catch (\frontend\controllers\bot\libs\VkException $e) {
-            echo $e->getMessage();
+            echo $e->getMessage() . PHP_EOL;
         }
 
     }
 
-    public static function actionIg($user_id = '', $peer_id = '', $media_id = '', $message = '')
+    /**
+     * Комментарий вКонтакте
+     *
+     * @param string $user_id
+     * @param string $peer_id
+     * @param string $media_id
+     * @param string $message
+     */
+    public static function actionVkComment($user_id = '', $peer_id = '', $media_id = '', $message = '')
     {
-        if($user_id == ''){
+        if($user_id == '') {
+            $user_id = Yii::$app->request->post('user_id');
+            $media_id = Yii::$app->request->post('media_id');
+            $peer_id = Yii::$app->request->post('peer_id');
+            $message = Yii::$app->request->post('message');
+        }
+
+
+        if(!$account = Accounts::getByUserId($user_id, Accounts::TYPE_VK)) {
+            throw new \InvalidArgumentException('Аккаунт не найден');
+        }
+
+        $data = json_decode($account->data);
+        $access_token = $data->access_token;
+
+
+        $vk = new \frontend\controllers\bot\libs\Vk([
+            'access_token' => $access_token
+        ]);
+
+        try {
+            $options = [
+                'owner_id' => $peer_id,
+                'post_id' => $media_id,
+                'message' => $message
+            ];
+            if($data->user_id != $data->groups->id) {
+                $options['from_group'] = $data->groups->id;
+            }
+            $vk->api('wall.createComment', $options);
+
+        } catch (\frontend\controllers\bot\libs\VkException $e) {
+            echo $e->getMessage() . PHP_EOL;
+        }
+
+    }
+
+    public static function actionIgComment($user_id = '', $peer_id = '', $media_id = '', $message = '')
+    {
+        if($user_id == '') {
             $user_id = Yii::$app->request->post('user_id');
             $media_id = Yii::$app->request->post('media_id');
             $peer_id = Yii::$app->request->post('peer_id');
@@ -139,7 +185,6 @@ class V1Controller extends Controller
             $ig->media->comment($media_id, $message);
 
             SocialDialoguesInstagram::newIgComment(
-                $media_id,
                 $user_id,
                 $ig->account_id,
                 $media_id,

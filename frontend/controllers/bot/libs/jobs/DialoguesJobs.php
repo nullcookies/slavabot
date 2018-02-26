@@ -67,6 +67,7 @@ class DialoguesJobs implements SocialJobs
                     $group_access_token,
                     $access_token
                 );
+
                 $title = $peer->title;
                 if($peerType == SocialDialoguesPeer::TYPE_CHAT) {
                     $from_peer_id = ArrayHelper::getValue(ArrayHelper::getValue($update, 6), 'from');
@@ -98,7 +99,6 @@ class DialoguesJobs implements SocialJobs
 
                     echo 'sended' . PHP_EOL;
                 }
-
 
             } else {
                 if($correctedAccount) {
