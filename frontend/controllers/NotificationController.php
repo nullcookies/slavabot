@@ -105,6 +105,12 @@ class NotificationController extends Controller
 
     public function actionUserNotifications()
     {
+        $id = Yii::$app->request->post('id');
+
+        if(!$id){
+            return false;
+        }
+
         $peer = SocialDialoguesPeer::find()
             ->where(['id'=> Yii::$app->request->post('id')])
             ->orderBy(['id' => SORT_DESC])
@@ -121,11 +127,23 @@ class NotificationController extends Controller
             ->orderBy(['id' => SORT_DESC])
             ->all();
 
+        $access = $peer->getMessagesCount()>0 || count($posts)>0;
+
+        if(!$access){
+            return [
+                'user' => \Yii::$app->user->identity->id,
+                'access' => $access
+            ];
+        }
+
         return [
             'user' => \Yii::$app->user->identity->id,
             'peer' => $peer,
-            'posts' => $posts
+            'posts' => $posts,
+            'access' => $access
         ];
+
+
     }
 
 

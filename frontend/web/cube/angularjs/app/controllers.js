@@ -1435,7 +1435,7 @@ angular.module('cubeWebApp')
             $scope.setPage($scope.currentPage);
         }, 10000);
     })
-    .controller('userNotificationCtrl', function($scope, $http, $sce, $interval, $routeParams){
+    .controller('userNotificationCtrl', function($scope, $http, $sce, $interval, $routeParams, $location){
 
         $scope.chatPane = true;
         $scope.postsPane = false;
@@ -1483,16 +1483,23 @@ angular.module('cubeWebApp')
 
 
             $http.post('/notification/user-notifications', data, config).then(function success(response) {
-                $scope.data = response.data.peer;
-                $scope.userNotification = $scope.data.notification;
-                $scope.userAvatar = $scope.data.avatar;
-                $scope.userName = $scope.data.title;
-                $scope.user_id = response.data.user;
-                $scope.peer_id = $scope.data.peer_id;
-                $scope.mediaID = $scope.data.media_id.info;
-                $scope.social = $scope.data.social;
-                $scope.posts = response.data.posts;
-                document.getElementById('refresh').click();
+                if(response.data){
+                    if(!response.data.access){
+                        $location.path('/pages/notice');
+                    }else{
+                        $scope.data = response.data.peer;
+                        $scope.userNotification = $scope.data.notification;
+                        $scope.userAvatar = $scope.data.avatar;
+                        $scope.userName = $scope.data.title;
+                        $scope.user_id = response.data.user;
+                        $scope.peer_id = $scope.data.peer_id;
+                        $scope.mediaID = $scope.data.media_id.info;
+                        $scope.social = $scope.data.social;
+                        $scope.posts = response.data.posts;
+
+                        document.getElementById('refresh').click();
+                    }
+                }
             });
         };
 

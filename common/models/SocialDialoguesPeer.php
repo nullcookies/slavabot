@@ -206,4 +206,8 @@ class SocialDialoguesPeer extends ActiveRecord
             ->all();
         return $comments;
     }
+
+    public function getMessagesCount(){
+        return count($this->dataNotifications);
+    }
 }
