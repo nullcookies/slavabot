@@ -18,22 +18,14 @@ use yii\console\Controller;
 
 class VkNotifyController extends Controller
 {
-    public function actionAdd()
+    public function actionNotify()
     {
-        $users = \common\models\rest\Accounts::find()
-            ->andWhere([
-                'type' => 'vkontakte',
-                'status' => 1,
-                'processed' => 1,
-                'user_id' => 30
-            ])
-            ->all();
+        $users = \common\models\rest\Accounts::getVk();
 
-        if($users) {
+        if ($users) {
             foreach ($users as $user) {
                 $user = $user->toArray();
-                if(!empty($user['telegram_id'] && !empty($user['access_token']))) {
-                    //TODO проверить, что это пользователь. Для групп не запускать
+                if (!empty($user['telegram_id'] && !empty($user['access_token']))) {
                     $access_token = $user['access_token'];
                     $options = [
                         'access_token' => $access_token,
@@ -41,65 +33,16 @@ class VkNotifyController extends Controller
                     try {
                         $vk = new \frontend\controllers\bot\libs\Vk($options);
                         echo $user['user_id'] . PHP_EOL;
-
-                        $result = $vk->api('groups.addCallbackServer');
-
-
-                    } catch(\Exception $e) {
+                        $this->getNotify($vk, $user['user_id'], $user['telegram_id']);
+                    } catch (\Exception $e) {
                         echo $e->getMessage() . PHP_EOL;
                     }
+                    sleep(1);
                 }
             }
         } else {
             echo 'Нет пользователей' . PHP_EOL;
             Yii::$app->end();
-        }
-    }
-
-    public function actionNotify()
-    {
-        $count = 0;
-        while (true) {
-
-
-
-            $users = \common\models\rest\Accounts::getVk();
-
-            /*$users = \common\models\rest\Accounts::find()
-                ->andWhere([
-                    'type' => 'vkontakte',
-                    'status' => 1,
-                    'processed' => 1,
-                    'user_id' => 30
-                ])
-                ->all();*/
-
-            if ($users) {
-                foreach ($users as $user) {
-                    $user = $user->toArray();
-                    if (!empty($user['telegram_id'] && !empty($user['access_token']))) {
-                        $access_token = $user['access_token'];
-                        $options = [
-                            'access_token' => $access_token,
-                        ];
-                        try {
-                            $vk = new \frontend\controllers\bot\libs\Vk($options);
-                            echo $user['user_id'] . PHP_EOL;
-                            $this->getNotify($vk, $user['user_id'], $user['telegram_id']);
-                        } catch (\Exception $e) {
-                            echo $e->getMessage() . PHP_EOL;
-                        }
-                        sleep(1);
-                    }
-                }
-            } else {
-                echo 'Нет пользователей' . PHP_EOL;
-                Yii::$app->end();
-            }
-
-
-
-            echo 'COUNT: ' . ++$count . PHP_EOL;
         }
     }
 
@@ -109,8 +52,6 @@ class VkNotifyController extends Controller
             'count' => 100,
             'filters' => 'mentions'
         ]);
-
-        //var_dump($notifyes['items']);
 
         if($notifyes['items']) {
             foreach ($notifyes['items'] as $notify) {
@@ -125,9 +66,6 @@ class VkNotifyController extends Controller
 
                     $hash = md5(json_encode($comment['text']));
 
-                    //$hash = md5(json_encode($comment));
-                    //echo $hash . PHP_EOL;
-                    //var_dump($comment);
                     //если такой комментарий уже есть, то переходим к следующему посту
                     if(in_array($hash, $commentsHashes)) {
                         echo 'Дубль' . PHP_EOL;
