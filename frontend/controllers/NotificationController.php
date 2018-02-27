@@ -119,7 +119,15 @@ class NotificationController extends Controller
         $filter = [];
 
         foreach(SocialDialoguesPeer::getPostsByPeerAction($peer->peer_id) as $post_id){
-            $filter[] = $post_id['post_id'];
+
+            if($post_id['social']===SocialDialoguesPost::SOCIAL_IG){
+                $filter[] = $post_id['post_id'];
+            }
+            //$filter[] = $post_id;
+            if($post_id['social']===SocialDialoguesPost::SOCIAL_VK){
+                $filter[] = $post_id['account_id'].'_'.$post_id['post_id'];
+            }
+
         }
 
         $posts = SocialDialoguesPost::find()
@@ -140,7 +148,8 @@ class NotificationController extends Controller
             'user' => \Yii::$app->user->identity->id,
             'peer' => $peer,
             'posts' => $posts,
-            'access' => $access
+            'access' => $access,
+            'debug' => $filter
         ];
 
 

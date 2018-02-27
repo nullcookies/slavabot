@@ -27,9 +27,19 @@ class SocialDialoguesPost extends \yii\db\ActiveRecord
     const SOCIAL_FB = "FB"; // facebook
     const SOCIAL_IG = "IG"; // instagram
 
+
     public function getDataComments()
     {
-        return $this->hasMany(SocialDialogues::className(), ['post_id' => 'post_id']);
+        if($this->social === static::SOCIAL_IG){
+            return $this->hasMany(SocialDialogues::className(), ['post_id' => 'post_id']);
+        }
+        if($this->social === static::SOCIAL_VK){
+            return $this->hasMany(SocialDialogues::className(), ['social' => 'social'])
+                ->where(['type'=>'comment'])
+                ->andWhere(['post_id' => explode( '_', $this->post_id)[1]])
+                ->andWhere(['account_id' => $this->account_id]);
+        }
+
     }
 
     /**
@@ -50,7 +60,7 @@ class SocialDialoguesPost extends \yii\db\ActiveRecord
             'social',
             'post_id',
             'url',
-            'comments' => "dataComments",
+            'comments' => "dataComments"
         ];
     }
 
@@ -88,7 +98,33 @@ class SocialDialoguesPost extends \yii\db\ActiveRecord
         $social = static::SOCIAL_IG;
 
         $model = static::find()
-            ->andWhere(['social' => $account_id, 'post_id' => $post_id, 'social' => $social])
+            ->andWhere(['account_id' => $account_id, 'post_id' => $post_id, 'social' => $social])
+            ->one();
+
+        if(!$model) {
+            $model = new static;
+            $model->social = $social;
+
+            $model->user_id = $user_id;
+            $model->account_id = $account_id;
+            $model->post_id = $post_id;
+            $model->url = $url;
+        }
+
+
+        if(!$model->save(false)) {
+            var_dump($model->errors);
+        }
+
+        return $model;
+    }
+
+    public static function saveVkPost($user_id, $account_id, $post_id, $url)
+    {
+        $social = static::SOCIAL_VK;
+
+        $model = static::find()
+            ->andWhere(['account_id' => $account_id, 'post_id' => $post_id, 'social' => $social])
             ->one();
 
         if(!$model) {

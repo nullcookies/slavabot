@@ -198,7 +198,7 @@ class SocialDialoguesPeer extends ActiveRecord
 
     public static function getPostsByPeerAction($peerId){
         $comments = SocialDialogues::find()
-            ->select('post_id')
+            ->select(['post_id', 'social', 'account_id'])
             ->where(['peer_id' => $peerId])
             ->andWhere(['is not', 'post_id', null])
             ->distinct()

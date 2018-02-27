@@ -10,6 +10,7 @@ namespace console\controllers;
 
 
 use common\models\SocialDialoguesPeerVk;
+use common\models\SocialDialoguesPost;
 use common\models\SocialDialoguesPostVk;
 use common\models\SocialDialoguesVkComments;
 use frontend\controllers\bot\Bot;
@@ -100,6 +101,29 @@ class VkCommentsController extends Controller
                             //var_dump($comment['attachments']);
                             $peerId = $comment['from_id'];
 
+
+
+                            $error = '';
+
+                            try{
+                                $full_post_id = $ownerId.'_'.$postId;
+
+                                if(stristr($ownerId, "-")){
+                                    $link = 'https://vk.com/club'.str_replace("-","",$ownerId).'?w=wall'.$full_post_id;
+                                }else{
+                                    $link = 'https://vk.com/id'.$ownerId.'?w=wall'.$full_post_id;
+                                }
+
+                                SocialDialoguesPost::saveVkPost(
+                                    $userId,
+                                    $ownerId,
+                                    $full_post_id,
+                                    $link
+                                );
+                            } catch(\Exception $e) {
+                                $error .= $e->getMessage();
+                            }
+
                             $model = SocialDialoguesVkComments::newVkComment(
                                 $userId,
                                 $ownerId,
@@ -110,6 +134,8 @@ class VkCommentsController extends Controller
                                 $peerId,
                                 $hash
                             );
+
+
 
                             $peerInfo = SocialDialoguesPeerVk::parsePeerInfo(
                                 $peerId, $comments['groups'], $comments['profiles']
