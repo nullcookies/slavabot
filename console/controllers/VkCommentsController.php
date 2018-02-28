@@ -105,6 +105,19 @@ class VkCommentsController extends Controller
 
                             $error = '';
 
+
+
+                            $model = SocialDialoguesVkComments::newVkComment(
+                                $userId,
+                                $ownerId,
+                                $postId,
+                                $comment['id'],
+                                $comment['text'],
+                                $comment['attachments']? json_encode($comment['attachments']): null,
+                                $peerId,
+                                $hash
+                            );
+
                             try{
                                 $full_post_id = $ownerId.'_'.$postId;
 
@@ -118,22 +131,12 @@ class VkCommentsController extends Controller
                                     $userId,
                                     $ownerId,
                                     $full_post_id,
-                                    $link
+                                    $link,
+                                    $model->id
                                 );
                             } catch(\Exception $e) {
                                 $error .= $e->getMessage();
                             }
-
-                            $model = SocialDialoguesVkComments::newVkComment(
-                                $userId,
-                                $ownerId,
-                                $postId,
-                                $comment['id'],
-                                $comment['text'],
-                                $comment['attachments']? json_encode($comment['attachments']): null,
-                                $peerId,
-                                $hash
-                            );
 
 
 

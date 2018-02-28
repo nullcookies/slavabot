@@ -264,7 +264,7 @@ angular.module('cubeWebApp')
 
         $scope.Timer = $interval(function () {
             $scope.getUserData()
-        }, 5000);
+        }, 10000);
 
         $scope.getUserData();
     })
@@ -1369,7 +1369,7 @@ angular.module('cubeWebApp')
 
         $scope.userNotifications = [];
         $scope.notificationMessage = [];
-
+        $scope.LoadInProgress = true;
         moment.locale('ru');
 
         // Пагинация
@@ -1423,17 +1423,25 @@ angular.module('cubeWebApp')
                 $scope.userNotifications = response.data.notifications;
                 $scope.pages = response.data.pages;
                 $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
+                $scope.LoadInProgress = false;
             });
         };
+        if (angular.isDefined($scope.Timer)) {
+            $interval.cancel($scope.Timer);
+        }
 
         $scope.setPage = function(n){
             $scope.getNotifications($.param({'page' : n}));
             $scope.currentPage = n;
         };
-
         $scope.Timer = $interval(function () {
             $scope.setPage($scope.currentPage);
         }, 10000);
+
+        $scope.setPage(0);
+        $scope.$on("$destroy", function (event) {
+            $interval.cancel($scope.Timer);
+        });
     })
     .controller('userNotificationCtrl', function($scope, $http, $sce, $interval, $routeParams, $location){
 
@@ -1503,8 +1511,6 @@ angular.module('cubeWebApp')
             });
         };
 
-
-
         $scope.sendMessage = function(){
             if($scope.social=='VK'){
                 $data = $.param({'user_id' : $scope.user_id, 'peer_id' : $scope.peer_id, 'message': $scope.message});
@@ -1517,15 +1523,35 @@ angular.module('cubeWebApp')
         };
 
         $scope.sendComment = function(post_id){
-
-
-                $data = $.param({'user_id' : $scope.user_id, 'peer_id' : $scope.peer_id, 'media_id' : post_id, 'message': $scope.comment[post_id]});
+            if($scope.social=='IG') {
+                $data = $.param({
+                    'user_id': $scope.user_id,
+                    'peer_id': $scope.peer_id,
+                    'media_id': post_id,
+                    'message': $scope.comment[post_id]
+                });
 
                 $scope.comment[post_id] = '';
 
                 $http.post('/rest/send/v1/ig-comment', $data, config).then(function success(response) {
                     $scope.getNotificationsForUser();
                 });
+            }
+
+            if($scope.social=='VK') {
+                $data = $.param({
+                    'user_id': $scope.user_id,
+                    'peer_id': post_id.split('_')[0],
+                    'media_id': post_id.split('_')[1],
+                    'message': $scope.comment[post_id]
+                });
+
+                $scope.comment[post_id] = '';
+
+                $http.post('/rest/send/v1/vk-comment', $data, config).then(function success(response) {
+                    $scope.getNotificationsForUser();
+                });
+            }
         };
 
         $scope.getNotificationsForUser();
@@ -1534,6 +1560,9 @@ angular.module('cubeWebApp')
             $scope.getNotificationsForUser();
         }, 10000);
 
+        $scope.$on("$destroy", function (event) {
+            $interval.cancel($scope.Timer);
+        });
 
     })
     .controller('tariffsCtrl', function($scope, $http, $sce, $interval){

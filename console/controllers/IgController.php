@@ -107,7 +107,7 @@ class IgController extends Controller
 
                         $user = $item->user;
 
-                        SocialDialoguesInstagram::newIgComment(
+                        $comment = SocialDialoguesInstagram::newIgComment(
                             $userId,
                             $ig->account_id,
                             $id,
@@ -120,7 +120,8 @@ class IgController extends Controller
                             $userId,
                             $ig->account_id,
                             $id,
-                            'https://www.instagram.com/p/'.$info->items[0]->code
+                            'https://www.instagram.com/p/'.$info->items[0]->code,
+                            $comment->id
                         );
 
                         SocialDialoguesPeerInstagram::saveIgPeer(

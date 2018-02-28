@@ -9,6 +9,7 @@ use common\models\SocialDialoguesPost;
 use Yii;
 use yii\data\Pagination;
 use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
@@ -69,15 +70,17 @@ class NotificationController extends Controller
             ->where(
                 ['and',
                     ['sd.peer_id' => new Expression('social_dialogues.peer_id')],
+                    ['sd.social' => new Expression('social_dialogues.social')],
                     ['user_id' => \Yii::$app->user->identity->id]
                 ]);
 
         $query = SocialDialogues::find()
             ->where(['in', 'id', $subQuery])
+            ->andWhere(['user_id' => \Yii::$app->user->identity->id])
             ->orderBy(['id' => SORT_DESC]);
 
         //$models = $query->all();
-
+        $sql = $query->createCommand()->rawSql;
         $countQuery = clone $query;
 
         $pages = new Pagination(
@@ -96,7 +99,7 @@ class NotificationController extends Controller
 
         return [
             'notifications'  =>  $models,
-            'pages'     => $pages,
+            'pages'          => $pages,
         ];
 
         //return $models;
@@ -113,26 +116,18 @@ class NotificationController extends Controller
 
         $peer = SocialDialoguesPeer::find()
             ->where(['id'=> Yii::$app->request->post('id')])
-            ->orderBy(['id' => SORT_DESC])
             ->one();
 
-        $filter = [];
-
-        foreach(SocialDialoguesPeer::getPostsByPeerAction($peer->peer_id) as $post_id){
-
-            if($post_id['social']===SocialDialoguesPost::SOCIAL_IG){
-                $filter[] = $post_id['post_id'];
-            }
-            //$filter[] = $post_id;
-            if($post_id['social']===SocialDialoguesPost::SOCIAL_VK){
-                $filter[] = $post_id['account_id'].'_'.$post_id['post_id'];
-            }
-
-        }
-
         $posts = SocialDialoguesPost::find()
-            ->where(['IN', 'post_id', $filter])
-            ->orderBy(['id' => SORT_DESC])
+            ->where([
+                    'IN',
+                    'post_id',
+                    ArrayHelper::getColumn(
+                        SocialDialogues::getPostsByPeerAction($peer->peer_id),
+                        'filter'
+                    )
+                ])
+            ->orderBy(['updated_at' => SORT_DESC])
             ->all();
 
         $access = $peer->getMessagesCount()>0 || count($posts)>0;
@@ -149,7 +144,6 @@ class NotificationController extends Controller
             'peer' => $peer,
             'posts' => $posts,
             'access' => $access,
-            'debug' => $filter
         ];
 
 

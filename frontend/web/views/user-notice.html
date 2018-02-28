@@ -11,8 +11,10 @@
             <h1>Профиль пользователя</h1>
         </div>
     </div>
-
-    <div class="row" id="user-profile">
+    <div class="main-box no-header clearfix" ng-show="!userName">
+        <img src="/cube/angularjs/img/loader.gif" style="margin-left: 35%;" alt="">
+    </div>
+    <div class="row" id="user-profile" ng-show="userName">
         <div class="col-lg-3 col-md-4 col-sm-4">
             <div class="main-box clearfix">
                 <header class="main-box-header clearfix">

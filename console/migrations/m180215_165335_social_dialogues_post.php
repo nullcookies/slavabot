@@ -19,7 +19,7 @@ class m180215_165335_social_dialogues_post extends Migration
             'social' => $this->string()->notNull(),
             'post_id' => $this->string()->notNull(),
             'url' => $this->string(8000),
-            'created_at' => $this->timestamp()
+            'updated_at' => $this->timestamp()
         ]);
     }
 

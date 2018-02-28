@@ -28,6 +28,7 @@ class SocialDialoguesPost extends \yii\db\ActiveRecord
     const SOCIAL_IG = "IG"; // instagram
 
 
+
     public function getDataComments()
     {
         if($this->social === static::SOCIAL_IG){
@@ -73,7 +74,7 @@ class SocialDialoguesPost extends \yii\db\ActiveRecord
             [['user_id', 'account_id', 'social', 'post_id'], 'required'],
             [['user_id',], 'integer'],
             [['created_at'], 'safe'],
-            [['account_id', 'social', 'post_id', 'hash','url'], 'string', 'max' => 255],
+            [['account_id', 'social', 'post_id', 'hash','url', 'last_comment'], 'string', 'max' => 255],
         ];
     }
 
@@ -89,11 +90,11 @@ class SocialDialoguesPost extends \yii\db\ActiveRecord
             'social' => 'Social',
             'post_id' => 'Post ID',
             'url' => 'Url',
-            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
         ];
     }
 
-    public static function saveIgPost($user_id, $account_id, $post_id, $url)
+    public static function saveIgPost($user_id, $account_id, $post_id, $url, $last_comment)
     {
         $social = static::SOCIAL_IG;
 
@@ -110,8 +111,7 @@ class SocialDialoguesPost extends \yii\db\ActiveRecord
             $model->post_id = $post_id;
             $model->url = $url;
         }
-
-
+        $model->last_comment = $last_comment;
         if(!$model->save(false)) {
             var_dump($model->errors);
         }
@@ -119,7 +119,7 @@ class SocialDialoguesPost extends \yii\db\ActiveRecord
         return $model;
     }
 
-    public static function saveVkPost($user_id, $account_id, $post_id, $url)
+    public static function saveVkPost($user_id, $account_id, $post_id, $url, $last_comment)
     {
         $social = static::SOCIAL_VK;
 
@@ -136,6 +136,10 @@ class SocialDialoguesPost extends \yii\db\ActiveRecord
             $model->post_id = $post_id;
             $model->url = $url;
         }
+        $model->last_comment = $last_comment;
+
+
+        $model->url = $url;
 
 
         if(!$model->save(false)) {

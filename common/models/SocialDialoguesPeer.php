@@ -6,6 +6,7 @@ use common\models\User;
 use yii\db\ActiveRecord;
 use Carbon\Carbon;
 use Yii;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "social_dialogues_peer".
@@ -40,8 +41,8 @@ class SocialDialoguesPeer extends ActiveRecord
     {
         return $this->hasMany(SocialDialoguesSimple::className(), [
             'peer_id' => 'peer_id',
-        ])            ->where(['type'=>'message'])
-            ;
+        ])
+            ->where(['type'=>'message']);
     }
 
     public function getDataMediaId()
@@ -196,16 +197,6 @@ class SocialDialoguesPeer extends ActiveRecord
         return $peer->title;
     }
 
-    public static function getPostsByPeerAction($peerId){
-        $comments = SocialDialogues::find()
-            ->select(['post_id', 'social', 'account_id'])
-            ->where(['peer_id' => $peerId])
-            ->andWhere(['is not', 'post_id', null])
-            ->distinct()
-            ->asArray()
-            ->all();
-        return $comments;
-    }
 
     public function getMessagesCount(){
         return count($this->dataNotifications);
