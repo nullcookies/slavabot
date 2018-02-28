@@ -3,6 +3,8 @@ namespace frontend\controllers\rest\send;
 
 use common\models\rest\Accounts;
 use common\models\SocialDialoguesInstagram;
+use common\models\SocialDialoguesVkComments;
+use frontend\controllers\bot\libs\Logger;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -156,7 +158,19 @@ class V1Controller extends Controller
             if($data->user_id != $data->groups->id) {
                 $options['from_group'] = $data->groups->id;
             }
-            $vk->api('wall.createComment', $options);
+            $result = $vk->api('wall.createComment', $options);
+
+            $model = SocialDialoguesVkComments::newVkComment(
+                $user_id,
+                $peer_id,
+                $media_id,
+                $result['comment_id'],
+                $message,
+                null,
+                $peer_id,
+                null,
+                SocialDialoguesVkComments::DIRECTION_OUTBOX
+            );
 
         } catch (\frontend\controllers\bot\libs\VkException $e) {
             echo $e->getMessage() . PHP_EOL;

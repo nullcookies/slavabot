@@ -64,7 +64,8 @@ class VkNotifyController extends Controller
                     $commentsHashes = SocialDialoguesVkComments::getCommentsHashByPostId($postId, $ownerId);
                     $comment = $notify['feedback'];
 
-                    $hash = md5(json_encode($comment['text']));
+                    //$hash = md5(json_encode($comment['text']));
+                    $hash = SocialDialoguesVkComments::generateHash($comment['text']);
 
                     //если такой комментарий уже есть, то переходим к следующему посту
                     if(in_array($hash, $commentsHashes)) {

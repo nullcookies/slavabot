@@ -49,6 +49,11 @@ class SocialDialoguesVkComments extends SocialDialogues
         return $model;
     }
 
+    public static function generateHash($text)
+    {
+        return md5(json_encode($text));
+    }
+
     public static function getCommentsHashByPostId($postId, $accountId)
     {
         $ids = static::find()

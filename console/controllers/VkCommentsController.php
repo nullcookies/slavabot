@@ -74,7 +74,10 @@ class VkCommentsController extends Controller
             $commentsHashes = SocialDialoguesVkComments::getCommentsHashByPostId($postId, $ownerId);
             $offset = 0;
             do {
-                sleep(3);
+                echo 'POST ' . $postId . PHP_EOL;
+                echo 'SLEEP' . PHP_EOL;
+                echo 'OFFSET ' . $offset . PHP_EOL;
+                sleep(1);
 
                 $comments = $vk->api('wall.getComments', [
                     'owner_id' => $ownerId,
@@ -90,7 +93,8 @@ class VkCommentsController extends Controller
                     foreach ($comments['items'] as $comment) {
                         if($comment['from_id'] != $ownerId) {
                             //если такой комментарий уже есть, то переходим к следующему посту
-                            $hash = md5(json_encode($comment['text']));
+                            //$hash = md5(json_encode($comment['text']));
+                            $hash = SocialDialoguesVkComments::generateHash($comment['text']);
 
                             if(in_array($hash, $commentsHashes)) {
                                 echo 'Дубль' . PHP_EOL;
