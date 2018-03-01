@@ -233,6 +233,10 @@ angular.module('cubeWebApp')
 
             }
         }
+
+        $scope.$on("$destroy", function (event) {
+            $interval.cancel($scope.Timer);
+        });
     })
     .controller('header', function ($scope, $http, $interval, $location) {
 
@@ -433,6 +437,10 @@ angular.module('cubeWebApp')
             $scope.setPage($scope.currentPage)
         }, 5000);
 
+        $scope.$on("$destroy", function (event) {
+            $interval.cancel($scope.Timer);
+        });
+
     })
     .controller('filterCtrl', function ($scope, $http, $sce, $routeParams,$location, $interval) {
     $scope.webhooks = [];
@@ -595,6 +603,10 @@ angular.module('cubeWebApp')
         $scope.Timer = $interval(function () {
             $scope.setPage($scope.currentPage)
         }, 10000);
+
+        $scope.$on("$destroy", function (event) {
+            $interval.cancel($scope.Timer);
+        });
 })
     .controller('detailCtrl', function($scope, $http, $routeParams, $sce,$location){
         $scope.webhook = [];
@@ -1426,9 +1438,7 @@ angular.module('cubeWebApp')
                 $scope.LoadInProgress = false;
             });
         };
-        if (angular.isDefined($scope.Timer)) {
-            $interval.cancel($scope.Timer);
-        }
+
 
         $scope.setPage = function(n){
             $scope.getNotifications($.param({'page' : n}));
@@ -1505,6 +1515,10 @@ angular.module('cubeWebApp')
                         $scope.social = $scope.data.social;
                         $scope.posts = response.data.posts;
 
+                        if($scope.userNotification.length===0){
+                            $scope.setPosts();
+                        }
+
                         document.getElementById('refresh').click();
                     }
                 }
@@ -1515,7 +1529,7 @@ angular.module('cubeWebApp')
             if($scope.social=='VK'){
                 $data = $.param({'user_id' : $scope.user_id, 'peer_id' : $scope.peer_id, 'message': $scope.message});
                 $scope.message = '';
-                $http.post('/rest/send/v1/vk', $data, config).then(function success(response) {
+                $http.post('/rest/send/v1/vk-message', $data, config).then(function success(response) {
 
 
                 });

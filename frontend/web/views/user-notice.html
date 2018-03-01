@@ -70,8 +70,8 @@
                 <div class="tabs-wrapper profile-tabs">
 
                     <ul class="nav nav-tabs">
-                        <li ng-class="{'active' : chatPane}"><a ng-click="setChat()">Сообщения</a></li>
-                        <li ng-class="{'active' : postsPane}"><a ng-click="setPosts()">Посты</a></li>
+                        <li ng-show="userNotification.length>0" ng-class="{'active' : chatPane}"><a ng-click="setChat()">Сообщения</a></li>
+                        <li ng-show="posts.length>0" ng-class="{'active' : postsPane}"><a ng-click="setPosts()">Посты</a></li>
                     </ul>
 
                     <div class="tab-content">

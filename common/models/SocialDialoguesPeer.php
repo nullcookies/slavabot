@@ -45,6 +45,13 @@ class SocialDialoguesPeer extends ActiveRecord
             ->where(['type'=>'message']);
     }
 
+    public function getDataCountNotifications()
+    {
+        return count($this->hasMany(SocialDialoguesSimple::className(), [
+            'peer_id' => 'peer_id',
+        ]));
+    }
+
     public function getDataMediaId()
     {
         return $this->hasOne(SocialDialoguesSimple::className(),
@@ -199,6 +206,6 @@ class SocialDialoguesPeer extends ActiveRecord
 
 
     public function getMessagesCount(){
-        return count($this->dataNotifications);
+        return count($this->DataCountNotifications);
     }
 }

@@ -71,6 +71,7 @@ class NotificationController extends Controller
                 ['and',
                     ['sd.peer_id' => new Expression('social_dialogues.peer_id')],
                     ['sd.social' => new Expression('social_dialogues.social')],
+                    ['direction' => 1],
                     ['user_id' => \Yii::$app->user->identity->id]
                 ]);
 
