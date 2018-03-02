@@ -936,6 +936,8 @@ angular.module('cubeWebApp')
     })
     .controller('socialCtrl', function($scope, $http, $sce, $timeout){
 
+        $scope.firstLoad = true;
+
         $scope.InstaLogin = '';
         $scope.InstaPassword = '';
         $scope.accounts = [];
@@ -946,7 +948,6 @@ angular.module('cubeWebApp')
         $scope.unprocessedName;
         $scope.activeID;
         $scope.removingID = 0;
-
         $scope.vkLogin;
         $scope.vkPassword;
         $scope.vkError = false;
@@ -1002,6 +1003,7 @@ angular.module('cubeWebApp')
                     $scope.available[$scope.accounts[key].type] = false;
                 }
             });
+            $scope.firstLoad = false;
         }
 
         $scope.remove = function() {
@@ -1192,7 +1194,7 @@ angular.module('cubeWebApp')
         };
     })
     .controller('historyCtrl', function($scope, $http, $sce, $interval){
-
+        $scope.firstLoad = true;
         $scope.history = []; // Массив элементов истории
         $scope.order = 'desc'; // Сортировка по умолчанию
         $scope.planned = [];
@@ -1283,6 +1285,7 @@ angular.module('cubeWebApp')
                 $scope.history = response.data.history;
                 $scope.pages = response.data.pages;
                 $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
+                $scope.firstLoad = false;
             });
         };
 
@@ -1293,6 +1296,7 @@ angular.module('cubeWebApp')
                 $scope.planned = response.data.history;
                 $scope.plannedPages = response.data.pages;
                 $scope.plannedNumberOfPages = $scope.plannedPages.totalCount / $scope.pageSize;
+                $scope.firstLoad = false;
             });
         };
 

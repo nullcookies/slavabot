@@ -1,8 +1,21 @@
 <?
 use frontend\controllers\SocialController;
 ?>
+<div class="row">
+    <div class="col-lg-12">
+        <ol class="breadcrumb">
+            <li><a href="">Главная</a></li>
+            <li class="active"><span>Социальные сети</span></li>
+        </ol>
+        <br>
+    </div>
+</div>
+<!--    ng-show="webhooks.length==0 && firstLoad"-->
+<div class="main-box no-header clearfix" ng-show="firstLoad">
+    <img src="/cube/angularjs/img/loader.gif" style="margin-left: 35%;" alt="">
+</div>
 
-<div class="col-lg-12 ng-scope">
+<div class="col-lg-12 ng-scope" ng-show="!firstLoad">
     <div class="main-box clearfix">
         <div class="main-box-body clearfix">
             <div class="row">

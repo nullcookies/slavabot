@@ -12,7 +12,14 @@
             <br>
         </div>
     </div>
-    <div class="row">
+<!--    ng-show="webhooks.length==0 && firstLoad"-->
+    <div class="main-box no-header clearfix" ng-show="history.length==0 && planned.length==0 && firstLoad">
+        <img src="/cube/angularjs/img/loader.gif" style="margin-left: 35%;" alt="">
+    </div>
+    <div class="main-box no-header clearfix" ng-show="history.length==0 && planned.length==0 && !firstLoad">
+        <h2 style="text-align: center; margin-bottom: 23px;">Элементы не найдены</h2>
+    </div>
+    <div class="row" ng-show="history.length!=0 && planned.length!=0 && !firstLoad">
         <div class="col-lg-12">
             <div class="main-box clearfix">
                 <header class="main-box-header clearfix">
