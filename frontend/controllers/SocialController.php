@@ -264,7 +264,8 @@ class SocialController extends Controller
         return parent::beforeAction($action);
     }
 
-    public function actionFacebookWebhooks(){
+    public function actionFacebookWebhooks()
+    {
         $this->enableCsrfValidation = false;
         $challenge = $_REQUEST['hub_challenge'];
         $verify_token = $_REQUEST['hub_verify_token'];

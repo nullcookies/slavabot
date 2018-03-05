@@ -38,8 +38,11 @@ social:
       3: 'publish_pages'
       4: 'pages_show_list'
       5: 'read_insights'
+      6: 'pages_messaging'
+      #7: 'pages_messaging_subscriptions'
+
       #5: 'feed'
-#      5: 'subscribed_apps'
+      #5: 'subscribed_apps'
   vk:
     app_id: '6223471'
     app_secret: 'ilsUQvhc50T6nEdsjzWS'

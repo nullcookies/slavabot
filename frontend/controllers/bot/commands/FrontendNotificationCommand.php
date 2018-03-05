@@ -8,6 +8,7 @@
 namespace frontend\controllers\bot\commands;
 //namespace Longman\TelegramBot\Commands\UserCommands;
 
+use common\models\SocialDialogues;
 use common\models\SocialDialoguesPeer;
 use common\models\User;
 use frontend\controllers\bot\libs\TelegramWrap;
@@ -161,6 +162,8 @@ class FrontendNotificationCommand extends UserCommand
                             case SocialDialoguesPeer::SOCIAL_IG:
                                 V1Controller::actionIgComment($user->id, $notes['peer'], $notes['media'], $text);
                                 break;
+                            case SocialDialogues::SOCIAL_FB:
+                                V1Controller::actionFbMessage($user->id, $notes['peer'], $text);
                             default: null;
                         }
 

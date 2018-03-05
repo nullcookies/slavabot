@@ -12,6 +12,7 @@ use common\models\User;
 class Accounts extends \yii\db\ActiveRecord
 {
     const TYPE_VK = 'vkontakte';
+    const TYPE_FB = 'facebook';
 
     public static function tableName()
     {
@@ -38,6 +39,9 @@ class Accounts extends \yii\db\ActiveRecord
 
         return [
             'id',
+            'system_user_id' => function() {
+                return $this->user_id;
+            },
             'user_id' => function(){
                 return $this->userValue->id;
             },

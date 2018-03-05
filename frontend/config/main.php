@@ -35,7 +35,7 @@ return [
                     'aviso',
                     'success',
                     'fail',
-                    'ig-callback'
+                    'fb-webhook'
                 ],
                 'allow' => true,
                 'roles' => ['?'],
