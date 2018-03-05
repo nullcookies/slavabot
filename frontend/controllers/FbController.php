@@ -52,6 +52,7 @@ class FbController extends \yii\web\Controller
             $messageService->readEntry($body['entry']);
             return 'EVENT_RECEIVED';
         } else {
+            return 'EVENT_RECEIVED';
             throw new NotFoundHttpException();
         }
     }
