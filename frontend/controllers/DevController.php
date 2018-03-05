@@ -1,6 +1,7 @@
 <?php
 namespace frontend\controllers;
 
+use common\models\User;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\web\BadRequestHttpException;
@@ -50,7 +51,6 @@ class DevController extends Controller
     }
 
     public function actionIndex(){
-
-        return 1;
+        return User::postingNotification(-5);
     }
 }

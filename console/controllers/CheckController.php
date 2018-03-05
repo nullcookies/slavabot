@@ -21,6 +21,8 @@ class CheckController extends Controller
         User::notification(1);
         User::notification(3);
         User::notification(5);
+
+
     }
 
 

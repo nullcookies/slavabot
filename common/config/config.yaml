@@ -47,3 +47,8 @@ bot_url: 'http://t.me/slavarubot'
 defaul_tarif:
   id: 4
   period: 10
+postsNotifications:
+  0: 'Вы давно не постили!'
+  1: 'Самое время добавить новый пост!'
+  2: 'Может запостим?'
+  3: 'Подписчики требуют постов!'

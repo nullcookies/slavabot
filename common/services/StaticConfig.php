@@ -32,6 +32,12 @@ class StaticConfig
         return self::config('social')['vk'];
     }
 
+    static function postsNotifications(){
+        $notifications = self::config('postsNotifications');
+
+        return $notifications[rand(0, count($notifications)-1)];
+    }
+
     static function botUrl(){
         return self::config('bot_url');
     }

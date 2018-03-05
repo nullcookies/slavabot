@@ -1,6 +1,7 @@
 <?php
 namespace common\models;
 
+use common\commands\command\SendPostingNotificationCommand;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -418,6 +419,17 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return \Yii::$app->commandBus->handle(
             new SendNotificationCommand(
+                [
+                    'day' => $day
+                ]
+            )
+        );
+    }
+
+    static function postingNotification($day)
+    {
+        return \Yii::$app->commandBus->handle(
+            new SendPostingNotificationCommand(
                 [
                     'day' => $day
                 ]
