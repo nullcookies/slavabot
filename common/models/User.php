@@ -3,9 +3,11 @@ namespace common\models;
 
 use common\commands\command\SendPostingNotificationCommand;
 use Yii;
+use common\models\Accounts;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 use yii\web\IdentityInterface;
 use common\models\billing\Payment;
 use Carbon\Carbon;
@@ -33,7 +35,6 @@ class User extends ActiveRecord implements IdentityInterface
 {
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
-    //public $tariff;
 
     /**
      * @inheritdoc
@@ -69,6 +70,15 @@ class User extends ActiveRecord implements IdentityInterface
 
     }
 
+
+    public function getDataAccounts()
+    {
+        return $this->hasMany(Accounts::className(), [
+            'user_id' => 'id',
+        ])->select(['type'])->asArray(true);
+
+    }
+
     public function fields(){
         return [
             'id',
@@ -79,8 +89,13 @@ class User extends ActiveRecord implements IdentityInterface
             'auth_key',
             'status',
             'timezone',
-            'tariff' => 'tariffValue',
+            'tariff' => 'tariffValue'
         ];
+    }
+
+    static function getUsers()
+    {
+        return self::find();//->with('dataAccounts');
     }
 
     /**
