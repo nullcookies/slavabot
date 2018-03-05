@@ -2,6 +2,8 @@
 
 namespace common\models;
 
+use common\services\social\FacebookService;
+use frontend\controllers\bot\libs\Logger;
 use Yii;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
@@ -11,7 +13,7 @@ use common\models\Instagram;
 
 class Accounts extends \yii\db\ActiveRecord
 {
-
+    const TYPE_FB = 'facebook';
     /**
      * @inheritdoc
      */
@@ -27,7 +29,7 @@ class Accounts extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'status', 'processed'], 'integer'],
+            [['user_id', 'status', 'processed', 'fb_page'], 'integer'],
             [['type', 'data'], 'string']
 
         ];
@@ -129,7 +131,7 @@ class Accounts extends \yii\db\ActiveRecord
 
         $post = \Yii::$app->request->post();
 
-        $acc = Accounts::find()->where(['id' => $post['id']])->one();
+        $acc = static::find()->where(['id' => $post['id']])->one();
 
         if(isset($post['data']['password'])){
             $decrypt = \Yii::$app->encrypter->encrypt($post['data']['password']);
@@ -139,11 +141,48 @@ class Accounts extends \yii\db\ActiveRecord
             }
         }
 
+        $subscribe = false;
+        if($acc->type == static::TYPE_FB) {
+            if(isset($post['data']['groups']['type']) && $post['data']['groups']['type'] == 'page') {
+                $acc->fb_page = $post['data']['groups']['id'];
+                $subscribe = true;
+            }
+        }
+
         $acc->data = json_encode($post['data']);
         $acc->processed = 1;
 
-        return $acc->save();
+        if($acc->save()) {
+           if($subscribe) {
+               $serv = new FacebookService();
+               $api = $serv->init();
+               try {
+                   $response = $serv->subscribePage($api, $post['data']['groups']['id'], $post['data']['groups']['access_token']);
+
+                   Logger::info(json_encode($response));
+
+                   if(isset($response['success']) && $response['success'] == true) {
+                       $result = true;
+                   } else {
+                       $result = false;
+                   }
+
+               } catch (\Exception $e) {
+                   Logger::info($e->getMessage());
+                   $result = false;
+               }
+           } else {
+               $result = true;
+           }
+        } else {
+            $result = false;
+        }
+
+
+
+        return $result;
     }
+
     public static function updateAccount(){
         $post = \Yii::$app->request->post();
         $acc = Accounts::find()->where(['id' => $post['id']])->one();

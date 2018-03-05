@@ -35,7 +35,7 @@ return [
                     'aviso',
                     'success',
                     'fail',
-                    'fb-messages'
+                    'fb-webhook'
                 ],
                 'allow' => true,
                 'roles' => ['?'],

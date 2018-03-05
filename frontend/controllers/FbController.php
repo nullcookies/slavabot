@@ -12,7 +12,7 @@ class FbController extends \yii\web\Controller
 {
     public function beforeAction($action)
     {
-        if (in_array($action->id, ['fb-messages'])) {
+        if (in_array($action->id, ['fb-webhook'])) {
             $this->enableCsrfValidation = false;
         }
 
@@ -24,10 +24,10 @@ class FbController extends \yii\web\Controller
         return 'OK';
     }
 
-    public function actionFbMessages()
+    public function actionFbWebhook()
     {
         // Your verify token. Should be a random string.
-        $verify_token = "salesbot_test";
+        $verify_token = "vupII49YYclqmaGtDTRD8Brf";//"salesbot_test";
 
         $mode = Yii::$app->request->get('hub_mode');
         $token = Yii::$app->request->get('hub_verify_token');
@@ -43,14 +43,13 @@ class FbController extends \yii\web\Controller
 
 
 
-
-
         Logger::info(Yii::$app->request->getRawBody());
 
         $body = json_decode(Yii::$app->request->getRawBody(), true);
 
         if ($body['object'] === 'page') {
-
+            $messageService = new FbMessagesService();
+            $messageService->readEntry($body['entry']);
             return 'EVENT_RECEIVED';
         } else {
             throw new NotFoundHttpException();
