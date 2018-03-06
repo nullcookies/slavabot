@@ -95,7 +95,7 @@ class User extends ActiveRecord implements IdentityInterface
 
     static function getUsers()
     {
-        return self::find();//->with('dataAccounts');
+        return self::find()->orderBy(['id' => SORT_DESC]);
     }
 
     /**

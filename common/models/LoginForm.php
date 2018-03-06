@@ -13,7 +13,7 @@ class LoginForm extends Model
     public $email;
     public $password;
     public $rememberMe = true;
-
+    public $id;
     private $_user;
 
 
@@ -58,6 +58,19 @@ class LoginForm extends Model
     {
         if ($this->validate()) {
             return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
+        } else {
+            return false;
+        }
+    }
+
+    public function isAdmin()
+    {
+        if ($this->validate()) {
+            $this->getUser();
+            if($this->_user->id==1){
+                return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
+            }
+            return false;
         } else {
             return false;
         }
