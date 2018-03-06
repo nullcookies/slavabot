@@ -51,6 +51,6 @@ class DevController extends Controller
     }
 
     public function actionIndex(){
-        return User::postingNotification(-5);
+        return User::postingNotification(-1);
     }
 }

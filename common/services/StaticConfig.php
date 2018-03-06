@@ -1,5 +1,6 @@
 <?php
 namespace common\services;
+use common\models\NotificationsTexts;
 use Symfony\Component\Yaml\Yaml;
 use yii\base\Object;
 
@@ -35,7 +36,12 @@ class StaticConfig
     static function postsNotifications(){
         $notifications = self::config('postsNotifications');
 
-        return $notifications[rand(0, count($notifications)-1)];
+        $notifications = NotificationsTexts::find()
+            ->where(['type' => 1])
+            ->asArray()
+            ->all();
+
+        return $notifications[rand(0, count($notifications)-1)]['text'];
     }
 
     static function botUrl(){
