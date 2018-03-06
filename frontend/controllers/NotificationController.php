@@ -119,6 +119,8 @@ class NotificationController extends Controller
             ->where(['id'=> Yii::$app->request->post('id')])
             ->one();
 
+        Yii::$app->session->set('peer_id', $peer->peer_id);
+
         $posts = SocialDialoguesPost::find()
             ->where([
                     'IN',

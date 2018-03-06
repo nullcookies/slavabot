@@ -31,12 +31,25 @@ class SocialDialoguesPost extends \yii\db\ActiveRecord
 
     public function getDataComments()
     {
+        if(Yii::$app->session->has('peer_id')) {
+            $peer_id = Yii::$app->session->get('peer_id');
+        } else {
+            $peer_id = 1;
+        }
+
         if($this->social === static::SOCIAL_IG){
-            return $this->hasMany(SocialDialogues::className(), ['post_id' => 'post_id']);
+            return $this->hasMany(SocialDialogues::className(), ['post_id' => 'post_id'])
+                ->where(['peer_id'=>$peer_id]);
         }
         if($this->social === static::SOCIAL_VK){
             return $this->hasMany(SocialDialogues::className(), ['social' => 'social'])
                 ->where(['type'=>'comment'])
+                ->andWhere(
+                    ['OR',
+                        ['peer_id' => $peer_id],
+                        [ 'peer_id' => (int)$this->account_id]
+                    ]
+                )
                 ->andWhere(['post_id' => explode( '_', $this->post_id)[1]])
                 ->andWhere(['account_id' => $this->account_id]);
         }

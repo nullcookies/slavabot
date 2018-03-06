@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'raw',
                 'value' => function ($model, $key, $index, $column) {
                     $types = [
-                        0 => 'Нет данных',
+                        0 => 'Нет данных. Уведомление не активно!',
                         1 => 'Мотивационные'
                     ];
 
