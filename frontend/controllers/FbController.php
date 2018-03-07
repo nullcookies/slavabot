@@ -53,7 +53,7 @@ class FbController extends \yii\web\Controller
             return 'EVENT_RECEIVED';
         } else {
             return 'EVENT_RECEIVED';
-            throw new NotFoundHttpException();
+            //throw new NotFoundHttpException();
         }
     }
 

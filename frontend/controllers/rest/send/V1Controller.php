@@ -151,6 +151,39 @@ class V1Controller extends Controller
 
     }
 
+    public static function actionFbComment($user_id = '', $peer_id = '', $media_id = '', $message = '')
+    {
+        if ($user_id == '') {
+            $user_id = Yii::$app->request->post('user_id');
+            $media_id = Yii::$app->request->post('media_id');
+            $peer_id = Yii::$app->request->post('peer_id');
+            $message = Yii::$app->request->post('message');
+        }
+
+
+        if (!$account = Accounts::getByUserId($user_id, Accounts::TYPE_FB)) {
+            throw new \InvalidArgumentException('Аккаунт не найден');
+        }
+
+        $data = json_decode($account->data);
+        $group_access_token = $data->groups->access_token;
+
+        $postId = $peer_id .'_'.$media_id;
+
+        try {
+            $fbService = new FacebookService();
+
+            $fbApi = $fbService->init();
+
+            $fbService->sendComment($fbApi, $postId, $message, $group_access_token);
+
+        } catch (\Exception $e) {
+            echo 'error: ' . $e->getMessage();
+            Logger::info('error: ' . $e->getMessage());
+            exit;
+        }
+    }
+
     /**
      * Комментарий вКонтакте
      *

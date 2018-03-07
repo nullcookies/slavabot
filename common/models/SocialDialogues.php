@@ -5,6 +5,7 @@ use common\models\SocialDialoguesPeer;
 use common\models\User;
 use yii\db\ActiveRecord;
 use Carbon\Carbon;
+use yii\db\Expression;
 
 
 /**
@@ -52,7 +53,7 @@ class SocialDialogues extends ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'peer_id', 'text', 'type', 'social', 'message'], 'required'],
+            [['user_id', 'peer_id', 'type', 'social'], 'required'],
             [['user_id', 'peer_id', 'message_id', 'edited', 'direction'], 'integer'],
             [['message', 'text', 'type', 'attaches', 'account_id', 'post_id', 'hash'], 'string'],
             [['social'], 'string', 'max' => 2],
@@ -103,6 +104,7 @@ class SocialDialogues extends ActiveRecord
             'social',
             'peer' =>'dataPeer',
             'message'=>'text',
+            'direction',
             'created_at',
             'type',
             'post_id'
@@ -348,6 +350,20 @@ class SocialDialogues extends ActiveRecord
         }
 
         return $message;
+    }
+
+    public static function getPostsByPeerAction($peerId){
+
+        $comments = SocialDialogues::find()
+            ->select([new Expression("IF(`social`='IG', `post_id`, IF(`social`='VK', CONCAT(`account_id`, '_', `post_id`), IF(`social`='FB', `post_id`, 'no' ))) as 'filter'")])
+            ->where(['peer_id' => $peerId])
+            ->andWhere(['is not', 'post_id', null])
+            ->andWhere(['is not', 'account_id', null])
+            ->distinct()
+            ->asArray()
+            ->all();
+        return $comments;
+
     }
 
 }

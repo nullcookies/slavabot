@@ -10,6 +10,7 @@ namespace common\services\social;
 
 
 use common\models\rest\Accounts;
+use common\models\SocialDialoguesFbComments;
 use common\models\SocialDialoguesFbMessages;
 use common\models\SocialDialoguesPeerFb;
 use frontend\controllers\bot\Bot;
@@ -70,8 +71,105 @@ class FbMessagesService
         foreach ($entry as $item) {
             $this->getUser($item['id']);
 
-            $this->readMessage($item['messaging'][0]);
+            if(isset($item['messaging'])) {
+                $this->readMessage($item['messaging'][0]);
+            }
+            if(isset($item['changes'])) {
+                if($item['changes'][0]['value']['item'] == 'comment') {
+                    $this->readComment($item['changes'][0]['value'], $item['id'] );
+                }
+            }
         }
+    }
+
+    protected function readComment(array $comment, $fromId)
+    {
+        $postId = 0;
+        if($fromId != $comment['sender_id'] && ($comment['verb'] == 'add' || $comment['verb'] == 'edited')) {
+            foreach ($this->users as $user) {
+                $exploded = explode('_', $comment['post_id']);
+                $postId = $exploded[1];
+
+                $exploded = explode('_', $comment['comment_id']);
+                $commentId = $exploded[1];
+
+                $edited = 0;
+
+                if($comment['verb'] == 'edited') {
+                    $edited = 1;
+                }
+
+                $attaches = [];
+                if(isset($comment['photo'])) {
+                    $attaches['photo'] = $comment['photo'];
+                }
+                if(isset($comment['video'])) {
+                    $attaches['video'] = $comment['video'];
+                }
+
+                SocialDialoguesFbComments::newFbComment(
+                    $user->user_id,
+                    $user->data->groups->id,
+                    $postId,
+                    $commentId,
+                    isset($comment['message'])? $comment['message']: '',
+                    !empty($attaches)? json_encode($attaches): null,
+                    $comment['sender_id'],
+                    $edited
+                );
+
+            }
+
+
+            $senderName = $comment['sender_id'];
+
+            $response = $this->getSenderInfoByPSID($comment['sender_id']);
+
+            if($response) {
+                Logger::info('SENDER INFO FOR: ' . $comment['sender_id'] . ' - ' . json_encode($response));
+
+                $senderName = $response['name'];
+
+                SocialDialoguesPeerFb::saveFbPeer(
+                    $response['id'],
+                    $senderName,
+                    isset($response['cover']['source'])? $response['cover']['source']: ''
+                );
+            }
+
+            $response = $this->getSenderInfoByPSID($fromId);
+
+            if($response) {
+                Logger::info('SENDER INFO FOR: ' . $fromId . ' - ' . json_encode($response));
+
+                SocialDialoguesPeerFb::saveFbPeer(
+                    $response['id'],
+                    $senderName,
+                    isset($response['cover']['source'])? $response['cover']['source']: ''
+                );
+            }
+
+            $text = $this->getCommentForTelegram($comment);
+
+            $this->sendToTelegram(
+                $senderName,
+                $fromId,
+                $text,
+                $postId
+            );
+
+
+        }
+    }
+
+    protected function getCommentForTelegram(array $comment)
+    {
+        $text = isset($comment['message'])? $comment['message']: '';
+
+        $text .= isset($comment['photo'])? "\n".$comment['photo']: '';
+        $text .= isset($comment['video'])? "\n".$comment['video']: '';
+
+        return $text;
     }
 
     protected function readMessage(array $message)
@@ -89,17 +187,17 @@ class FbMessagesService
 
         $senderName = $message['sender']['id'];
 
-        $response = $this->getSenderInfo($message['sender']['id']);
+        $response = $this->getSenderInfoByPSID($message['sender']['id']);
 
         if($response) {
-            Logger::info(json_encode($response));
+            Logger::info('SENDER INFO FOR: ' . $message['sender']['id'] . ' - ' . json_encode($response));
 
-            $senderName = $response['first_name'] . ' ' . $response['last_name'];
+            $senderName = $response['name'];
 
             SocialDialoguesPeerFb::saveFbPeer(
                 $response['id'],
                 $senderName,
-                $response['profile_pic']
+                isset($response['cover']['source'])? $response['cover']['source']: null
             );
         }
 
@@ -112,7 +210,7 @@ class FbMessagesService
         );
     }
 
-    protected function getSenderInfo($psid)
+    protected function getSenderInfoByPSID($psid)
     {
         $token = $this->users[0]->data->groups->access_token;
 
@@ -121,7 +219,7 @@ class FbMessagesService
         return $response = $this->fb->getUserInfoByPSID($fb, $psid, $token);
     }
 
-    protected function sendToTelegram($senderName, $senderId, $text)
+    protected function sendToTelegram($senderName, $senderId, $text, $mediaId = 0)
     {
         foreach ($this->users as $user) {
             $this->command->prepareParams([
@@ -129,7 +227,7 @@ class FbMessagesService
                 'message' => $senderName.":\n".$text,
             ]);
 
-            $this->command->execute($senderId);
+            $this->command->execute($senderId, $mediaId);
         }
 
     }

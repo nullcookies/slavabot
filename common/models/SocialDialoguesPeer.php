@@ -71,7 +71,7 @@ class SocialDialoguesPeer extends ActiveRecord
     public function rules()
     {
         return [
-            [['social', 'type', 'peer_id', 'title', 'avatar'], 'required'],
+            [['social', 'type', 'peer_id', 'title'], 'required'],
             [['peer_id'], 'integer'],
             [['created_at'], 'safe'],
             [['social'], 'string', 'max' => 2],
