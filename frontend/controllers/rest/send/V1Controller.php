@@ -238,7 +238,7 @@ class V1Controller extends Controller
             );
 
         } catch (\frontend\controllers\bot\libs\VkException $e) {
-            echo $e->getMessage() . PHP_EOL;
+            Logger::info($peer_id . ' - ' . $e->getMessage());
         }
 
     }

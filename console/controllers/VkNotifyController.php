@@ -25,6 +25,9 @@ class VkNotifyController extends Controller
         if ($users) {
             foreach ($users as $user) {
                 $user = $user->toArray();
+                if($user['access_token'] != $user['group_access_token']) {
+                    continue;
+                }
                 if (!empty($user['telegram_id'] && !empty($user['access_token']))) {
                     $access_token = $user['access_token'];
                     $options = [
@@ -61,11 +64,11 @@ class VkNotifyController extends Controller
                     $post = $notify['parent'];
                     $postId = $post['id'];
                     $ownerId = $post['from_id'];
-                    $commentsHashes = SocialDialoguesVkComments::getCommentsHashByPostId($postId, $ownerId);
+                    $commentsHashes = SocialDialoguesVkComments::getCommentsHashByPostId($postId, $ownerId, $userId);
                     $comment = $notify['feedback'];
 
                     //$hash = md5(json_encode($comment['text']));
-                    $hash = SocialDialoguesVkComments::generateHash($comment['text']);
+                    $hash = SocialDialoguesVkComments::generateHash($comment['id'].$comment['text']);
 
                     //если такой комментарий уже есть, то переходим к следующему посту
                     if(in_array($hash, $commentsHashes)) {
@@ -104,7 +107,7 @@ class VkNotifyController extends Controller
                             'message' => $peerInfo['title'].":\n".$model->getMessageForTelegram(),
                         ]);
 
-                        $command->execute($ownerId, $postId);
+                        $command->execute($peerId, $postId);
 
                         echo 'sended' . PHP_EOL;
                     }

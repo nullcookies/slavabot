@@ -61,20 +61,23 @@ class VkCommentsController extends Controller
     {
         echo $ownerId . PHP_EOL;
         $postIds = [];
+        $minTimestamp = time() - 60 * 60 * 24 * 7;
 
         $wall = $vk->api('wall.get', [
             'owner_id' => $ownerId,
-            'count' => 100,
+            'count' => 30,
             'extended' => 1
         ]);
 
         foreach ($wall['items'] as $post) {
-            echo $post['date'] . PHP_EOL;
-            $postIds[] = $post['id'];
+            if($post['date'] > $minTimestamp) {
+                echo $post['date'] . PHP_EOL;
+                $postIds[] = $post['id'];
+            }
         }
 
         foreach ($postIds as $postId) {
-            $commentsHashes = SocialDialoguesVkComments::getCommentsHashByPostId($postId, $ownerId);
+            $commentsHashes = SocialDialoguesVkComments::getCommentsHashByPostId($postId, $ownerId, $userId);
             $offset = 0;
             do {
                 echo 'POST ' . $postId . PHP_EOL;
@@ -97,7 +100,7 @@ class VkCommentsController extends Controller
                         if($comment['from_id'] != $ownerId) {
                             //если такой комментарий уже есть, то переходим к следующему посту
                             //$hash = md5(json_encode($comment['text']));
-                            $hash = SocialDialoguesVkComments::generateHash($comment['text']);
+                            $hash = SocialDialoguesVkComments::generateHash($comment['id'].$comment['text']);
 
                             if(in_array($hash, $commentsHashes)) {
                                 echo 'Дубль' . PHP_EOL;
