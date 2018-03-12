@@ -202,6 +202,23 @@ class FacebookService
         return false;
     }
 
+    public function getRealLink(FB $fb, $psid, $pageAccessToken)
+    {
+        try {
+            $response = $fb->get("/$psid?fields=link", "{$pageAccessToken}");
+            Logger::info('LINK: ' . $response->getGraphNode()->asJson());
+            return $response->getGraphNode()->asArray();
+        } catch(Facebook\Exceptions\FacebookResponseException $e) {
+            Logger::info('Graph returned an error: ' . $e->getMessage());
+        } catch(Facebook\Exceptions\FacebookSDKException $e) {
+            Logger::info('Facebook SDK returned an error: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            Logger::info("error for $psid: " . $e->getMessage());
+        }
+
+        return false;
+    }
+
     public function subscribePage(FB $fb, $pageId, $pageAccessToken)
     {
         $response = $fb->post("/$pageId/subscribed_apps", [], $pageAccessToken);

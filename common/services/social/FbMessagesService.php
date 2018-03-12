@@ -33,7 +33,9 @@ class FbMessagesService
     /**
      * @var FacebookService
      */
-    protected $fb;
+    protected $fbService;
+
+    protected $fbApi;
 
     public function __construct()
     {
@@ -42,7 +44,9 @@ class FbMessagesService
 
         $this->command = new FrontendNotificationCommand($telegram);
 
-        $this->fb = new FacebookService();
+        $this->fbService = new FacebookService();
+
+        $this->fbApi = $this->fbService->init();
     }
 
     protected function getUser($pageId)
@@ -174,11 +178,18 @@ class FbMessagesService
 
     protected function readMessage(array $message)
     {
+        $token = $this->users[0]->data->groups->access_token;
+        $from = $this->fbService->getRealLink($this->fbApi, $message['sender']['id'], $token);
+        $path = trim(parse_url($from['link'], PHP_URL_PATH), '/');
+        $peerId = explode('/', $path);
+        Logger::info('PEER: ' . json_encode($peerId));
+
+
         foreach ($this->users as $user) {
             SocialDialoguesFbMessages::newFbMessage(
                 $user->user_id,
                 $user->data->groups->id,
-                $message['sender']['id'],
+                $peerId[1],
                 $message['message']['seq'],
                 isset($message['message']['text'])? $message['message']['text']: '',
                 isset($message['message']['attachments'])? json_encode($message['message']['attachments']): null
@@ -195,9 +206,10 @@ class FbMessagesService
             $senderName = $response['name'];
 
             SocialDialoguesPeerFb::saveFbPeer(
-                $response['id'],
+                $peerId[1],
                 $senderName,
-                isset($response['picture']['url'])? $response['picture']['url']: null
+                isset($response['picture']['url'])? $response['picture']['url']: null,
+                $response['id']
             );
         }
 
@@ -205,7 +217,7 @@ class FbMessagesService
 
         $this->sendToTelegram(
             $senderName,
-            $message['sender']['id'],
+            $peerId[1],
             $text
         );
     }
@@ -214,11 +226,9 @@ class FbMessagesService
     {
         $token = $this->users[0]->data->groups->access_token;
 
-        $fb = $this->fb->init();
+        $response = $this->fbService->getUserInfoByPSID($this->fbApi, $psid, $token);
 
-        $response = $this->fb->getUserInfoByPSID($fb, $psid, $token);
-
-        $response['picture'] = $this->fb->getPictureByPSID($fb, $psid, $token);
+        $response['picture'] = $this->fbService->getPictureByPSID($this->fbApi, $psid, $token);
 
         return $response;
     }

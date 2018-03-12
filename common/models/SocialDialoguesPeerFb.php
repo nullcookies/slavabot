@@ -11,7 +11,7 @@ namespace common\models;
 
 class SocialDialoguesPeerFb extends SocialDialoguesPeer
 {
-    public static function saveFbPeer($peerId, $title, $avatar)
+    public static function saveFbPeer($peerId, $title, $avatar, $psid = null)
     {
         $social = static::SOCIAL_FB;
         $type = static::TYPE_USER;
@@ -29,6 +29,7 @@ class SocialDialoguesPeerFb extends SocialDialoguesPeer
 
         $model->title = $title;
         $model->avatar = $avatar;
+        $model->psid = $psid;
 
         if(!$model->save(false)) {
             var_dump($model->errors);

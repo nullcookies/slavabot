@@ -14,6 +14,7 @@ use Yii;
  * @property string $social
  * @property string $type
  * @property integer $peer_id
+ * @property integer $psid
  * @property string $title
  * @property string $avatar
  * @property string $created_at
@@ -58,6 +59,7 @@ class SocialDialoguesPeer extends ActiveRecord
             'created_at',
             'avatar',
             'peer_id',
+            'psid',
             'title',
             'social',
             'notification' => 'dataNotifications',
@@ -72,7 +74,7 @@ class SocialDialoguesPeer extends ActiveRecord
     {
         return [
             [['social', 'type', 'peer_id', 'title'], 'required'],
-            [['peer_id'], 'integer'],
+            [['peer_id', 'psid'], 'integer'],
             [['created_at'], 'safe'],
             [['social'], 'string', 'max' => 2],
             [['type', 'title', 'avatar'], 'string', 'max' => 255],

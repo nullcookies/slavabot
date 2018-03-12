@@ -140,6 +140,10 @@ class FrontendNotificationCommand extends UserCommand
 
                         $peer = SocialDialoguesPeer::findOne(['peer_id' => $notes['peer']]);
 
+                        if($peer->psid) {
+                            $notes['peer'] = $peer->psid;
+                        }
+
                         $data = [
                             'chat_id' => $chat_id,
                             'user_id' => $chat_id,
