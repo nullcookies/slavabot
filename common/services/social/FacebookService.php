@@ -149,11 +149,14 @@ class FacebookService
     public function getUser(FB $fb, $accessToken){
         try {
             $response = $fb->get('/me?fields=id,name', "{$accessToken}");
+            //Logger::info('Ids: ' . $response->getGraphNode()->asJson());
             return $response->getGraphNode();
         } catch(Facebook\Exceptions\FacebookResponseException $e) {
+            Logger::info('Graph returned an error: ' . $e->getMessage());
             echo 'Graph returned an error: ' . $e->getMessage();
             exit;
         } catch(Facebook\Exceptions\FacebookSDKException $e) {
+            Logger::info('Facebook SDK returned an error: ' . $e->getMessage());
             echo 'Facebook SDK returned an error: ' . $e->getMessage();
             exit;
         }
