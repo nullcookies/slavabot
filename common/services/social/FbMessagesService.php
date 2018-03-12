@@ -133,7 +133,7 @@ class FbMessagesService
                 SocialDialoguesPeerFb::saveFbPeer(
                     $response['id'],
                     $senderName,
-                    isset($response['cover']['source'])? $response['cover']['source']: ''
+                    isset($response['picture']['url'])? $response['picture']['url']: ''
                 );
             }
 
@@ -144,8 +144,8 @@ class FbMessagesService
 
                 SocialDialoguesPeerFb::saveFbPeer(
                     $response['id'],
-                    $senderName,
-                    isset($response['cover']['source'])? $response['cover']['source']: ''
+                    $response['name'],
+                    isset($response['picture']['url'])? $response['picture']['url']: ''
                 );
             }
 
@@ -197,7 +197,7 @@ class FbMessagesService
             SocialDialoguesPeerFb::saveFbPeer(
                 $response['id'],
                 $senderName,
-                isset($response['cover']['source'])? $response['cover']['source']: null
+                isset($response['picture']['url'])? $response['picture']['url']: null
             );
         }
 
@@ -216,7 +216,11 @@ class FbMessagesService
 
         $fb = $this->fb->init();
 
-        return $response = $this->fb->getUserInfoByPSID($fb, $psid, $token);
+        $response = $this->fb->getUserInfoByPSID($fb, $psid, $token);
+
+        $response['picture'] = $this->fb->getPictureByPSID($fb, $psid, $token);
+
+        return $response;
     }
 
     protected function sendToTelegram($senderName, $senderId, $text, $mediaId = 0)
