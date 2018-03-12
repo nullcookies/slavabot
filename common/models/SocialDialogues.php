@@ -53,7 +53,7 @@ class SocialDialogues extends ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'peer_id', 'text', 'type', 'social', 'message'], 'required'],
+            [['user_id', 'peer_id', 'type', 'social'], 'required'],
             [['user_id', 'peer_id', 'message_id', 'edited', 'direction'], 'integer'],
             [['message', 'text', 'type', 'attaches', 'account_id', 'post_id', 'hash'], 'string'],
             [['social'], 'string', 'max' => 2],

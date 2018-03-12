@@ -163,7 +163,12 @@ class FrontendNotificationCommand extends UserCommand
                                 V1Controller::actionIgComment($user->id, $notes['peer'], $notes['media'], $text);
                                 break;
                             case SocialDialogues::SOCIAL_FB:
-                                V1Controller::actionFbMessage($user->id, $notes['peer'], $text);
+                                if(empty($notes['media'])) {
+                                    V1Controller::actionFbMessage($user->id, $notes['peer'], $text);
+                                } else {
+                                    V1Controller::actionFbComment($user->id, $notes['peer'], $notes['media'], $text);
+                                }
+                                break;
                             default: null;
                         }
 

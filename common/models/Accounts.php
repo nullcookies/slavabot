@@ -14,6 +14,8 @@ use common\models\Instagram;
 class Accounts extends \yii\db\ActiveRecord
 {
     const TYPE_FB = 'facebook';
+    const TYPE_VK = 'vkontakte';
+
     /**
      * @inheritdoc
      */
@@ -139,6 +141,24 @@ class Accounts extends \yii\db\ActiveRecord
             if($decrypt){
                 $post['data']['password'] = $decrypt;
             }
+        }
+
+        if($acc->type == static::TYPE_VK) {
+            if($post['data']['user_id'] == $post['data']['groups']['id']) {
+                $name = $post['data']['user_name'];
+                $peerId = $post['data']['groups']['id'];
+                $peerType = SocialDialoguesPeerVk::TYPE_USER;
+            } else {
+                $name = $post['data']['groups']['name'];
+                $peerId = -$post['data']['groups']['id'];
+                $peerType = SocialDialoguesPeerVk::TYPE_GROUP;
+            }
+            SocialDialoguesPeerVk::saveVkPeer(
+                $peerId,
+                $name,
+                $post['data']['groups']['photo_100'],
+                $peerType
+            );
         }
 
         $subscribe = false;
