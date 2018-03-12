@@ -144,7 +144,7 @@ class FbMessagesService
 
                 SocialDialoguesPeerFb::saveFbPeer(
                     $response['id'],
-                    $senderName,
+                    $response['name'],
                     isset($response['cover']['source'])? $response['cover']['source']: ''
                 );
             }
