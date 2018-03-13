@@ -5,6 +5,7 @@ use common\models\rest\Accounts;
 use common\models\SocialDialoguesFbComments;
 use common\models\SocialDialoguesFbMessages;
 use common\models\SocialDialoguesInstagram;
+use common\models\SocialDialoguesPeer;
 use common\models\SocialDialoguesVkComments;
 use common\services\social\FacebookService;
 use frontend\controllers\bot\libs\Logger;
@@ -148,6 +149,10 @@ class V1Controller extends Controller
             $result = $fbService->sendMessage($fbApi, $peer_id, $message, $group_access_token);
 
             $messageId = 0;
+
+            if($peer = SocialDialoguesPeer::findOne(['psid' => $peer_id])) {
+                $peer_id = $peer->peer_id;
+            }
 
             SocialDialoguesFbMessages::newFbMessage(
                 $user_id, $accountId, $peer_id, $messageId, $message, null,
