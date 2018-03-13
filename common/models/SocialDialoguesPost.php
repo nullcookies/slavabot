@@ -40,7 +40,7 @@ class SocialDialoguesPost extends \yii\db\ActiveRecord
         if($this->social === static::SOCIAL_IG || $this->social === static::SOCIAL_FB){
             return $this->hasMany(SocialDialogues::className(), ['post_id' => 'post_id'])
                 ->where(['peer_id'=>$peer_id])
-                ->orderBy(['id' => SORT_DESC]);
+                ->orderBy(['id' => SORT_ASC]);
         }
         if($this->social === static::SOCIAL_VK){
             return $this->hasMany(SocialDialogues::className(), ['social' => 'social'])
@@ -53,7 +53,7 @@ class SocialDialoguesPost extends \yii\db\ActiveRecord
                 )
                 ->andWhere(['post_id' => explode( '_', $this->post_id)[1]])
                 ->andWhere(['account_id' => $this->account_id])
-                ->orderBy(['id' => SORT_DESC]);
+                ->orderBy(['id' => SORT_ASC]);
         }
 
     }
