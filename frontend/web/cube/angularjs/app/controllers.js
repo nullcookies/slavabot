@@ -1538,6 +1538,7 @@ angular.module('cubeWebApp')
 
                 });
             }else if($scope.social=='FB'){
+                console.log($scope.data.psid);
                 $data = $.param({'user_id' : $scope.user_id, 'peer_id' : $scope.data.psid, 'message': $scope.message});
                 $scope.message = '';
                 $http.post('/rest/send/v1/fb-message', $data, config).then(function success(response) {
