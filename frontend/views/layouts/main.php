@@ -128,7 +128,7 @@ AppAsset::register($this);
 <!--                                        </li>-->
 <!--                                    </ul>-->
 <!--                                </li>-->
-<!--                                <li class="header-nav__item" data-match-route="/pages/contacts"><a href="#/pages/contacts"><i class="fa fa-folder-open-o"></i><span>Купленные контакты</span></a></li>-->
+                                <li class="header-nav__item" data-match-route="/pages/contacts"><a href="#/pages/contacts"><i class="fa fa-folder-open-o"></i><span>Купленные контакты</span></a></li>
                                 <li data-match-route="/history*" class="header-nav__item">
                                     <a href="#/history">
                                         <i class="fa fa-history"></i>
