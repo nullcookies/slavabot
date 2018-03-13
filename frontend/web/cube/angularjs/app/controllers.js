@@ -1537,6 +1537,13 @@ angular.module('cubeWebApp')
 
 
                 });
+            }else if($scope.social=='FB'){
+                $data = $.param({'user_id' : $scope.user_id, 'peer_id' : $scope.data.psid, 'message': $scope.message});
+                $scope.message = '';
+                $http.post('/rest/send/v1/fb-message', $data, config).then(function success(response) {
+
+
+                });
             }
         };
 
@@ -1552,6 +1559,21 @@ angular.module('cubeWebApp')
                 $scope.comment[post_id] = '';
 
                 $http.post('/rest/send/v1/ig-comment', $data, config).then(function success(response) {
+                    $scope.getNotificationsForUser();
+                });
+            }
+
+            if($scope.social=='FB') {
+                $data = $.param({
+                    'user_id': $scope.user_id,
+                    'peer_id': $scope.peer_id,
+                    'media_id': post_id,
+                    'message': $scope.comment[post_id]
+                });
+
+                $scope.comment[post_id] = '';
+
+                $http.post('/rest/send/v1/fb-comment', $data, config).then(function success(response) {
                     $scope.getNotificationsForUser();
                 });
             }

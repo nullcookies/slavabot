@@ -37,7 +37,7 @@ class SocialDialoguesPost extends \yii\db\ActiveRecord
             $peer_id = 1;
         }
 
-        if($this->social === static::SOCIAL_IG){
+        if($this->social === static::SOCIAL_IG || $this->social === static::SOCIAL_FB){
             return $this->hasMany(SocialDialogues::className(), ['post_id' => 'post_id'])
                 ->where(['peer_id'=>$peer_id]);
         }
@@ -135,6 +135,36 @@ class SocialDialoguesPost extends \yii\db\ActiveRecord
     public static function saveVkPost($user_id, $account_id, $post_id, $url, $last_comment)
     {
         $social = static::SOCIAL_VK;
+
+        $model = static::find()
+            ->andWhere(['account_id' => $account_id, 'post_id' => $post_id, 'social' => $social])
+            ->one();
+
+        if(!$model) {
+            $model = new static;
+            $model->social = $social;
+
+            $model->user_id = $user_id;
+            $model->account_id = $account_id;
+            $model->post_id = $post_id;
+            $model->url = $url;
+        }
+        $model->last_comment = $last_comment;
+
+
+        $model->url = $url;
+
+
+        if(!$model->save(false)) {
+            var_dump($model->errors);
+        }
+
+        return $model;
+    }
+
+    public static function saveFbPost($user_id, $account_id, $post_id, $url, $last_comment)
+    {
+        $social = static::SOCIAL_FB;
 
         $model = static::find()
             ->andWhere(['account_id' => $account_id, 'post_id' => $post_id, 'social' => $social])

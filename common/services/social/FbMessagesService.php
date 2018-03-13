@@ -13,6 +13,7 @@ use common\models\rest\Accounts;
 use common\models\SocialDialoguesFbComments;
 use common\models\SocialDialoguesFbMessages;
 use common\models\SocialDialoguesPeerFb;
+use common\models\SocialDialoguesPost;
 use frontend\controllers\bot\Bot;
 use frontend\controllers\bot\commands\FrontendNotificationCommand;
 use frontend\controllers\bot\libs\Logger;
@@ -111,7 +112,7 @@ class FbMessagesService
                     $attaches['video'] = $comment['video'];
                 }
 
-                SocialDialoguesFbComments::newFbComment(
+                $commentData = SocialDialoguesFbComments::newFbComment(
                     $user->user_id,
                     $user->data->groups->id,
                     $postId,
@@ -121,6 +122,16 @@ class FbMessagesService
                     $comment['sender_id'],
                     $edited
                 );
+
+
+                SocialDialoguesPost::saveFbPost(
+                    $user->user_id,
+                    $user->data->groups->id,
+                    $postId,
+                    "https://www.facebook.com/".$user->data->groups->id."/posts/".$postId,
+                    $commentData->id
+                );
+
 
             }
 
