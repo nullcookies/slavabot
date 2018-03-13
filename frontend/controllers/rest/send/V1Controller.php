@@ -2,6 +2,8 @@
 namespace frontend\controllers\rest\send;
 
 use common\models\rest\Accounts;
+use common\models\SocialDialoguesFbComments;
+use common\models\SocialDialoguesFbMessages;
 use common\models\SocialDialoguesInstagram;
 use common\models\SocialDialoguesVkComments;
 use common\services\social\FacebookService;
@@ -136,12 +138,21 @@ class V1Controller extends Controller
         $data = json_decode($account->data);
         $group_access_token = $data->groups->access_token;
 
+        $accountId = $data->groups->id;
+
         try {
             $fbService = new FacebookService();
 
             $fbApi = $fbService->init();
 
-            $fbService->sendMessage($fbApi, $peer_id, $message, $group_access_token);
+            $result = $fbService->sendMessage($fbApi, $peer_id, $message, $group_access_token);
+
+            $messageId = 0;
+
+            SocialDialoguesFbMessages::newFbMessage(
+                $user_id, $accountId, $peer_id, $messageId, $message, null,
+                SocialDialoguesFbMessages::DIRECTION_OUTBOX
+            );
 
         } catch (\Exception $e) {
             echo 'error: ' . $e->getMessage();
@@ -168,6 +179,8 @@ class V1Controller extends Controller
         $data = json_decode($account->data);
         $group_access_token = $data->groups->access_token;
 
+        $accountId = $data->groups->id;
+
         $postId = $peer_id .'_'.$media_id;
 
         try {
@@ -175,7 +188,16 @@ class V1Controller extends Controller
 
             $fbApi = $fbService->init();
 
-            $fbService->sendComment($fbApi, $postId, $message, $group_access_token);
+            $result = $fbService->sendComment($fbApi, $postId, $message, $group_access_token);
+            $result = $result->getGraphNode()->asArray();
+
+            $commentId = explode('_', $result['id']);
+            $commentId = $commentId[1];
+
+            SocialDialoguesFbComments::newFbComment(
+                $user_id, $accountId, $media_id, $commentId, $message, null, $peer_id, 0,
+                SocialDialoguesFbComments::DIRECTION_OUTBOX
+            );
 
         } catch (\Exception $e) {
             echo 'error: ' . $e->getMessage();
