@@ -28,17 +28,17 @@ class SendPostingNotificationCommand extends BaseObject implements SelfHandlingC
         $day = $command->day;
 
         Carbon::setLocale('ru');
-        $start = Carbon::today()->addDay($day)->timestamp;
+        $start = Carbon::now()->addDay($day)->timestamp;
 
 
         $res = [];
         $users = History::find()
             ->from(['us' => History::tableName()])
             ->where(
-                ['>', 'us.updated_at', $start]
+                ['>', 'us.updated_at', $start-3600]
             )
             ->andWhere(
-                ['<', 'us.updated_at', $start+86400]
+                ['<', 'us.updated_at', $start]
             )
             ->innerJoin( '(select max(sd.id) as `sd_max` FROM `history` `sd` GROUP BY `sd`.`user_id`) as `x`', '`us`.`id`=`x`.`sd_max`')
             ->leftJoin(User::tableName(), User::tableName().'.id=us.user_id')
