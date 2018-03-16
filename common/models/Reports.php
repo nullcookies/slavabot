@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "reports".
@@ -44,5 +45,14 @@ class Reports extends \yii\db\ActiveRecord
             'title' => 'Title',
             'active' => 'Active',
         ];
+    }
+
+
+
+    public static function getActiveIDs(){
+        return ArrayHelper::getColumn(
+            self::find()->where(['active'=>1])->asArray()->all(),
+            'mlg_id'
+        );
     }
 }
