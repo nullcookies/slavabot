@@ -3,23 +3,30 @@
 namespace common\models;
 
 use Yii;
-
-use common\models\Location;
-use common\models\Category;
-use common\models\Priority;
-use common\models\Theme;
-use common\models\Filters;
-use common\models\Social;
-use common\models\Additional;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use common\models\ExtraPropsBehaviour;
 use yii\data\Pagination;
-
-
-class Webhooks  extends \yii\db\ActiveRecord
+/**
+ * This is the model class for table "webhooks".
+ *
+ * @property integer $id
+ * @property integer $post_id
+ * @property integer $category
+ * @property integer $aCity
+ * @property integer $aCountry
+ * @property integer $aRegion
+ * @property string $post_url
+ * @property string $author_image_url
+ * @property string $author_url
+ * @property string $post_content
+ * @property string $author_name
+ * @property integer $blog
+ * @property integer $type
+ * @property integer $published_at
+ */
+class Webhooks extends \yii\db\ActiveRecord
 {
-
     /**
      * @inheritdoc
      */
@@ -34,103 +41,87 @@ class Webhooks  extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mlg_id', 'number', 'client', 'location', 'category', 'priority', 'theme', 'social', 'created_at', 'owner'], 'integer'],
-            [['post_url', 'post_content', 'author_name', 'author_image_url', 'author_url'], 'string'],
+            [['post_id', 'category', 'aCity', 'aCountry', 'aRegion', 'post_url', 'post_content', 'author_name', 'blog', 'type', 'published_at'], 'required'],
+            [['post_id', 'category', 'aCity', 'aCountry', 'aRegion', 'blog', 'type', 'published_at'], 'integer'],
+            [['post_url', 'author_image_url', 'author_url', 'author_name'], 'string', 'max' => 255],
+            [['post_content'], 'string', 'max' => 10000],
         ];
     }
-    public function getLocationValue()
-    {
-        return $this->hasOne(Location::className(), ['id' => 'location']);
-    }
-    public function getSocialValue()
-    {
-        return $this->hasOne(Social::className(), ['id' => 'social']);
-    }
-    public function getThemeValue()
-    {
-        return $this->hasOne(Theme::className(), ['id' => 'theme']);
-    }
-    public function getContactsValue()
-    {
-        return $this->hasMany(Additional::className(), ['webhook' => 'id']);
-    }
-    public function fields()
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
     {
         return [
-            'mlg_id',
-            'location' => function(){
-                return (string)$this->location;
-            },
-            'theme' => function(){
-                return (string)$this->theme;
-            },
-            'social',
-            'locationValue' => 'locationValue',
-            'post_content' => function(){
-                if($this->owner != Yii::$app->user->identity->id) {
-                    $body = $this->post_content;
-                    //телефон
-                    //$pattern = '~(\(\d{3}\)\s\d{3}\-\d{2}\-\d{2})|(\d{3}\s\d{3}\s\d{2}\s\d{2})|(\d{10})|(\d{3}\s\d{3}\-\d{2}\-\d{2})|(8\(\d{3}\)\s\d{3}\-\d{2}\-\d{2})|(7\s\d{3}\s\d{3}\-\d{2}\-\d{2})~s';
-
-                    $pattern = '~([\d- \(\)]){10,20}~s';
-                    $body = preg_replace($pattern, "<b>[номер телефона]</b>", $body);
-
-
-                    //почта
-                    $pattern = '/([a-z0-9_\.\-])+\@(([a-z0-9\-])+\.)+([a-zа-я0-9]{2,4})+/i';
-                    $body = preg_replace($pattern, "<b>[email]</b>", $body);
-                    return $body;
-                }else{
-                    return $this->post_content;
-                }
-            },
-            'author_name',
-            'author_image_url'=> function(){
-                if(strlen($this->author_image_url)>0){
-                    return $this->author_image_url;
-                }else{
-                    return 'https://orteka.ru/local/templates/.default/components/bitrix/news.detail/salon_item/images/no-photo.png';
-                }
-            },
-            'tags' => function(){
-
-                $res  = false;
-
-                foreach($this->contactsValue as $contact){
-                    if($contact->type==3){
-                        $res  = explode(',', $contact->value);
-                    }
-                }
-                return $res;
-            },
-            'author_url',
-            'socialValue' => 'socialValue',
-            'themeValue' => 'themeValue',
-            'contacts' => function(){
-                $res = array();
-                if($this->owner != Yii::$app->user->identity->id){
-                    foreach($this->contactsValue as $contact){
-
-                        unset($contact['value']);
-
-                        if($contact['type']!=3){
-                            $res[] = $contact;
-                        }
-                    }
-                }else{
-                    foreach($this->contactsValue as $contact){
-                        if($contact['type']!=3){
-                            $res[] = $contact;
-                        }
-                    }
-                }
-                return $res;
-            },
-            'created_at',
-            'id',
-            'owner'
+            'id' => 'ID',
+            'post_id' => 'Post ID',
+            'category' => 'Category',
+            'aCity' => 'A City',
+            'aCountry' => 'A Country',
+            'aRegion' => 'A Region',
+            'post_url' => 'Post Url',
+            'author_image_url' => 'Author Image Url',
+            'author_url' => 'Author Url',
+            'post_content' => 'Post Content',
+            'author_name' => 'Author Name',
+            'blog' => 'Blog',
+            'type' => 'Type',
+            'published_at' => 'Published At',
         ];
     }
+
+    public static function savePost($data){
+        if($data['post_id'] > 0){
+
+            $webhook = self::findOne([
+                'post_id' => (int)$data['post_id']
+            ]);
+
+            if($webhook){
+
+                return [
+                    'new' => false,
+                    'id' => $webhook->post_id
+                ];
+
+            }else{
+
+                $webhook = new self();
+
+                $webhook->post_id = $data['post_id'];
+                $webhook->category = (int)$data['category'];
+                $webhook->aCity = (int)$data['aCity'];
+                $webhook->aCountry = (int)$data['aCountry'];
+                $webhook->aRegion = (int)$data['aRegion'];
+                $webhook->post_url = $data['post_url'];
+                $webhook->author_image_url = $data['author_image_url'];
+                $webhook->author_url = $data['author_url'];
+                $webhook->post_content = $data['post_content'];
+                $webhook->author_name = $data['author_name'];
+                $webhook->blog = $data['blog'];
+                $webhook->type = $data['type'];
+                $webhook->published_at = $data['published_at'];
+
+
+                $webhook->save(false);
+
+                //return $webhook->id;
+                return [
+                    'new' => true,
+                    'id' => $webhook->post_id,
+                    'post' => $data['post_id']
+                ];
+            }
+
+        }else{
+            return [
+                'new' => true,
+                'id' => 'Data error!'
+            ];
+        }
+    }
+
     public static function getWebHooks()
     {
         $filter = [];
@@ -139,83 +130,26 @@ class Webhooks  extends \yii\db\ActiveRecord
         if(Yii::$app->request->post()){
             $page = Yii::$app->request->post()['page'];
             $search = Yii::$app->request->post()['search'];
-            $location = Yii::$app->request->post()['city'];
+          //  $location = Yii::$app->request->post()['city'];
             $theme = Yii::$app->request->post()['theme'];
         }else{
             $search ="";
             $page = 0;
-            $location = 0;
+           // $location = 0;
             $theme = 0;
         }
 
 
-        if($location>0){
-            $filter['location'] = $location;
-        }
+
         if($theme>0){
             $filter['theme'] = $theme;
         }
+
         if(strlen($search)>3){
             $searchArr = array('LIKE', 'post_content', $search);
         }
 
-        $webhooks = Webhooks::find()->where($filter)->andWhere($searchArr)->andWhere(['OR', ['owner' => null], ['owner' => Yii::$app->user->identity->id]])->orderBy(['created_at' => SORT_DESC]);
-
-        $countQuery = clone $webhooks;
-
-        $pages = new Pagination(
-            [
-                'totalCount' => $countQuery->count(),
-                'pageSize' => 10,
-                'page' => ($page > 0 ? $page : 0 )
-            ]
-        );
-
-        $pages->pageSizeParam = false;
-
-        $models = $webhooks->offset($pages->offset)
-             ->limit($pages->limit)
-             ->all();
-
-        return array(
-            'webhooks'  =>  $models,
-            'pages'     => $pages,
-            'location'  =>  Location::find()->asArray()->all(),
-            'category'  =>  Category::find()->asArray()->all(),
-            'priority'  =>  Priority::find()->asArray()->all(),
-            'theme'     =>  Theme::find()->asArray()->all()
-        );
-    }
-    public static function getMyWebHooks()
-    {
-        $filter = [];
-        $searchArr = [];
-        
-        if(Yii::$app->request->post()){
-            $page = Yii::$app->request->post()['page'];
-            $search = Yii::$app->request->post()['search'];
-            $location = Yii::$app->request->post()['city'];
-            $theme = Yii::$app->request->post()['theme'];
-        }else{
-            $search ="";
-            $page = 0;
-            $location = 0;
-            $theme = 0;
-        }
-
-        $filter['owner'] = Yii::$app->user->identity->id;
-
-        if($location>0){
-            $filter['location'] = $location;
-        }
-        if($theme>0){
-            $filter['theme'] = $theme;
-        }
-        if(strlen($search)>3){
-            $searchArr = array('LIKE', 'post_content', $search);
-        }
-
-        $webhooks = Webhooks::find()->where($filter)->andWhere($searchArr)->orderBy(['created_at' => SORT_DESC]);
+        $webhooks = Webhooks::find()->where($filter)->andWhere($searchArr)->orderBy(['published_at' => SORT_DESC]);
 
         $countQuery = clone $webhooks;
 
@@ -236,134 +170,10 @@ class Webhooks  extends \yii\db\ActiveRecord
         return array(
             'webhooks'  =>  $models,
             'pages'     => $pages,
-            'location'  =>  Location::find()->asArray()->all(),
-            'category'  =>  Category::find()->asArray()->all(),
-            'priority'  =>  Priority::find()->asArray()->all(),
-            'theme'     =>  Theme::find()->asArray()->all()
+//            'location'  =>  Location::find()->asArray()->all(),
+//            'category'  =>  Category::find()->asArray()->all(),
+//            'priority'  =>  Priority::find()->asArray()->all(),
+            'theme'     =>  Reports::find()->asArray()->all()
         );
-    }
-
-    public static function SetWebhookOwner($user, $webhook)
-    {
-        $elem = self::findOne(['id' => $webhook, 'owner' => null]);
-        if($elem){
-            $elem->owner = $user;
-            if($elem->save(false)){
-                return 'success';
-            }else{
-                return 'error';
-            }
-        }else{
-            return false;
-        }
-    }
-
-    public static function getDetail()
-    {
-        $webhooks = Webhooks::find()->where(['id' => Yii::$app->request->post()['id'], 'owner'=> Yii::$app->user->identity->id])->one();
-
-        return array(
-            'webhooks'  =>  $webhooks
-        );
-    }
-    public static function checkWebHook($mlg_id)
-    {
-        $id = self::findOne(['mlg_id' => $mlg_id]);
-
-        if($id){
-            return $id;
-        }else{
-            return new Webhooks();
-        }
-    }
-    public static function getWebHook($id)
-    {
-        $id = self::findOne(['id' => $id]);
-
-        if($id){
-            return $id;
-        }else{
-            return new Webhooks();
-        }
-    }
-    public static function SaveWebHook($item)
-    {
-        $elem = self::checkWebHook($item->id);
-
-        $elem->mlg_id =  $item->id;
-        $elem->number = $item->number;
-        $elem->client = $item->client;
-
-        $elem->location = Location::saveReference($item);
-        $elem->category = Category::saveReference($item);
-        $elem->priority = Priority::saveReference($item);
-        $elem->theme = Theme::saveReference($item);
-
-        $elem->post_url = $item->post_url;
-        $elem->author_image_url  = $item->author_image_url;
-        $elem->author_url = $item->author_url;
-        $elem->post_content = $item->post_content;
-        $elem->author_name = $item->author_name;
-        $elem->social = Social::checkSocial($item);
-        $elem->created_at = (int)strtotime($item->created);
-
-        $elem->save();
-
-        Additional::saveReference($item, $elem->id);
-
-        Filters::sendNotification($elem);
-
-    }
-
-    public static function getTags($item)
-    {
-        $tags = Additional::find()->where(['webhook' => $item, 'type' => 3])->one();
-        if($tags){
-            return explode(',', $tags->value);
-        }else{
-            return false;
-        }
-
-
-    }
-    public static function getCity($item)
-    {
-        $city = Location::find()->where(['id' => $item])->one();
-        return $city->name;
-    }
-
-    public static function getTheme($item)
-    {
-        $theme = Theme::find()->where(['id' => $item])->one();
-        return $theme->name;
-    }
-
-    public static function DemoWebHook($item)
-    {
-        $elem = self::checkWebHook($item->id);
-
-        $elem->mlg_id =  $item->id;
-        $elem->number = $item->number;
-        $elem->client = $item->client;
-
-        $elem->location = Location::saveReference($item);
-        $elem->category = Category::saveReference($item);
-        $elem->priority = Priority::saveReference($item);
-        $elem->theme = Theme::saveReference($item);
-
-        $elem->post_url = $item->post_url;
-        $elem->author_image_url  = $item->author_image_url;
-        $elem->author_url = $item->author_url;
-        $elem->post_content = $item->post_content;
-        $elem->author_name = $item->author_name;
-        $elem->social = Social::checkSocial($item);
-        $elem->created_at = (int)strtotime($item->created);
-
-        //$elem->save();
-
-        Additional::saveReference($item, $elem->id);
-
-        Filters::sendNotification($elem);
-
     }
 }

@@ -4,11 +4,19 @@
  * User: lexgorbachev
  * Date: 12.01.2018
  * Time: 09:16
+ *
+ * Команда для получения постов из sm.mlg.ru
+ *
  */
 
 namespace common\commands\command;
 use Carbon\Carbon;
+use common\models\ABlog;
+use common\models\ACity;
+use common\models\ACountry;
+use common\models\ARegion;
 use common\models\Reports;
+use common\models\Webhooks;
 use trntv\bus\interfaces\SelfHandlingCommand;
 use yii\base\Object as BaseObject;
 
@@ -16,9 +24,23 @@ use yii\base\Object as BaseObject;
 class GetPostsCommand extends BaseObject implements SelfHandlingCommand
 {
 
+    /**
+     * Параметры:
+     *
+     * $period - интервал в минутах, за который мы получим посты по интересующим фильтрам
+     * $wsdl - адрес api
+     *
+     */
+
     public $period;
     public $wsdl;
 
+    /**
+     * Обработчик комманды
+     *
+     * @param $command
+     * @return array
+     */
     public function handle($command)
     {
 
@@ -31,6 +53,15 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
         return $response;
     }
 
+    /**
+     * Получить данные по всем отчетам
+     *
+     * @param $ids - идентификаторы отчетов, которые нужно загрузить
+     * @param $period - интервал
+     * @param $wsdl - адрес api
+     * @return array - отформатированный под нашу бд массив данных
+     */
+
     public function getReports($ids, $period, $wsdl){
 
         $res = array();
@@ -41,7 +72,12 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
 
             if(is_array($response)){
                 foreach($response as $post){
-                    $res[] = $this->convertPost($post, $id);
+
+                    $data = $this->convertPost($post, $id);
+
+                    if(is_array($data)){
+                        $res[] = Webhooks::savePost($data);
+                    }
                 }
             }
         }
@@ -49,11 +85,20 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
         return $res;
     }
 
+    /**
+     * Получаем отчет по конкретному id
+     *
+     * @param $id - идентификатор отчета
+     * @param $period - интервал
+     * @param $wsdl - адрес api
+     * @return mixed
+     */
+
     public function getReport($id, $period, $wsdl){
 
-        $finish = Carbon::now();
+        $finish = Carbon::now()->setTimezone('Europe/London');
 
-        $start = Carbon::now()->subMinutes($period);
+        $start = Carbon::now()->setTimezone('Europe/London')->subMinutes($period);
 
         $xmlString = $this->makeXML($id, $this->timeConvert($start), $this->timeConvert($finish));
 
@@ -61,13 +106,36 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
 
         $response = $this->sendRequest($wsdl,$xmlString, $header);
 
+        /**
+         * Раскомментить для отладки. Отразит исходные данные (или ошибку)
+         */
+
+//        echo '<pre>';
+//        print_r($response);
+//        echo '</pre>';
+
         return $response;
+
     }
 
+    /**
+     * Конвертер времени под формат API
+     *
+     * @param $time - объект Carbon
+     * @return string
+     */
     public function timeConvert($time){
-        return $time->format('Y-m-d').'T'.$time->format('H:i:s').'.002Z';
+        return $time->format('Y-m-d').'T'.$time->format('H:i:s').'.000Z';
     }
 
+    /**
+     * XML обертка для запроса
+     *
+     * @param $reposrt_id - id отчета
+     * @param $start - время начала периода выборки
+     * @param $finish - время конца периода выборки
+     * @return string
+     */
     public function makeXML($reposrt_id, $start, $finish){
          return "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\" xmlns:mlg=\"http://schemas.datacontract.org/2004/07/MlgBuzz.Web.Services\">
                        <soapenv:Header/>
@@ -95,6 +163,12 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
                     </soapenv:Envelope>";
     }
 
+    /**
+     * Заголовки запроса
+     *
+     * @param $xmlString - XML для запроса
+     * @return array
+     */
     public function makeHeaders($xmlString){
         return array(
             "Content-type: text/xml;charset=\"utf-8\"",
@@ -106,6 +180,15 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
             "Host: sm.mlg.ru"
         );
     }
+
+    /**
+     * Запрос для получения данных
+     *
+     * @param $url - адрес api
+     * @param $xmlString - XML для запроса
+     * @param $header - заголовки запроса
+     * @return mixed
+     */
 
     public function sendRequest($url, $xmlString, $header){
         $ch = curl_init();
@@ -130,26 +213,64 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
         return $responseArray['sBody']['GetPostsResponse']['GetPostsResult']['aPosts']['aCubusPost'];
     }
 
+    /**
+     * Конвертер данных из пришедших в наш формат
+     *
+     * @param $post - массив данных поста из api
+     * @param $theme - id отчета из нашей бд
+     * @return array
+     */
+
     public function convertPost ($post, $theme){
+        if(isset($post['aPostId'])){
+            return [
+                'post_id' => $post['aPostId'],
 
-        return [
-            'id' => $post['aPostId'],
-            'number' => '',
-            'client' => '',
+                'category' => (int)$theme,
 
-            'location' => '',
-            'category' => '',
-            'priority' => '',
-            'theme' => $theme,
+                'aCity' => ACity::getCity(
+                                $post['aCity']
+                            ),
+                'aCountry' => ACountry::getCountry(
+                                $post['aCountry']
+                            ),
+                'aRegion' => ARegion::getRegion(
+                                $post['aRegion']
+                            ),
 
-            'post_url' => $post['aUrl'],
-            'author_image_url' => $post['aAuthorImageUrl'],
-            'author_url' => $post['aAuthorUrl'],
-            'post_content' => $post['aContent'],
-            'author_name' => $post['aAuthorName'],
-            'social' => '',
-            'created_at' => ''
-        ];
+                'post_url' => $post['aUrl'],
+                'author_image_url' => $post['aAuthorImageUrl'],
+                'author_url' => $post['aAuthorUrl'],
+                'post_content' => $post['aContent'],
+                'author_name' => $post['aAuthorName'],
 
+                'blog' => ABlog::getBlog(
+                                $post['aBlogHost'],
+                                $post['aBlogHostId'],
+                                $post['aBlogHostType']
+                            ),
+
+                'type'=> (int)$post['aMessageType'],
+
+                'published_at' => $this->setTime(
+                                    $post['aPublishDate']
+                                )
+            ];
+        }
+
+    }
+
+    /**
+     * Преобразование времени sm.mlg.ru в timestamp
+     * Устанавливаем пояс 'Europe/London' для удобства работы в дальнейшем.
+     */
+
+    public function setTime($time){
+
+        $time = Carbon::parse($time)
+            ->setTimezone('Europe/London')
+            ->getTimestamp();
+
+        return $time;
     }
 }

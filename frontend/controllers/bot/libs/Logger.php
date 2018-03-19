@@ -35,4 +35,10 @@ class Logger
         $logger->addRecord(\Monolog\Logger::INFO, $message, $context);
     }
 
+    public static function report($message, $context = [], $filename = '')
+    {
+        $logger = self::logger('reports');
+        $logger->addRecord(\Monolog\Logger::INFO, $message, $context);
+    }
+
 }

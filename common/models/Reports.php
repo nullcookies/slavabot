@@ -4,6 +4,8 @@ namespace common\models;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use common\commands\command\GetPostsCommand;
+
 
 /**
  * This is the model class for table "reports".
@@ -53,6 +55,14 @@ class Reports extends \yii\db\ActiveRecord
         return ArrayHelper::getColumn(
             self::find()->where(['active'=>1])->asArray()->all(),
             'mlg_id'
+        );
+    }
+
+    public static function getReports(){
+        return \Yii::$app->commandBus->handle(
+            new GetPostsCommand(
+                \common\services\StaticConfig::ReportsConfig()
+            )
         );
     }
 }
