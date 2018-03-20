@@ -4,15 +4,15 @@
             <td>
                 <div class="col-md-12 contact">
                     <div class="row">
-                        <div class="col-md-1">
-                            <div class="ss {{webhook.socialValue.code.replace('.', '')}}"></div>
+                        <div class="col-md-2" style="text-align: center; margin-top: 5px; margin-bottom: 5px; font-size: 13px;">
+                            <div class="">{{webhook.blogName.aBlogHost}}</div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-2">
                             <div class="row">
                                 <div class="col-md-6 col-md-offset-3 contact__text">
-                                    <img class="contact__image" src="{{webhook.author_image_url}}" alt=""/>
+                                    <img class="contact__image" src="{{webhook.author_image_url ? webhook.author_image_url : '/cube/img/no-image-icon-md.png'}}" alt=""/>
                                 </div>
                             </div>
                             <div class="row">
@@ -40,19 +40,24 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-12 top-margin-10 bottom-margin-10">
-                                    <span class="label label-success right-margin-10 " ng-repeat="tag in webhook.tags">{{tag}}</span>
+                                <div class="col-md-4 top-margin-10 bottom-margin-10">
+                                    <span class="label label-success right-margin-10 ">{{webhook.categoryText}}</span>
+                                </div>
+                            </div>
+                            <div class="row" ng-show="webhook.location">
+                                <div class="col-md-12">
+                                    <div class="webhooks__point"><i class="fa fa-map-marker" aria-hidden="true"></i>{{webhook.location}}</div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="row">
                                 <div class="col-md-12 getBtn">
-                                        <a href="{{(webhook.owner === user.id) ? '#/potential/detail/' + webhook.id : ''}}" class="btn btn-warning col-lg-12" ng-show="webhook.owner>0">
-                                            <i class="fa fa-get-pocket"></i>
-                                            {{(webhook.owner === user.id) ? 'Ваш контакт' : 'Контакт забронированн'}}
-                                        </a>
-                                    <a ng-click="getContact(webhook.id)" class="btn btn-success col-lg-12" ng-show="webhook.owner === null">
+                                        <!--<a href="{{(webhook.owner === user.id) ? '#/potential/detail/' + webhook.id : ''}}" class="btn btn-warning col-lg-12" ng-show="webhook.owner>0">-->
+                                            <!--<i class="fa fa-get-pocket"></i>-->
+                                            <!--{{(webhook.owner === user.id) ? 'Ваш контакт' : 'Контакт забронированн'}}-->
+                                        <!--</a>-->
+                                    <a class="btn btn-success col-lg-12">
                                         Получить контакт
                                     </a>
                                 </div>
@@ -63,11 +68,6 @@
                                         <li ng-show="webhook.author_url" class="list-group-item">Ссылка на профиль</li>
                                         <li ng-repeat="contact in webhook.contacts" ng-show="contact.type!='tag'" class="list-group-item">{{contact.name}}</li>
                                     </ul>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="webhooks__point"><i class="fa fa-map-marker" aria-hidden="true"></i>{{webhook.locationValue.name}}</div>
                                 </div>
                             </div>
                         </div>

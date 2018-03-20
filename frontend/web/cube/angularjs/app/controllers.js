@@ -338,6 +338,8 @@ angular.module('cubeWebApp')
                 $scope.themes = response.data.webhooks.theme;
                 $scope.pages = response.data.webhooks.pages;
                 $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
+
+                console.log($scope.locations[0].aName);
             });
         };
 
@@ -435,7 +437,7 @@ angular.module('cubeWebApp')
         $scope.setPage($scope.currentPage);
         $scope.Timer = $interval(function () {
             $scope.setPage($scope.currentPage)
-        }, 5000);
+        }, 10000);
 
         $scope.$on("$destroy", function (event) {
             $interval.cancel($scope.Timer);

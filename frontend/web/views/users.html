@@ -13,13 +13,13 @@
 						<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
 							<select class="form-control" ng-model="location" ng-change="changeFilter()">
 								<option value="" selected>{{cityPlaceholder}}</option>
-								<option value="{{location.id}}"  ng-repeat="location in locations">{{location.name}}</option>
+								<option value="{{location.id}}"  ng-repeat="location in locations">{{location.aName}}</option>
 							</select>
 						</div>
 						<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
 							<select class="form-control" ng-model="theme" ng-change="changeFilter()">
 								<option value="" selected>{{themePlaceholder}}</option>
-								<option value="{{theme.id}}"  ng-repeat="theme in themes">{{theme.name}}</option>
+								<option value="{{theme.mlg_id}}"  ng-repeat="theme in themes">{{theme.title}}</option>
 							</select>
 						</div>
 						<div class="col-lg-3">

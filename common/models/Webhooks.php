@@ -49,6 +49,158 @@ class Webhooks extends \yii\db\ActiveRecord
     }
 
     /**
+     * Получаем страну поста
+     *
+     * Справочник common\models\ACountry, наполняется автоматически,
+     * при добавлении поста
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDataCountry()
+    {
+        return $this->hasOne(ACountry::className(), [
+            'id' => 'aCountry',
+        ]);
+
+    }
+
+    /**
+     * Получаем регион поста
+     *
+     * Справочник common\models\ARegion, наполняется автоматически,
+     * при добавлении поста
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDataRegion()
+    {
+        return $this->hasOne(ARegion::className(), [
+            'id' => 'aRegion',
+        ]);
+
+    }
+
+    /**
+     * Получаем город поста
+     *
+     * Справочник common\models\ACity, наполняется автоматически,
+     * при добавлении поста
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDataCity()
+    {
+        return $this->hasOne(ACity::className(), [
+            'id' => 'aCity',
+        ]);
+
+    }
+
+    /**
+     * Получаем категорию поста
+     *
+     * Справочник common\models\Reports, заполняется
+     * и редактируется в админке (Главная > Выгрузки)
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDataCategory()
+    {
+        return $this->hasOne(Reports::className(), [
+            'mlg_id' => 'category',
+        ]);
+
+    }
+
+    /**
+     * Получаем блог поста
+     *
+     * Справочник common\models\ABlog, наполняется автоматически,
+     * при добавлении поста
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDataBlog()
+    {
+        return $this->hasOne(ABlog::className(), [
+            'id' => 'blog',
+        ]);
+
+    }
+
+    /**
+     *
+     * location - строка местоположения поста (страна, регион, город), формируется из справочников
+     * categoryText - строка, название категории поста
+     * blogName - массив, данные о блоге, к которому принадлежит пост (Titter, VK, Facebook и т.п.)
+     *
+     * @inheritdoc
+     */
+    public function fields(){
+        return [
+            'id',
+            'post_id',
+            'category',
+            'aCity',
+            'aCountry',
+            'aRegion',
+            'post_url',
+            'author_image_url',
+            'author_url',
+            'post_content',
+            'author_name',
+            'blog',
+            'type',
+            'published_at',
+
+            'location' => function(){
+                if($this->dataCountry->aid==0 && $this->dataRegion==0 && $this->dataCity==0){
+                    return false;
+                }
+
+                $res = '';
+
+                if($this->dataCountry->aid!=0){
+
+                    if($this->dataCountry->aType!=''){
+                        $res .= $this->dataCountry->aType.' ';
+                    }
+
+                    $res.= $this->dataCountry->aName.', ';
+                }
+
+                if($this->dataRegion->aid!=0 && $this->dataRegion->aName!=$this->dataCity->aName){
+
+                    if($this->dataRegion->aType!=''){
+                        $res .= $this->dataRegion->aType.' ';
+                    }
+
+                    $res.= $this->dataRegion->aName.', ';
+                }
+
+                if($this->dataCity->aid!=0){
+
+                    if($this->dataCity->aType!=''){
+                        $res .= $this->dataCity->aType.' ';
+                    }
+
+                    $res.= $this->dataCity->aName;
+                }else{
+                    $res = substr($res, 0, -2);
+                }
+
+                return $res;
+            },
+            'categoryText' => function(){
+                return $this->dataCategory->title;
+            },
+            'blogName' => function(){
+                return $this->dataBlog;
+            },
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public function attributeLabels()
@@ -70,6 +222,35 @@ class Webhooks extends \yii\db\ActiveRecord
             'published_at' => 'Published At',
         ];
     }
+
+    /**
+     * Сохранение нового поста.
+     *
+     *
+     * @param $data => [
+     *                  'post_id'          => ID - поста, унакальный для каждого поста
+     *                  'category'         => ID категории (отчет из модели common\models\Reports)
+     *                  'aCity'            => ID города (справочник common\models\ACity)
+     *                  'aCountry'         => ID страны (справочник common\models\ACountry)
+     *                  'aRegion'          => ID региона (справочник common\models\ARegion)
+     *                  'post_url'         => Ссылка на пост
+     *                  'author_image_url' => Аватар автора
+     *                  'author_url'       => Ссылка на автора поста
+     *                  'post_content'     => Содержимое поста (обычно html)
+     *                  'author_name'      => Имя автора
+     *                  'blog'             => тип социальной сети (справочник common\models\ABlog)
+     *
+     *                  'type'             => Тип поста (
+     *                                          0 - оригинальный пост,
+     *                                          1 - репост,
+     *                                          2 - сообщение на форуме (но это не точно)
+     *                                     )
+     *
+     *                  'published_at'     => дата публикации (timestamp, часовой пояс Europe/London)
+     *                  ]
+     *
+     * @return array - массив результата обработки поступивших постов
+     */
 
     public static function savePost($data){
         if($data['post_id'] > 0){
@@ -110,7 +291,6 @@ class Webhooks extends \yii\db\ActiveRecord
                 return [
                     'new' => true,
                     'id' => $webhook->post_id,
-                    'post' => $data['post_id']
                 ];
             }
 
@@ -122,6 +302,16 @@ class Webhooks extends \yii\db\ActiveRecord
         }
     }
 
+    /**
+     * Возвращает данные для вывода страницы "Потенциальные клиенты"
+     *
+     * @return array [
+     *                 'webhooks'  =>  массив постов,
+     *                 'pages'     => инфа для формирования пагинации,
+     *                 'location'  =>  справочник городов common\models\ACity, для фильтра
+     *                 'theme'     =>  справочник категорий common\models\Reports, для фильтра
+     *               ]
+     */
     public static function getWebHooks()
     {
         $filter = [];
@@ -130,19 +320,22 @@ class Webhooks extends \yii\db\ActiveRecord
         if(Yii::$app->request->post()){
             $page = Yii::$app->request->post()['page'];
             $search = Yii::$app->request->post()['search'];
-          //  $location = Yii::$app->request->post()['city'];
+            $location = Yii::$app->request->post()['city'];
             $theme = Yii::$app->request->post()['theme'];
         }else{
             $search ="";
             $page = 0;
-           // $location = 0;
+            $location = 0;
             $theme = 0;
         }
 
 
 
         if($theme>0){
-            $filter['theme'] = $theme;
+            $filter['category'] = $theme;
+        }
+        if($location>0){
+            $filter['aCity'] = $location;
         }
 
         if(strlen($search)>3){
@@ -170,10 +363,8 @@ class Webhooks extends \yii\db\ActiveRecord
         return array(
             'webhooks'  =>  $models,
             'pages'     => $pages,
-//            'location'  =>  Location::find()->asArray()->all(),
-//            'category'  =>  Category::find()->asArray()->all(),
-//            'priority'  =>  Priority::find()->asArray()->all(),
-            'theme'     =>  Reports::find()->asArray()->all()
+            'location'  =>  ACity::find()->asArray()->all(),
+            'theme'     =>  Reports::getActive()
         );
     }
 }
