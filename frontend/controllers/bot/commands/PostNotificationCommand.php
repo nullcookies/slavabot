@@ -84,20 +84,27 @@ class PostNotificationCommand extends UserCommand
             switch ($state) {
                 case 0:
 
-                    $buttonsArray = [
-                        ['text' => 'Перейти к обсуждению', 'url' => $post_url],
-                        ['text' => 'В избранное', 'callback_data' => 'getPost_'.$post_id.'_'.urldecode($post_url)]
-                    ];
-
                     $data = [
                         'chat_id' => $chat_id,
                         'user_id' => $chat_id,
                         'text' => $message
                     ];
 
-                    $inline_keyboard = new InlineKeyboard($buttonsArray);
+                    $inline_keyboard = new InlineKeyboard([]);
+                    $inline_keyboard->addRow(
+                        [
+                            'text' => 'Перейти к обсуждению',
+                            'url' => $post_url
+                        ]
+                    );
+                    $inline_keyboard->addRow(
+                        [
+                            'text' => 'В избранное',
+                            'callback_data' => 'getPost_'.$post_id.'_'.urldecode($post_url)
+                        ]
+                    );
 
-                    $data['reply_markup'] = $inline_keyboard;
+                    $data['reply_markup'] = $inline_keyboard->setResizeKeyboard(true)->setOneTimeKeyboard(true);
 
                     $message = Request::sendMessage($data);
 
