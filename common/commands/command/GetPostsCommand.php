@@ -223,20 +223,29 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
 
     public function convertPost ($post, $theme){
         if(isset($post['aPostId'])){
+            $aCountry = ACountry::getCountry(
+                $post['aCountry']
+            );
+
+            $aRegion = ARegion::getRegion(
+                $post['aRegion'],
+                $aCountry
+            );
+
+            $aCity = ACity::getCity(
+                $post['aCity'],
+                $aCountry,
+                $aRegion
+            );
+
             return [
                 'post_id' => $post['aPostId'],
 
                 'category' => (int)$theme,
 
-                'aCity' => ACity::getCity(
-                                $post['aCity']
-                            ),
-                'aCountry' => ACountry::getCountry(
-                                $post['aCountry']
-                            ),
-                'aRegion' => ARegion::getRegion(
-                                $post['aRegion']
-                            ),
+                'aCity' => $aCity,
+                'aCountry' => $aCountry,
+                'aRegion' => $aRegion,
 
                 'post_url' => $post['aUrl'],
                 'author_image_url' => $post['aAuthorImageUrl'],

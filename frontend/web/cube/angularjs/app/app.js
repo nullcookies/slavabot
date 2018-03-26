@@ -45,7 +45,7 @@ app.config(['$routeProvider', function ($routeProvider) {
             title: 'Детальный просмотр'
         })
         .when("/pages/contacts", {
-            templateUrl: "views/contacts.html",
+            templateUrl: "views/users.html",
             controller: "contactsCtrl",
             title: 'Купленные контакты',
         })

@@ -1,8 +1,12 @@
 <?php
 namespace frontend\controllers;
 
+use common\commands\command\FilterNotificationCommand;
 use common\commands\command\GetPostsCommand;
+use common\commands\command\SendTelegramNotificationCommand;
+use common\models\Filters;
 use common\models\User;
+use common\models\Webhooks;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\web\BadRequestHttpException;
@@ -54,15 +58,17 @@ class DevController extends Controller
 
     public function actionIndex(){
 
-        $res =  \Yii::$app->commandBus->handle(
-            new GetPostsCommand(
-                \common\services\StaticConfig::ReportsConfig()
+        $item = Webhooks::findOne(['id' => 742]);
+
+        $result = \Yii::$app->commandBus->handle(
+            new FilterNotificationCommand(
+                [
+                    'item' => $item,
+                ]
             )
         );
 
-        echo '<pre>';
-            var_dump($res);
-        echo '</pre>';
+        return json_encode($result);
 
 
     }

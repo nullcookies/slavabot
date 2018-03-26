@@ -1,6 +1,11 @@
 <?php
 namespace frontend\controllers;
 
+use common\models\ACity;
+use common\models\ACountry;
+use common\models\ARegion;
+use common\models\FavoritesPosts;
+use common\models\Reports;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\web\BadRequestHttpException;
@@ -46,12 +51,12 @@ class PotentialController extends Controller
                 'actions' => [
                     'logout' => ['get'],
                     'savefilter' => ['post'],
-                    'setowner' => ['post']
+                    'getpost' => ['post']
                 ],
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['list', 'newfilter', 'filter', 'filters', 'detail', 'setowner', 'contacts'],
+                'only' => ['list', 'newfilter', 'filter', 'filters', 'detail', 'getpost', 'contacts'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -77,6 +82,7 @@ class PotentialController extends Controller
     {
         return array(
             'user' => Yii::$app->user->identity,
+            'owned' => FavoritesPosts::GetPostsIDByUser(),
             'webhooks' => Webhooks::getWebHooks(),
         );
     }
@@ -85,7 +91,8 @@ class PotentialController extends Controller
     {
         return array(
             'user' => Yii::$app->user->identity,
-            'webhooks' => Webhooks::getMyWebHooks(),
+            'owned' => FavoritesPosts::GetPostsIDByUser(),
+            'webhooks' => Webhooks::getWebHooks(true),
         );
     }
 
@@ -97,23 +104,27 @@ class PotentialController extends Controller
         );
     }
 
-    public function actionSetOwner()
+    public function actionGetPost()
     {
-        $id = Yii::$app->request->post('id');
-        $user  = Yii::$app->user->identity->id;
-
-        return Webhooks::SetWebhookOwner($user, $id);
+        return FavoritesPosts::GetPost(Yii::$app->request->post('id'));
     }
 
     public function actionFilter()
     {
         return array(
             'user' => Yii::$app->user->identity,
+            'owned' => FavoritesPosts::GetPostsIDByUser(),
             'filter' => Filters::getFilter(Yii::$app->request->get('id')),
-            'location'  =>  Location::find()->asArray()->all(),
-            'category'  =>  Category::find()->asArray()->all(),
-            'priority'  =>  Priority::find()->asArray()->all(),
-            'theme'     =>  Theme::find()->asArray()->all()
+            'location'  =>  ACity::find()->where([
+                '>', 'aid', 0
+            ])->asArray()->all(),
+            'countries' => ACountry::find()->where([
+                '>', 'aid', 0
+            ])->asArray()->all(),
+            'regions' => ARegion::find()->where([
+                '>', 'aid', 0
+            ])->asArray()->all(),
+            'theme'     =>  Reports::getActive()
         );
     }
 

@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * Модель для работы с клиентскими фильтрами по поиску потенциальных клиентов
@@ -32,8 +33,8 @@ class Filters extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'location', 'theme'], 'integer'],
-            [['name', 'search', 'email'], 'string']
+            [['user_id', 'location', 'theme', 'aRegion', 'aCountry', 'send_notification'], 'integer'],
+            [['name', 'search'], 'string']
 
         ];
     }
@@ -54,7 +55,9 @@ class Filters extends \yii\db\ActiveRecord
             'theme' => function(){
                 return (string)$this->theme;
             },
-            'email'
+            'send_notification',
+            'aRegion',
+            'aCountry'
         ];
     }
 
@@ -89,18 +92,27 @@ class Filters extends \yii\db\ActiveRecord
             ->where(
                 ['AND',
                     ['OR',
-                        ['location' => $item->location],
-                        ['location' => null]
+                        ['aCountry' => $item->aCountry],
+                        ['aCountry' => null],
                     ],
                     ['OR',
-                        ['theme' => $item->theme],
+                        ['aRegion' => $item->aRegion],
+                        ['aRegion' => null]
+                    ],
+                    ['OR',
+                        ['location' => $item->aCity],
+                        ['location' => null],
+                    ],
+                    ['OR',
+                        ['theme' => $item->category],
                         ['theme' => null]
                     ],
                 ]
             )
-            ->andWhere(['not', ['email' => null]])
+            ->andWhere(['send_notification' => 1])
             ->asArray()
             ->all();
+
         if($model){
             return $model;
         }else{
@@ -243,6 +255,9 @@ class Filters extends \yii\db\ActiveRecord
         $model->search = $item['search'];
         $model->location = $item['location'];
         $model->theme = $item['theme'];
+        $model->aRegion = $item['region'];
+        $model->aCountry = $item['country'];
+        $model->send_notification = 1;
 
 
         if($model->save()){
@@ -265,7 +280,10 @@ class Filters extends \yii\db\ActiveRecord
         $model->search = $item['search'];
         $model->location = $item['city'];
         $model->theme = $item['theme'];
-        $model->email = $item['email'];
+        $model->aRegion = $item['region'];
+        $model->aCountry = $item['country'];
+
+        $model->send_notification = $item['send_notification']=='true' || $item['send_notification']=='1' ? 1 : 0;
 
         if($model->save()){
             return true;

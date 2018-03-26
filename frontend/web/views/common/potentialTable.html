@@ -26,7 +26,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-8 contact__post">
+                        <div class="col-md-7 contact__post">
                             <div class="row">
                                 <div class="col-md-6">
                                     <h2 style="color: #03a9f4;">
@@ -35,7 +35,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-12" style="word-break: break-word; ">
                                     <span ng-bind-html="sce.trustAsHtml(webhook.post_content)"></span>
                                 </div>
                             </div>
@@ -50,24 +50,18 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <div class="row">
-                                <div class="col-md-12 getBtn">
-                                        <!--<a href="{{(webhook.owner === user.id) ? '#/potential/detail/' + webhook.id : ''}}" class="btn btn-warning col-lg-12" ng-show="webhook.owner>0">-->
-                                            <!--<i class="fa fa-get-pocket"></i>-->
-                                            <!--{{(webhook.owner === user.id) ? 'Ваш контакт' : 'Контакт забронированн'}}-->
-                                        <!--</a>-->
-                                    <a class="btn btn-success col-lg-12">
-                                        Получить контакт
+                                <div class="col-md-9 col-md-offset-3 getBtn">
+                                    <a href="{{(owned.indexOf( webhook.id.toString() ) != -1) ? '#/potential/detail/' + webhook.id : ''}}" ng-show="(owned.indexOf( webhook.id.toString() ) != -1)" class="btn btn-warning col-lg-12" >
+                                        Избранный контакт
                                     </a>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <ul class="list-group" style="font-size: 13px;">
-                                        <li ng-show="webhook.author_url" class="list-group-item">Ссылка на профиль</li>
-                                        <li ng-repeat="contact in webhook.contacts" ng-show="contact.type!='tag'" class="list-group-item">{{contact.name}}</li>
-                                    </ul>
+                                    <a ng-click="getContact(webhook.id)" class="btn btn-success col-lg-12" ng-show="(owned.indexOf( webhook.id.toString() ) === -1)">
+                                        Добавить в избранное
+                                    </a>
+                                    <a class="btn btn-success col-lg-12" target="_blank" style="margin-top:10px;" href="{{webhook.post_url}}">
+                                        Перейти к обсуждению
+                                    </a>
                                 </div>
                             </div>
                         </div>

@@ -29,7 +29,7 @@ class ACity extends \yii\db\ActiveRecord
     {
         return [
             [['aid', 'aName'], 'required'],
-            [['aid'], 'integer'],
+            [['aid', 'aCountry', 'aRegion'], 'integer'],
             [['aName', 'aType'], 'string', 'max' => 255],
         ];
     }
@@ -44,10 +44,12 @@ class ACity extends \yii\db\ActiveRecord
             'aid' => 'Aid',
             'aName' => 'A Name',
             'aType' => 'A Type',
+            'aCountry' => 'A Country',
+            'aRegion' => 'A Region'
         ];
     }
 
-    public static function getCity($aCity)
+    public static function getCity($aCity, $aCountry, $aRegion)
     {
         if(is_array($aCity) && (int)$aCity['aId'] > 0){
             $aid = (int)$aCity['aId'];
@@ -60,7 +62,9 @@ class ACity extends \yii\db\ActiveRecord
         }
 
         $city = self::findOne([
-            'aid' => $aid
+            'aid' => $aid,
+            'aCountry' => $aCountry,
+            'aRegion' => $aRegion
         ]);
 
         if($city){
@@ -72,6 +76,8 @@ class ACity extends \yii\db\ActiveRecord
             $city->aid = $aid;
             $city->aName = $aName;
             $city->aType = $aType;
+            $city->aCountry = $aCountry;
+            $city->aRegion = $aRegion;
 
             $city->save(false);
 

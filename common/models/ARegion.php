@@ -29,7 +29,7 @@ class ARegion extends \yii\db\ActiveRecord
     {
         return [
             [['aid', 'aName', 'aType'], 'required'],
-            [['aid'], 'integer'],
+            [['aid', 'aCountry'], 'integer'],
             [['aName', 'aType'], 'string', 'max' => 255],
         ];
     }
@@ -44,10 +44,11 @@ class ARegion extends \yii\db\ActiveRecord
             'aid' => 'Aid',
             'aName' => 'A Name',
             'aType' => 'A Type',
+            'aCountry' => 'A Country'
         ];
     }
 
-    public static function getRegion($aRegion)
+    public static function getRegion($aRegion, $aCountry)
     {
         if(is_array($aRegion) && (int)$aRegion['aId'] > 0){
             $aid = (int)$aRegion['aId'];
@@ -60,7 +61,8 @@ class ARegion extends \yii\db\ActiveRecord
         }
 
         $region = self::findOne([
-            'aid' => $aid
+            'aid' => $aid,
+            'aCountry' => $aCountry
         ]);
 
         if($region){
@@ -72,10 +74,20 @@ class ARegion extends \yii\db\ActiveRecord
             $region->aid = $aid;
             $region->aName = $aName;
             $region->aType = $aType;
+            $region->aCountry = $aCountry;
 
             $region->save(false);
 
             return $region->id;
         }
     }
+
+    public static function getUnknown(){
+        $regions = self::findAll([
+            'aid' => 0
+        ]);
+
+        return $regions;
+    }
+
 }

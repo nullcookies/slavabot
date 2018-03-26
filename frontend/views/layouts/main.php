@@ -118,7 +118,7 @@ AppAsset::register($this);
                                 <li data-match-route="/potential*" class="header-nav__item">
                                     <a href="#/potential">
                                         <i class="fa fa-list"></i>
-                                        <span style="font-size: 0.775em;">Потенциальные клиенты</span>
+                                        <span>Обсуждения</span>
                                     </a>
                                     <ul class="submenu">
                                         <li ng-repeat="menu in potentialSubMenu">
@@ -131,13 +131,13 @@ AppAsset::register($this);
                                 <li class="header-nav__item" data-match-route="/pages/contacts">
                                     <a href="#/pages/contacts">
                                         <i class="fa fa-folder-open-o"></i>
-                                        <span>Купленные контакты</span>
+                                        <span>Избранные обсуждения</span>
                                     </a>
                                 </li>
                                 <li data-match-route="/history*" class="header-nav__item">
                                     <a href="#/history">
                                         <i class="fa fa-history"></i>
-                                        <span style="font-size: 0.775em;">История</span>
+                                        <span>История</span>
                                     </a>
                                     <!--                                    <ul class="submenu">-->
                                     <!--                                        <li>-->

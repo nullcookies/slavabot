@@ -2,7 +2,9 @@
 
 namespace common\models;
 
+use common\commands\command\FilterNotificationCommand;
 use Yii;
+use yii\base\Exception;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use common\models\ExtraPropsBehaviour;
@@ -287,7 +289,18 @@ class Webhooks extends \yii\db\ActiveRecord
 
                 $webhook->save(false);
 
-                //return $webhook->id;
+                try{
+                    \Yii::$app->commandBus->handle(
+                        new FilterNotificationCommand(
+                            [
+                                'item' => $webhook,
+                            ]
+                        )
+                    );
+                }catch(\Exception $e){
+
+                }
+
                 return [
                     'new' => true,
                     'id' => $webhook->post_id,
@@ -303,8 +316,10 @@ class Webhooks extends \yii\db\ActiveRecord
     }
 
     /**
-     * Возвращает данные для вывода страницы "Потенциальные клиенты"
+     * Возвращает данные для вывода страницы "Обсуждения" и "Избранные"
      *
+     * @param bool $user_contacts - true вернет обсуждения, находящиеся в избраном у текущего пользователя
+     *                              false вернет все доступные обсуждения
      * @return array [
      *                 'webhooks'  =>  массив постов,
      *                 'pages'     => инфа для формирования пагинации,
@@ -312,15 +327,21 @@ class Webhooks extends \yii\db\ActiveRecord
      *                 'theme'     =>  справочник категорий common\models\Reports, для фильтра
      *               ]
      */
-    public static function getWebHooks()
+
+
+    public static function getWebHooks($user_contacts = false)
     {
-        $filter = [];
+
         $searchArr = [];
+        $filter = [];
+
 
         if(Yii::$app->request->post()){
             $page = Yii::$app->request->post()['page'];
             $search = Yii::$app->request->post()['search'];
             $location = Yii::$app->request->post()['city'];
+            $region = Yii::$app->request->post()['region'];
+            $country =   Yii::$app->request->post()['country'];
             $theme = Yii::$app->request->post()['theme'];
         }else{
             $search ="";
@@ -329,20 +350,44 @@ class Webhooks extends \yii\db\ActiveRecord
             $theme = 0;
         }
 
-
-
         if($theme>0){
             $filter['category'] = $theme;
         }
+
         if($location>0){
             $filter['aCity'] = $location;
         }
+
+        if($region>0){
+            $filter['aRegion'] = $region;
+        }
+
+        if($country>0){
+            $filter['aCountry'] = $country;
+        }
+
 
         if(strlen($search)>3){
             $searchArr = array('LIKE', 'post_content', $search);
         }
 
-        $webhooks = Webhooks::find()->where($filter)->andWhere($searchArr)->orderBy(['published_at' => SORT_DESC]);
+        if($user_contacts){
+            $webhooks = Webhooks::find()
+                ->where([
+                    'IN',
+                    'id',
+                    FavoritesPosts::GetPostsIDByUser()
+                ])
+                ->andWhere($filter)
+                ->andWhere($searchArr)
+                ->orderBy(['published_at' => SORT_DESC]);
+        }else{
+            $webhooks = Webhooks::find()
+                ->where($filter)
+                ->andWhere($searchArr)
+                ->orderBy(['published_at' => SORT_DESC]);
+        }
+
 
         $countQuery = clone $webhooks;
 
@@ -364,7 +409,19 @@ class Webhooks extends \yii\db\ActiveRecord
             'webhooks'  =>  $models,
             'pages'     => $pages,
             'location'  =>  ACity::find()->asArray()->all(),
+            'countries' => ACountry::find()->asArray()->all(),
+            'regions' => ARegion::find()->asArray()->all(),
             'theme'     =>  Reports::getActive()
         );
     }
+
+    public static function getDetail()
+    {
+        $webhooks = Webhooks::find()->where(['id' => Yii::$app->request->post()['id']])->one();
+
+        return array(
+            'webhooks'  =>  $webhooks
+        );
+    }
+
 }

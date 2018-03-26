@@ -10,6 +10,8 @@
 
 namespace Longman\TelegramBot\Commands\SystemCommands;
 
+use common\models\FavoritesPosts;
+use frontend\controllers\bot\commands\PostNotificationCommand;
 use frontend\controllers\bot\libs\Logger;
 use GuzzleHttp\Exception\RequestException;
 use Longman\TelegramBot\Commands\SystemCommand;
@@ -118,6 +120,31 @@ class CallbackqueryCommand extends SystemCommand
 
             return (new NotificationCommand($this->telegram,
                 new Update(json_decode($this->update->toJson(), true))))->execute($param, $media);
+
+        }
+
+        if ($command == 'getPost') {
+
+            $explodedCommand = explode('_', $data);
+
+            $this->conversation = new Conversation($user_id, $chat_id, 'postNotification');
+            $notes = &$this->conversation->notes;
+            $notes['state'] = 1;
+            $this->conversation->update();
+
+            return (new PostNotificationCommand($this->telegram,
+                new Update(json_decode($this->update->toJson(), true))))->execute((int)$explodedCommand[1], $explodedCommand[2],1);
+
+
+            //$post = FavoritesPosts::GetPostTLG((int)$explodedCommand[2], (int)$explodedCommand[1]);
+
+//            $data = [
+//                'chat_id' => $chat_id,
+//                'user_id' => $chat_id,
+//                'text' => json_encode($notes)
+//            ];
+//
+//            Request::sendMessage($data);
 
         }
 
