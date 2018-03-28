@@ -147,6 +147,11 @@ class User extends ActiveRecord implements IdentityInterface
         return static::findOne(['telegram_id' => $tid, 'status' => self::STATUS_ACTIVE]);
     }
 
+    public static function getTID($id)
+    {
+        return User::findOne(['id' => $id, 'status' => self::STATUS_ACTIVE])->telegram_id;
+    }
+
     /**
      * Finds user by id
      *

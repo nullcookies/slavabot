@@ -14,31 +14,41 @@
 						<div class="col-lg-3" ng-class="{'has-error' : noFilter}">
 							<input type="text" class="form-control" placeholder="Поиск" ng-model="search" ng-keyup="changeFilter()">
 						</div>
-						<div class="col-lg-3" ng-class="{'has-error' : noFilter}">
-							<select class="form-control" ng-model="city" ng-change="changeFilter()"  ng-options="location.id as location.name for location in locations">
-								<option value="" selected>{{cityPlaceholder}}</option>
+
+						<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
+							<select class="form-control" ng-model="country" ng-change="changeFilter('country')"  ng-options="country.id as country.aName  for country in countries">
+								<option value="" >{{countryPlaceholder}}</option>
 							</select>
 						</div>
-						<div class="col-lg-3" ng-class="{'has-error' : noFilter}">
-							<select class="form-control" ng-model="theme" ng-change="changeFilter()" ng-options="theme.id as theme.name for theme in themes">
-								<option value="" selected>{{themePlaceholder}}</option>
+
+						<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
+							<select class="form-control" ng-model="region" ng-change="changeFilter('region')"  ng-options="region.id as region.aName for region in regions | filter:shouldShowRegion">
+								<option value="" >{{regionPlaceholder}}</option>
+							</select>
+						</div>
+
+						<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
+							<select class="form-control" ng-model="city" ng-change="changeFilter('city')"  ng-options="location.id as location.aName for location in locations | filter:shouldShowCity">
+								<option value="" >{{cityPlaceholder}}</option>
 							</select>
 						</div>
 
 					</div>
 					<div class="row webhooks__filters">
-						<div class="col-lg-6">
-							<div class="alert alert-info" style="    padding: 8px;">
-								<i class="fa fa-info-circle fa-fw fa-lg"></i>
-								<strong>Укажите Email</strong> для получения уведомлений.
-							</div>
-						</div>
-						<div class="col-lg-4" ng-class="{'has-error' : notifEmailError}">
-							<input type="text" class="form-control"  placeholder="Email для уведомлений" ng-model="notifEmail">
+						<div class="checkbox-nice col-lg-2" style="margin-left: 7px;">
+							<input type="checkbox" id="checkbox-1" ng-model="send_notification" ng-checked="send_notification">
+							<label for="checkbox-1">
+								Получать уведомления
+							</label>
 						</div>
 						<div class="col-lg-2">
 							<button class="btn btn-success col-lg-12" ng-click="saveFilter()">
 								Сохранить
+							</button>
+						</div>
+						<div class="col-lg-2">
+							<button class="btn btn-default col-lg-12" ng-click="dropFilter()">
+								Удалить фильтр
 							</button>
 						</div>
 					</div>

@@ -190,6 +190,7 @@
     text-align: center;
     font-size: 13px;
     line-height: 25px;
+    word-wrap: break-word;
 }
 .contact__post{
     text-align: left;

@@ -347,7 +347,7 @@ class TelegramWrap
         return $arDate;
     }
 
-    /*
+    /**
      * Клавиатура для настроек учетной записи
      */
     public function getAccountSettingsKeyboard(array $arDate)

@@ -4,30 +4,52 @@
 			<div class="main-box-body clearfix">
 				<div class="" id="top">
 					<div class="row webhooks__filters">
-						<div ng-class="{'has-error' : nameError}" class="col-lg-3">
-							<input type="text" class="form-control"  placeholder="Название фильтра" ng-model="filterName">
-						</div>
-						<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
-							<input type="text" class="form-control" placeholder="Поиск" ng-model="search" ng-keyup="changeFilter()">
-						</div>
-						<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
-							<select class="form-control" ng-model="location" ng-change="changeFilter()">
-								<option value="" selected>{{cityPlaceholder}}</option>
-								<option value="{{location.id}}"  ng-repeat="location in locations">{{location.name}}</option>
-							</select>
-						</div>
-						<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
-							<select class="form-control" ng-model="theme" ng-change="changeFilter()">
-								<option value="" selected>{{themePlaceholder}}</option>
-								<option value="{{theme.id}}"  ng-repeat="theme in themes">{{theme.name}}</option>
-							</select>
-						</div>
-						<div class="col-lg-3">
-							<button class="btn btn-success col-lg-12" ng-click="saveFilter()">
-								Сохранить как новый фильтр
-							</button>
-						</div>
 
+						<div class="row">
+
+							<div class="col-lg-4" ng-class="{'has-error' : noFilter}">
+								<input type="text" class="form-control" placeholder="Поиск" ng-model="search" ng-keyup="changeFilter()">
+							</div>
+
+							<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
+								<select class="form-control" ng-model="country" ng-change="changeFilter('country')">
+									<option value="" selected>{{countryPlaceholder}}</option>
+									<option value="{{country.id}}"  ng-show="country.aid!=0" ng-repeat="country in countries">{{country.aName}}</option>
+								</select>
+							</div>
+
+							<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
+								<select class="form-control" ng-model="region" ng-change="changeFilter('region')">
+									<option value="" selected>{{regionPlaceholder}}</option>
+									<option ng-show="(country===region.aCountry || !country) && region.aid!=0" value="{{region.id}}"  ng-repeat="region in regions">{{region.aName}} {{region.aType}}</option>
+								</select>
+							</div>
+
+							<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
+								<select class="form-control" ng-model="city" ng-change="changeFilter('city')">
+									<option value="" selected>{{cityPlaceholder}}</option>
+									<option ng-show="(region===location.aRegion || !region && country===location.aCountry || !country) && location.aid!=0" value="{{location.id}}"  ng-repeat="location in locations">{{location.aName}}</option>
+								</select>
+							</div>
+
+							<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
+								<select class="form-control" ng-model="theme" ng-change="changeFilter()">
+									<option value="" selected>{{themePlaceholder}}</option>
+									<option value="{{theme.mlg_id}}"  ng-repeat="theme in themes">{{theme.title}}</option>
+								</select>
+							</div>
+
+						</div>
+						<div class="row" style="margin-top:10px;">
+							<div ng-class="{'has-error' : nameError}" class="col-lg-9">
+								<input type="text" class="form-control"  placeholder="Название фильтра" ng-model="filterName">
+							</div>
+							<div class="col-lg-3">
+								<button class="btn btn-success col-lg-12" ng-click="saveFilter()">
+									Сохранить как новый фильтр
+								</button>
+							</div>
+						</div>
 					</div>
 					<div ng-include='"views/common/messages.html"'></div>
 					<div ng-include='"views/common/loader.html"'></div>

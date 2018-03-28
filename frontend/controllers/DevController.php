@@ -1,7 +1,12 @@
 <?php
 namespace frontend\controllers;
 
+use common\commands\command\FilterNotificationCommand;
+use common\commands\command\GetPostsCommand;
+use common\commands\command\SendTelegramNotificationCommand;
+use common\models\Filters;
 use common\models\User;
+use common\models\Webhooks;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\web\BadRequestHttpException;
@@ -11,6 +16,7 @@ use yii\filters\AccessControl;
 use yii\web\Response;
 use common\commands\command\CheckStatusNotificationCommand;
 
+use SoapClient;
 
 
 class DevController extends Controller
@@ -42,7 +48,7 @@ class DevController extends Controller
             ],
             [
                 'class' => \yii\filters\ContentNegotiator::className(),
-                'only' => ['index'],
+                //'only' => ['index'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -51,6 +57,19 @@ class DevController extends Controller
     }
 
     public function actionIndex(){
-        return User::postingNotification(-1);
+
+        $item = Webhooks::findOne(['id' => 742]);
+
+        $result = \Yii::$app->commandBus->handle(
+            new FilterNotificationCommand(
+                [
+                    'item' => $item,
+                ]
+            )
+        );
+
+        return json_encode($result);
+
+
     }
 }

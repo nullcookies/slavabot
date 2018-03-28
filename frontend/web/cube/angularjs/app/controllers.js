@@ -272,21 +272,32 @@ angular.module('cubeWebApp')
 
         $scope.getUserData();
     })
-    .controller('menu', function ($scope, $http) {
+    .controller('menu', function ($scope, $http, $interval) {
 
         $scope.potentialSubMenu = [];
 
+        $scope.refreshMenu = function()
+        {
+            $http({method: 'GET', url: '/potential/filters'}).then(function success(response) {
+                $scope.potentialSubMenu = response.data;
+            });
+        };
 
-        $http({method: 'GET', url: '/potential/filters'}).then(function success(response) {
-            $scope.potentialSubMenu = response.data;
+        $scope.refreshMenu();
+
+        $scope.Timer = $interval(function () {
+            $scope.refreshMenu();
+        }, 1000);
+
+        $scope.$on("$destroy", function (event) {
+            $interval.cancel($scope.Timer);
         });
-
-
     })
     .controller('potentialCtrl', function ($scope, $http, $sce, $location, $interval) {
         $scope.webhooks = [];
-        $scope.location;
-
+        $scope.city;
+        $scope.country;
+        $scope.region;
         $scope.sce = $sce;
         $scope.firstLoad = true;
         moment.locale('ru');
@@ -297,24 +308,39 @@ angular.module('cubeWebApp')
         $scope.nameError = false;
         $scope.noFilter = false;
         $scope.cityPlaceholder = 'Город';
+        $scope.countryPlaceholder = 'Страна';
+        $scope.regionPlaceholder = 'Регион';
         $scope.themePlaceholder = 'Тема';
         $scope.numberOfPages = 0;
         $scope.filterSuccess = false;
         $scope.filterError = false;
+        $scope.owned = [];
 
-        $scope.changeFilter = function(){
+        $scope.changeFilter = function($type){
 
-            if($scope.city==''){
+            if($scope.country===null ){
+                delete $scope.country;
+
+                // $scope.region = null;
+                // $scope.city = null;
+            }
+
+            if($scope.region===null || $type === 'country'){
+                delete $scope.region;
+                //$scope.city = null;
+            }
+
+            if($scope.city===null || $type === 'country' || $type === 'region'){
                 delete $scope.city;
             }
 
             if($scope.theme==''){
                 delete $scope.theme;
             }
-
-            $scope.setPage(0);
+            $scope.setPage($scope.currentPage);
 
         };
+
         $scope.time = moment(new Date());
 
         $scope.getContact = function(id){
@@ -325,19 +351,505 @@ angular.module('cubeWebApp')
                 }
             };
 
-            $http.post('/potential/set-owner', data, config).then(function success(response) {
-               $location.path('/potential/detail/'+id);
+            $http.post('/potential/get-post', data, config).then(function success(response) {
+                //$location.path('/potential/detail/'+id);
+                $scope.setPage($scope.currentPage);
             });
         };
+
+        $scope.dropContact = function(id){
+            var data = $.param({'id' : id});
+            var config = {
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+
+            $http.post('/potential/drop-post', data, config).then(function success(response) {
+                //$location.path('/potential/detail/'+id);
+                $scope.setPage($scope.currentPage);
+            });
+        };
+
         $scope.getList = function(){
 
             $http.get('/potential/list').then(function success(response) {
                 $scope.user = response.data.user;
+                $scope.owned = response.data.owned;
                 $scope.webhooks = response.data.webhooks.webhooks;
                 $scope.locations = response.data.webhooks.location;
+                $scope.countries = response.data.webhooks.countries;
+                $scope.regions = response.data.webhooks.regions;
                 $scope.themes = response.data.webhooks.theme;
                 $scope.pages = response.data.webhooks.pages;
                 $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
+
+                console.log(response);
+            });
+        };
+
+        $scope.getList();
+        $scope.paginationBlock = function(n){
+            if($scope.currentPage < 4 && n < 7){
+                return true;
+            }else{
+                if($scope.currentPage >  n + 3 || $scope.currentPage <  n - 3){
+                    return false;
+                }else{
+                    return true;
+                }
+            }
+
+        };
+        $scope.disabledBack = function() {
+            if($scope.currentPage == 0){
+                return false;
+            }else{
+                $scope.currentPage = $scope.currentPage-1
+            }
+        };
+        $scope.saveFilter = function() {
+            console.log($scope.location);
+            if($scope.filterName.length<3){
+                $scope.nameError = true;
+                return false;
+            }
+
+            if(
+                $scope.search.length==0 &&
+                $scope.city === undefined &&
+                $scope.theme === undefined &&
+                $scope.region === undefined &&
+                $scope.country === undefined
+            ){
+                $scope.noFilter = true;
+                return false;
+            }
+
+            $scope.nameError = false;
+            $scope.noFilter = false;
+
+            var data = $.param({
+                name: $scope.filterName,
+                search : $scope.search,
+                location : $scope.city,
+                theme : $scope.theme,
+                region : $scope.region,
+                country : $scope.country
+            });
+
+            var config = {
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+
+            $http.post('/potential/new-filter', data, config).then(function success(response) {
+                if(response.data){
+                    $scope.filterSuccess = true;
+                    $scope.filterError = false;
+                }else{
+                    $scope.filterSuccess = true;
+                    $scope.filterError = false;
+                }
+            });
+        };
+        $scope.disabledNext = function() {
+            if($scope.currentPage >= $scope.numberOfPages() - 1){
+                return false;
+            }else{
+                $scope.currentPage = $scope.currentPage+1
+            }
+        };
+        $scope.setPage = function(n){
+
+            $scope.pagination = {
+                'search' : $scope.search,
+                'city' : $scope.city,
+                'region' : $scope.region,
+                'country' : $scope.country,
+                'theme' : $scope.theme,
+                'page' : n
+            };
+
+            var data = $.param($scope.pagination);
+
+            var config = {
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+
+            $http.post('/potential/list', data, config).then(function success(response) {
+                $scope.firstLoad = false;
+                $scope.webhooks = response.data.webhooks.webhooks;
+                $scope.pages = response.data.webhooks.pages;
+                $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
+
+                $scope.currentPage = n;
+            });
+        };
+        $scope.setPage($scope.currentPage);
+        $scope.Timer = $interval(function () {
+            $scope.setPage($scope.currentPage)
+        }, 10000);
+
+        $scope.$on("$destroy", function (event) {
+            $interval.cancel($scope.Timer);
+        });
+
+    })
+    .controller('filterCtrl', function ($scope, $http, $sce, $routeParams,$location, $interval) {
+        $scope.webhooks = [];
+        $scope.locations = [];
+        $scope.countries = [];
+        $scope.regions = [];
+        $scope.themes = [];
+
+        $scope.city;
+        $scope.country;
+        $scope.region;
+
+        $scope.sce = $sce;
+
+        moment.locale('ru');
+        $scope.search   = '';
+        $scope.filterName = '';
+        $scope.currentPage = 0;
+        $scope.pageSize = 10;
+        $scope.nameError = false;
+        $scope.noFilter = false;
+        $scope.cityPlaceholder = 'Город';
+        $scope.countryPlaceholder = 'Страна';
+        $scope.regionPlaceholder = 'Регион';
+        $scope.themePlaceholder = 'Тема';
+        $scope.numberOfPages = 0;
+        $scope.notif = false;
+        $scope.notifEmail = '';
+        $scope.filterSuccess = false;
+        $scope.filterError = false;
+
+        $scope.changeFilter = function($type){
+
+            if($scope.country===null ){
+                delete $scope.country;
+            }
+
+            if($scope.region===null || $type === 'country'){
+                delete $scope.region;
+            }
+
+            if($scope.city===null || $type === 'country' || $type === 'region'){
+                delete $scope.city;
+            }
+
+            if($scope.theme==''){
+                delete $scope.theme;
+            }
+            $scope.setPage($scope.currentPage);
+
+        };
+
+        $scope.shouldShowCity = function (location) {
+            return ($scope.region===location.aRegion || !$scope.region) && ($scope.country===location.aCountry || !$scope.country);
+        }
+
+        $scope.shouldShowRegion = function (location) {
+            return $scope.country===location.aCountry || !$scope.country;
+        }
+
+        $scope.time = moment(new Date());
+
+        var id = $routeParams["id"];
+
+        $http({method: 'GET', url: '/potential/filter?id='+id}).then(function success(response) {
+            $scope.user = response.data.user;
+
+            $scope.send_notification = response.data.filter.send_notification;
+            $scope.owned = response.data.owned;
+
+            $scope.locations = response.data.location;
+            $scope.themes = response.data.theme;
+            $scope.countries = response.data.countries;
+            $scope.regions = response.data.regions;
+            $scope.search = response.data.filter.search;
+
+            $scope.city = response.data.filter.location;
+            $scope.theme = response.data.filter.theme;
+            $scope.filterName = response.data.filter.name;
+            $scope.country = (response.data.filter.aCountry) ? response.data.filter.aCountry.toString() : response.data.filter.aCountry;
+            $scope.region = (response.data.filter.aRegion) ? response.data.filter.aRegion.toString() : response.data.filter.aRegion;
+
+
+
+            console.log('Posts request')
+
+            $scope.setPage(0);
+        });
+
+        $scope.getContact = function(id){
+            var data = $.param({'id' : id});
+            var config = {
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+
+            $http.post('/potential/get-post', data, config).then(function success(response) {
+                //$location.path('/potential/detail/'+id);
+                $scope.setPage($scope.currentPage);
+            });
+        };
+        $scope.dropContact = function(id){
+            var data = $.param({'id' : id});
+            var config = {
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+
+            $http.post('/potential/drop-post', data, config).then(function success(response) {
+                //$location.path('/potential/detail/'+id);
+                $scope.setPage($scope.currentPage);
+            });
+        };
+
+        $scope.paginationBlock = function(n){
+            if($scope.currentPage < 4 && n < 7){
+                return true;
+            }else{
+                if($scope.currentPage >  n + 3 || $scope.currentPage <  n - 3){
+                    return false;
+                }else{
+                    return true;
+                }
+            }
+
+        };
+        $scope.disabledBack = function() {
+            if($scope.currentPage == 0){
+                return false;
+            }else{
+                $scope.currentPage = $scope.currentPage-1
+            }
+        };
+
+        $scope.saveFilter = function() {
+            if($scope.filterName.length<3){
+                $scope.nameError = true;
+                return false;
+            }
+
+            if(
+                $scope.search.length==0 &&
+                $scope.city === undefined &&
+                $scope.theme === undefined &&
+                $scope.region === undefined &&
+                $scope.country === undefined
+            ){
+                $scope.noFilter = true;
+                return false;
+            }
+
+            $scope.nameError = false;
+            $scope.noFilter = false;
+
+
+            var data = $.param({
+                id: id,
+                name: $scope.filterName,
+                search: $scope.search,
+                city: $scope.city,
+                theme: $scope.theme,
+                region : $scope.region,
+                country : $scope.country,
+                send_notification : $scope.send_notification,
+            });
+
+            var config = {
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+
+            $http.post('/potential/update-filter', data, config).then(function success(response) {
+                if(response.data){
+                    $scope.filterSuccess = true;
+                    $scope.filterError = false;
+                }else{
+                    $scope.filterSuccess = true;
+                    $scope.filterError = false;
+                }
+            });
+        };
+        $scope.dropFilter = function(){
+            var config = {
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+
+            $http.post('/potential/drop-filter', $.param({id: id}), config).then(function success(response) {
+                $location.path('/potential');
+            });
+        };
+        $scope.disabledNext = function() {
+            if($scope.currentPage >= $scope.numberOfPages() - 1){
+                return false;
+            }else{
+                $scope.currentPage = $scope.currentPage+1
+            }
+        };
+        $scope.setPage = function(n){
+            $scope.pagination = {
+                'search' : $scope.search,
+                'city' : $scope.city,
+                'region' : $scope.region,
+                'country' : $scope.country,
+                'theme' : $scope.theme,
+                'page' : n
+            };
+
+            var data = $.param($scope.pagination);
+            var config = {
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+
+            $http.post('/potential/list', data, config).then(function success(response) {
+
+                $scope.webhooks = response.data.webhooks.webhooks;
+                $scope.pages = response.data.webhooks.pages;
+                $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
+                $scope.currentPage = n;
+            });
+        };
+
+        //$scope.setPage($scope.currentPage);
+        $scope.Timer = $interval(function () {
+            console.log('Refresh request')
+
+            $scope.setPage($scope.currentPage)
+        }, 10000);
+
+        $scope.$on("$destroy", function (event) {
+            $interval.cancel($scope.Timer);
+        });
+    })
+    .controller('detailCtrl', function($scope, $http, $routeParams, $sce,$location){
+        $scope.webhook = [];
+        $scope.sce = $sce;
+        moment.locale('ru');
+        $scope.getDetail = function(n){
+
+            var data = $.param({'id' : $routeParams["id"]});
+            var config = {
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+
+            $http.post('/potential/detail', data, config).then(function success(response) {
+                $scope.user = response.data.user;
+                $scope.webhook = response.data.webhooks.webhooks;
+            });
+        };
+
+        $scope.getDetail();
+    })
+    .controller('contactsCtrl', function ($scope, $http, $sce, $location, $interval) {
+        $scope.webhooks = [];
+        $scope.city;
+        $scope.country;
+        $scope.region;
+        $scope.sce = $sce;
+        $scope.firstLoad = true;
+        moment.locale('ru');
+        $scope.search   = '';
+        $scope.filterName = '';
+        $scope.currentPage = 0;
+        $scope.pageSize = 10;
+        $scope.nameError = false;
+        $scope.noFilter = false;
+        $scope.cityPlaceholder = 'Город';
+        $scope.countryPlaceholder = 'Страна';
+        $scope.regionPlaceholder = 'Регион';
+        $scope.themePlaceholder = 'Тема';
+        $scope.numberOfPages = 0;
+        $scope.filterSuccess = false;
+        $scope.filterError = false;
+        $scope.owned = [];
+
+        $scope.changeFilter = function(){
+
+            if($scope.country===''){
+
+                delete $scope.country;
+
+                $scope.region = '';
+                $scope.city = '';
+            }
+
+            if($scope.region===''){
+                delete $scope.region;
+                $scope.city = '';
+            }
+
+            if($scope.city===''){
+                delete $scope.city;
+            }
+
+            if($scope.theme==''){
+                delete $scope.theme;
+            }
+
+            $scope.setPage(0);
+
+        };
+
+        $scope.time = moment(new Date());
+
+        $scope.getContact = function(id){
+            var data = $.param({'id' : id});
+            var config = {
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+
+            $http.post('/potential/get-post', data, config).then(function success(response) {
+                $location.path('/potential/detail/'+id);
+            });
+        };
+        $scope.dropContact = function(id){
+            var data = $.param({'id' : id});
+            var config = {
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+
+            $http.post('/potential/drop-post', data, config).then(function success(response) {
+                //$location.path('/potential/detail/'+id);
+                $scope.setPage($scope.currentPage);
+            });
+        };
+
+        $scope.getList = function(){
+
+            $http.get('/potential/contacts').then(function success(response) {
+                $scope.user = response.data.user;
+                $scope.owned = response.data.owned;
+                $scope.webhooks = response.data.webhooks.webhooks;
+                $scope.locations = response.data.webhooks.location;
+                $scope.countries = response.data.webhooks.countries;
+                $scope.regions = response.data.webhooks.regions;
+                $scope.themes = response.data.webhooks.theme;
+                $scope.pages = response.data.webhooks.pages;
+                $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
+
+                console.log(response);
             });
         };
 
@@ -368,7 +880,13 @@ angular.module('cubeWebApp')
                 return false;
             }
 
-            if($scope.search.length==0 && $scope.location === undefined && $scope.theme === undefined){
+            if(
+                $scope.search.length==0 &&
+                $scope.location === undefined &&
+                $scope.theme === undefined &&
+                $scope.region === undefined &&
+                $scope.country === undefined
+            ){
                 $scope.noFilter = true;
                 return false;
             }
@@ -380,7 +898,9 @@ angular.module('cubeWebApp')
                 name: $scope.filterName,
                 search : $scope.search,
                 location : $scope.location,
-                theme : $scope.theme
+                theme : $scope.theme,
+                region : $scope.region,
+                country : $scope.country
             });
 
             var config = {
@@ -399,328 +919,7 @@ angular.module('cubeWebApp')
                 }
             });
         };
-        $scope.disabledNext = function() {
-            if($scope.currentPage >= $scope.numberOfPages() - 1){
-                return false;
-            }else{
-                $scope.currentPage = $scope.currentPage+1
-            }
-        };
-        $scope.setPage = function(n){
 
-            $scope.pagination = {
-                'search' : $scope.search,
-                'city' : $scope.location,
-                'theme' : $scope.theme,
-                'page' : n
-            };
-
-            var data = $.param($scope.pagination);
-
-            var config = {
-                headers : {
-                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-                }
-            };
-
-            $http.post('/potential/list', data, config).then(function success(response) {
-                $scope.firstLoad = false;
-                $scope.webhooks = response.data.webhooks.webhooks;
-                $scope.pages = response.data.webhooks.pages;
-                $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
-
-                $scope.currentPage = n;
-            });
-        };
-        $scope.setPage($scope.currentPage);
-        $scope.Timer = $interval(function () {
-            $scope.setPage($scope.currentPage)
-        }, 5000);
-
-        $scope.$on("$destroy", function (event) {
-            $interval.cancel($scope.Timer);
-        });
-
-    })
-    .controller('filterCtrl', function ($scope, $http, $sce, $routeParams,$location, $interval) {
-    $scope.webhooks = [];
-    $scope.locations = [];
-    $scope.themes = [];
-    $scope.city;
-
-    $scope.sce = $sce;
-    moment.locale('ru');
-    $scope.search   = '';
-    $scope.filterName = '';
-    $scope.currentPage = 0;
-    $scope.pageSize = 10;
-    $scope.nameError = false;
-    $scope.noFilter = false;
-    $scope.cityPlaceholder = 'Город';
-    $scope.themePlaceholder = 'Тема';
-    $scope.numberOfPages = 0;
-    $scope.notif = false;
-    $scope.notifEmail = '';
-    $scope.filterSuccess = false;
-    $scope.filterError = false;
-
-    $scope.changeFilter = function(){
-
-        if($scope.city==''){
-            delete $scope.city;
-        }
-        if($scope.theme==''){
-                delete $scope.theme;
-        }
-
-        $scope.setPage(0);
-
-    };
-    $scope.time = moment(new Date());
-
-    var id = $routeParams["id"];
-
-    $http({method: 'GET', url: '/potential/filter?id='+id}).then(function success(response) {
-        $scope.user = response.data.user;
-
-        $scope.notifEmail = response.data.filter.email;
-
-        $scope.search = response.data.filter.search;
-        $scope.city = response.data.filter.location;
-        $scope.theme = response.data.filter.theme;
-        $scope.filterName = response.data.filter.name;
-
-        $scope.locations = response.data.location;
-        $scope.themes = response.data.theme;
-
-
-        $scope.setPage(0);
-    });
-
-    $scope.getContact = function(id){
-        var data = $.param({'id' : id});
-        var config = {
-            headers : {
-                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-            }
-        };
-
-        $http.post('/potential/set-owner', data, config).then(function success(response) {
-            $location.path('/potential/detail/'+id);
-        });
-    };
-
-    $scope.paginationBlock = function(n){
-        if($scope.currentPage < 4 && n < 7){
-            return true;
-        }else{
-            if($scope.currentPage >  n + 3 || $scope.currentPage <  n - 3){
-                return false;
-            }else{
-                return true;
-            }
-        }
-
-    };
-    $scope.disabledBack = function() {
-        if($scope.currentPage == 0){
-            return false;
-        }else{
-            $scope.currentPage = $scope.currentPage-1
-        }
-    };
-
-    $scope.saveFilter = function() {
-        if($scope.filterName.length<3){
-            $scope.nameError = true;
-            return false;
-        }
-
-        if($scope.search.length==0 && $scope.city === undefined && $scope.theme === undefined){
-            $scope.noFilter = true;
-            return false;
-        }
-
-        $scope.nameError = false;
-        $scope.noFilter = false;
-
-        var data = $.param({
-            id: id,
-            name: $scope.filterName,
-            search: $scope.search,
-            city: $scope.city,
-            theme: $scope.theme,
-            email : $scope.notifEmail,
-        });
-
-        var config = {
-            headers : {
-                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-            }
-        };
-
-        $http.post('/potential/update-filter', data, config).then(function success(response) {
-            if(response.data){
-                $scope.filterSuccess = true;
-                $scope.filterError = false;
-            }else{
-                $scope.filterSuccess = true;
-                $scope.filterError = false;
-            }
-        });
-    };
-    $scope.disabledNext = function() {
-        if($scope.currentPage >= $scope.numberOfPages() - 1){
-            return false;
-        }else{
-            $scope.currentPage = $scope.currentPage+1
-        }
-    };
-    $scope.setPage = function(n){
-
-        $scope.pagination = {
-            'search' : $scope.search,
-            'city' : $scope.city,
-            'theme' : $scope.theme,
-            'page' : n
-        };
-
-        var data = $.param($scope.pagination);
-        var config = {
-            headers : {
-                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-            }
-        };
-
-        $http.post('/potential/list', data, config).then(function success(response) {
-
-            $scope.webhooks = response.data.webhooks.webhooks;
-            $scope.pages = response.data.webhooks.pages;
-            $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
-            $scope.currentPage = n;
-        });
-    };
-        $scope.Timer = $interval(function () {
-            $scope.setPage($scope.currentPage)
-        }, 10000);
-
-        $scope.$on("$destroy", function (event) {
-            $interval.cancel($scope.Timer);
-        });
-})
-    .controller('detailCtrl', function($scope, $http, $routeParams, $sce,$location){
-        $scope.webhook = [];
-        $scope.sce = $sce;
-        moment.locale('ru');
-        $scope.getDetail = function(n){
-
-            var data = $.param({'id' : $routeParams["id"]});
-            var config = {
-                headers : {
-                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-                }
-            };
-
-            $http.post('/potential/detail', data, config).then(function success(response) {
-                $scope.user = response.data.user;
-                $scope.webhook = response.data.webhooks.webhooks;
-            });
-        };
-
-        $scope.getDetail();
-    })
-    .controller('contactsCtrl', function ($scope, $http, $sce) {
-        $scope.webhooks = [];
-        $scope.city;
-
-        $scope.sce = $sce;
-        moment.locale('ru');
-        $scope.search   = '';
-        $scope.filterName = '';
-        $scope.currentPage = 0;
-        $scope.pageSize = 10;
-        $scope.nameError = false;
-        $scope.noFilter = false;
-        $scope.cityPlaceholder = 'Город';
-        $scope.themePlaceholder = 'Тема';
-        $scope.numberOfPages = 0;
-
-        $scope.changeFilter = function(){
-
-            if($scope.city==''){
-                delete $scope.city;
-            }
-
-            if($scope.theme==''){
-                delete $scope.theme;
-            }
-
-            $scope.setPage(0);
-
-        };
-        $scope.time = moment(new Date());
-
-        $http({method: 'GET', url: '/potential/contacts'}).then(function success(response) {
-            $scope.user = response.data.user;
-            $scope.webhooks = response.data.webhooks.webhooks;
-            $scope.locations = response.data.webhooks.location;
-            $scope.themes = response.data.webhooks.theme;
-            $scope.pages = response.data.webhooks.pages;
-            $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
-        });
-
-        $scope.paginationBlock = function(n){
-            if($scope.currentPage < 4 && n < 7){
-                return true;
-            }else{
-                if($scope.currentPage >  n + 3 || $scope.currentPage <  n - 3){
-                    return false;
-                }else{
-                    return true;
-                }
-            }
-
-        };
-        $scope.disabledBack = function() {
-            if($scope.currentPage == 0){
-                return false;
-            }else{
-                $scope.currentPage = $scope.currentPage-1
-            }
-        };
-        $scope.saveFilter = function() {
-            $scope.arrFilter = {
-                'search' : $scope.search,
-                'city' : $scope.city,
-                'theme' : $scope.theme
-            };
-
-            if($scope.filterName.length<3){
-                $scope.nameError = true;
-                return false;
-            }
-
-            if($scope.search.length==0 && $scope.city === undefined && $scope.theme === undefined){
-                $scope.noFilter = true;
-                return false;
-            }
-
-            $scope.nameError = false;
-            $scope.noFilter = false;
-
-            var data = $.param({
-                name: $scope.filterName,
-                filter: JSON.stringify($scope.arrFilter)
-            });
-
-            var config = {
-                headers : {
-                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-                }
-            }
-
-            $http.post('/potential/new-filter', data, config).then(function success(response) {});
-        };
         $scope.disabledNext = function() {
             if($scope.currentPage >= $scope.numberOfPages() - 1){
                 return false;
@@ -733,6 +932,8 @@ angular.module('cubeWebApp')
             $scope.pagination = {
                 'search' : $scope.search,
                 'city' : $scope.city,
+                'region' : $scope.region,
+                'country' : $scope.country,
                 'theme' : $scope.theme,
                 'page' : n
             };
@@ -746,7 +947,7 @@ angular.module('cubeWebApp')
             };
 
             $http.post('/potential/contacts', data, config).then(function success(response) {
-
+                $scope.firstLoad = false;
                 $scope.webhooks = response.data.webhooks.webhooks;
                 $scope.pages = response.data.webhooks.pages;
                 $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
@@ -754,6 +955,14 @@ angular.module('cubeWebApp')
                 $scope.currentPage = n;
             });
         };
+        $scope.setPage($scope.currentPage);
+        $scope.Timer = $interval(function () {
+            $scope.setPage($scope.currentPage)
+        }, 10000);
+
+        $scope.$on("$destroy", function (event) {
+            $interval.cancel($scope.Timer);
+        });
     })
     .controller('helpCtrl', function ($scope, $http, $sce) {
 

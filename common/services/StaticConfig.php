@@ -68,4 +68,8 @@ class StaticConfig
         }
     }
 
+    public static function ReportsConfig(){
+        return self::config('ReportsConfig');
+    }
+
 }
