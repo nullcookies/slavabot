@@ -110,11 +110,11 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
         $header = $this->makeHeaders($xmlString);
 
         $response = $this->sendRequest($wsdl,$xmlString, $header);
-//        Logger::report('Start:', [
-//            'Start' => $start,
-//            'Finish' => $finish,
-//            'CarbonNow' => Carbon::now()->setTimezone('UTC')
-//        ]);
+        Logger::report('Start:', [
+            'Start' => $start,
+            'Finish' => $finish,
+            'CarbonNow' => Carbon::now()->setTimezone('UTC')
+        ]);
         /**
          * Раскомментить для отладки. Отразит исходные данные (или ошибку)
          */
