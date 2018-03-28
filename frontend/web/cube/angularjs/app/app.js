@@ -32,7 +32,7 @@ app.config(['$routeProvider', function ($routeProvider) {
         .when("/potential", {
             templateUrl: "views/users.html",
             controller: "potentialCtrl",
-            title: 'Потенциальные клиенты'
+            title: 'Обсуждения'
         })
 		.when("/potential/:id", {
 			templateUrl: "views/filter.html",
@@ -47,7 +47,7 @@ app.config(['$routeProvider', function ($routeProvider) {
         .when("/pages/contacts", {
             templateUrl: "views/users.html",
             controller: "contactsCtrl",
-            title: 'Купленные контакты',
+            title: 'Избранные',
         })
         .when("/pages/config", {
             templateUrl: "/site/config/",
