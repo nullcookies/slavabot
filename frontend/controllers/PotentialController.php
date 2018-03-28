@@ -109,6 +109,17 @@ class PotentialController extends Controller
         return FavoritesPosts::GetPost(Yii::$app->request->post('id'));
     }
 
+    public function actionDropPost()
+    {
+        return FavoritesPosts::DropPost(Yii::$app->request->post('id'));
+    }
+
+    public function actionDropFilter()
+    {
+
+        return Filters::DropFilter(Yii::$app->request->post('id'));
+    }
+
     public function actionFilter()
     {
         return array(

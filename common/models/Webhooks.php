@@ -98,6 +98,14 @@ class Webhooks extends \yii\db\ActiveRecord
 
     }
 
+    public function getDataFavorite()
+    {
+        return $this->hasOne(FavoritesPosts::className(), [
+            'post_id' => 'id',
+        ])->where(['user_id' => \Yii::$app->user->id]);
+
+    }
+
     /**
      * Получаем категорию поста
      *
@@ -198,6 +206,9 @@ class Webhooks extends \yii\db\ActiveRecord
             },
             'blogName' => function(){
                 return $this->dataBlog;
+            },
+            'favorite' => function(){
+                return ($this->dataFavorite) ? true : false;
             },
         ];
     }

@@ -272,16 +272,26 @@ angular.module('cubeWebApp')
 
         $scope.getUserData();
     })
-    .controller('menu', function ($scope, $http) {
+    .controller('menu', function ($scope, $http, $interval) {
 
         $scope.potentialSubMenu = [];
 
+        $scope.refreshMenu = function()
+        {
+            $http({method: 'GET', url: '/potential/filters'}).then(function success(response) {
+                $scope.potentialSubMenu = response.data;
+            });
+        };
 
-        $http({method: 'GET', url: '/potential/filters'}).then(function success(response) {
-            $scope.potentialSubMenu = response.data;
+        $scope.refreshMenu();
+
+        $scope.Timer = $interval(function () {
+            $scope.refreshMenu();
+        }, 1000);
+
+        $scope.$on("$destroy", function (event) {
+            $interval.cancel($scope.Timer);
         });
-
-
     })
     .controller('potentialCtrl', function ($scope, $http, $sce, $location, $interval) {
         $scope.webhooks = [];
@@ -306,30 +316,28 @@ angular.module('cubeWebApp')
         $scope.filterError = false;
         $scope.owned = [];
 
-        $scope.changeFilter = function(){
+        $scope.changeFilter = function($type){
 
-            if($scope.country===''){
-
+            if($scope.country===null ){
                 delete $scope.country;
 
-                $scope.region = '';
-                $scope.city = '';
+                // $scope.region = null;
+                // $scope.city = null;
             }
 
-            if($scope.region===''){
+            if($scope.region===null || $type === 'country'){
                 delete $scope.region;
-                $scope.city = '';
+                //$scope.city = null;
             }
 
-            if($scope.city===''){
+            if($scope.city===null || $type === 'country' || $type === 'region'){
                 delete $scope.city;
             }
 
             if($scope.theme==''){
                 delete $scope.theme;
             }
-
-            $scope.setPage(0);
+            $scope.setPage($scope.currentPage);
 
         };
 
@@ -344,7 +352,22 @@ angular.module('cubeWebApp')
             };
 
             $http.post('/potential/get-post', data, config).then(function success(response) {
-                $location.path('/potential/detail/'+id);
+                //$location.path('/potential/detail/'+id);
+                $scope.setPage($scope.currentPage);
+            });
+        };
+
+        $scope.dropContact = function(id){
+            var data = $.param({'id' : id});
+            var config = {
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+
+            $http.post('/potential/drop-post', data, config).then(function success(response) {
+                //$location.path('/potential/detail/'+id);
+                $scope.setPage($scope.currentPage);
             });
         };
 
@@ -386,7 +409,7 @@ angular.module('cubeWebApp')
             }
         };
         $scope.saveFilter = function() {
-
+            console.log($scope.location);
             if($scope.filterName.length<3){
                 $scope.nameError = true;
                 return false;
@@ -394,7 +417,7 @@ angular.module('cubeWebApp')
 
             if(
                 $scope.search.length==0 &&
-                $scope.location === undefined &&
+                $scope.city === undefined &&
                 $scope.theme === undefined &&
                 $scope.region === undefined &&
                 $scope.country === undefined
@@ -409,7 +432,7 @@ angular.module('cubeWebApp')
             var data = $.param({
                 name: $scope.filterName,
                 search : $scope.search,
-                location : $scope.location,
+                location : $scope.city,
                 theme : $scope.theme,
                 region : $scope.region,
                 country : $scope.country
@@ -477,96 +500,92 @@ angular.module('cubeWebApp')
 
     })
     .controller('filterCtrl', function ($scope, $http, $sce, $routeParams,$location, $interval) {
-    $scope.webhooks = [];
-    $scope.locations = [];
-    $scope.countries = [];
-    $scope.regions = [];
-    $scope.themes = [];
+        $scope.webhooks = [];
+        $scope.locations = [];
+        $scope.countries = [];
+        $scope.regions = [];
+        $scope.themes = [];
 
-    $scope.city;
-    $scope.country;
-    $scope.region;
+        $scope.city;
+        $scope.country;
+        $scope.region;
 
-    $scope.sce = $sce;
+        $scope.sce = $sce;
 
-    moment.locale('ru');
-    $scope.search   = '';
-    $scope.filterName = '';
-    $scope.currentPage = 0;
-    $scope.pageSize = 10;
-    $scope.nameError = false;
-    $scope.noFilter = false;
-    $scope.cityPlaceholder = 'Город';
-    $scope.countryPlaceholder = 'Страна';
-    $scope.regionPlaceholder = 'Регион';
-    $scope.themePlaceholder = 'Тема';
-    $scope.numberOfPages = 0;
-    $scope.notif = false;
-    $scope.notifEmail = '';
-    $scope.filterSuccess = false;
-    $scope.filterError = false;
+        moment.locale('ru');
+        $scope.search   = '';
+        $scope.filterName = '';
+        $scope.currentPage = 0;
+        $scope.pageSize = 10;
+        $scope.nameError = false;
+        $scope.noFilter = false;
+        $scope.cityPlaceholder = 'Город';
+        $scope.countryPlaceholder = 'Страна';
+        $scope.regionPlaceholder = 'Регион';
+        $scope.themePlaceholder = 'Тема';
+        $scope.numberOfPages = 0;
+        $scope.notif = false;
+        $scope.notifEmail = '';
+        $scope.filterSuccess = false;
+        $scope.filterError = false;
 
-    $scope.changeFilter = function($type){
+        $scope.changeFilter = function($type){
 
-        if($scope.country===null ){
-            delete $scope.country;
+            if($scope.country===null ){
+                delete $scope.country;
+            }
 
-            $scope.region = null;
-            $scope.city = null;
+            if($scope.region===null || $type === 'country'){
+                delete $scope.region;
+            }
+
+            if($scope.city===null || $type === 'country' || $type === 'region'){
+                delete $scope.city;
+            }
+
+            if($scope.theme==''){
+                delete $scope.theme;
+            }
+            $scope.setPage($scope.currentPage);
+
+        };
+
+        $scope.shouldShowCity = function (location) {
+            return ($scope.region===location.aRegion || !$scope.region) && ($scope.country===location.aCountry || !$scope.country);
         }
 
-        if($scope.region===null || $type === 'country'){
-            delete $scope.region;
-            $scope.city = null;
+        $scope.shouldShowRegion = function (location) {
+            return $scope.country===location.aCountry || !$scope.country;
         }
 
-        if($scope.city===null || $type === 'country' || $type === 'region'){
-            delete $scope.city;
-        }
+        $scope.time = moment(new Date());
 
-        if($scope.theme==''){
-            delete $scope.theme;
-        }
-        $scope.setPage(0);
+        var id = $routeParams["id"];
 
-    };
+        $http({method: 'GET', url: '/potential/filter?id='+id}).then(function success(response) {
+            $scope.user = response.data.user;
 
-    $scope.shouldShowCity = function (location) {
-        return ($scope.region===location.aRegion || !$scope.region) && ($scope.country===location.aCountry || !$scope.country);
-    }
+            $scope.send_notification = response.data.filter.send_notification;
+            $scope.owned = response.data.owned;
 
-    $scope.shouldShowRegion = function (location) {
-        return $scope.country===location.aCountry || !$scope.country;
-    }
+            $scope.locations = response.data.location;
+            $scope.themes = response.data.theme;
+            $scope.countries = response.data.countries;
+            $scope.regions = response.data.regions;
+            $scope.search = response.data.filter.search;
 
-    $scope.time = moment(new Date());
-
-    var id = $routeParams["id"];
-
-    $http({method: 'GET', url: '/potential/filter?id='+id}).then(function success(response) {
-        $scope.user = response.data.user;
-
-        $scope.send_notification = response.data.filter.send_notification;
-        $scope.owned = response.data.owned;
-
-        $scope.locations = response.data.location;
-        $scope.themes = response.data.theme;
-        $scope.countries = response.data.countries;
-        $scope.regions = response.data.regions;
-        $scope.search = response.data.filter.search;
-
-        $scope.city = response.data.filter.location;
-        $scope.theme = response.data.filter.theme;
-        $scope.filterName = response.data.filter.name;
-        $scope.country = response.data.filter.aCountry.toString();
-        $scope.region = response.data.filter.aRegion.toString();
+            $scope.city = response.data.filter.location;
+            $scope.theme = response.data.filter.theme;
+            $scope.filterName = response.data.filter.name;
+            $scope.country = (response.data.filter.aCountry) ? response.data.filter.aCountry.toString() : response.data.filter.aCountry;
+            $scope.region = (response.data.filter.aRegion) ? response.data.filter.aRegion.toString() : response.data.filter.aRegion;
 
 
 
-        console.log($scope.city)
+            console.log('Posts request')
 
-        $scope.setPage(0);
-    });
+            $scope.setPage(0);
+        });
 
         $scope.getContact = function(id){
             var data = $.param({'id' : id});
@@ -577,7 +596,21 @@ angular.module('cubeWebApp')
             };
 
             $http.post('/potential/get-post', data, config).then(function success(response) {
-                $location.path('/potential/detail/'+id);
+                //$location.path('/potential/detail/'+id);
+                $scope.setPage($scope.currentPage);
+            });
+        };
+        $scope.dropContact = function(id){
+            var data = $.param({'id' : id});
+            var config = {
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+
+            $http.post('/potential/drop-post', data, config).then(function success(response) {
+                //$location.path('/potential/detail/'+id);
+                $scope.setPage($scope.currentPage);
             });
         };
 
@@ -609,7 +642,7 @@ angular.module('cubeWebApp')
 
             if(
                 $scope.search.length==0 &&
-                $scope.location === undefined &&
+                $scope.city === undefined &&
                 $scope.theme === undefined &&
                 $scope.region === undefined &&
                 $scope.country === undefined
@@ -649,6 +682,17 @@ angular.module('cubeWebApp')
                 }
             });
         };
+        $scope.dropFilter = function(){
+            var config = {
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+
+            $http.post('/potential/drop-filter', $.param({id: id}), config).then(function success(response) {
+                $location.path('/potential');
+            });
+        };
         $scope.disabledNext = function() {
             if($scope.currentPage >= $scope.numberOfPages() - 1){
                 return false;
@@ -681,8 +725,11 @@ angular.module('cubeWebApp')
                 $scope.currentPage = n;
             });
         };
-        $scope.setPage($scope.currentPage);
+
+        //$scope.setPage($scope.currentPage);
         $scope.Timer = $interval(function () {
+            console.log('Refresh request')
+
             $scope.setPage($scope.currentPage)
         }, 10000);
 
@@ -775,6 +822,19 @@ angular.module('cubeWebApp')
                 $location.path('/potential/detail/'+id);
             });
         };
+        $scope.dropContact = function(id){
+            var data = $.param({'id' : id});
+            var config = {
+                headers : {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+                }
+            };
+
+            $http.post('/potential/drop-post', data, config).then(function success(response) {
+                //$location.path('/potential/detail/'+id);
+                $scope.setPage($scope.currentPage);
+            });
+        };
 
         $scope.getList = function(){
 
@@ -859,6 +919,7 @@ angular.module('cubeWebApp')
                 }
             });
         };
+
         $scope.disabledNext = function() {
             if($scope.currentPage >= $scope.numberOfPages() - 1){
                 return false;

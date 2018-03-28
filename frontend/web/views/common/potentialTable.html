@@ -53,14 +53,14 @@
                         <div class="col-md-3">
                             <div class="row">
                                 <div class="col-md-9 col-md-offset-3 getBtn">
-                                    <a href="{{(owned.indexOf( webhook.id.toString() ) != -1) ? '#/potential/detail/' + webhook.id : ''}}" ng-show="(owned.indexOf( webhook.id.toString() ) != -1)" class="btn btn-warning col-lg-12" >
-                                        Избранный контакт
-                                    </a>
-                                    <a ng-click="getContact(webhook.id)" class="btn btn-success col-lg-12" ng-show="(owned.indexOf( webhook.id.toString() ) === -1)">
-                                        Добавить в избранное
-                                    </a>
-                                    <a class="btn btn-success col-lg-12" target="_blank" style="margin-top:10px;" href="{{webhook.post_url}}">
+                                    <a class="btn btn-success col-lg-12" target="_blank" style="margin-bottom:10px;" href="{{webhook.post_url}}">
                                         Перейти к обсуждению
+                                    </a>
+                                    <a ng-click="dropContact(webhook.id)" class="btn btn-default col-lg-12" ng-show="webhook.favorite" >
+                                        Удалить из избранного
+                                    </a>
+                                    <a ng-click="getContact(webhook.id)" class="btn btn-primary col-lg-12" ng-show="!webhook.favorite">
+                                        Добавить в избранное
                                     </a>
                                 </div>
                             </div>

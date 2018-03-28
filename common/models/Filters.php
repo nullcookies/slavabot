@@ -268,6 +268,13 @@ class Filters extends \yii\db\ActiveRecord
 
     }
 
+    public static function DropFilter ($id)
+    {
+        $model = self::findOne(['id' => $id]);
+
+        return $model->delete();
+    }
+
     /**
      * Обновляем существующий фильтр
      */

@@ -17,6 +17,7 @@ use common\models\ACountry;
 use common\models\ARegion;
 use common\models\Reports;
 use common\models\Webhooks;
+use frontend\controllers\bot\libs\Logger;
 use trntv\bus\interfaces\SelfHandlingCommand;
 use yii\base\Object as BaseObject;
 
@@ -49,6 +50,10 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
             $command->period,
             $command->wsdl
         );
+
+//        Logger::report('Start:', [
+//            'Period' => $command->period
+//        ]);
 
         return $response;
     }
@@ -96,16 +101,20 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
 
     public function getReport($id, $period, $wsdl){
 
-        $finish = Carbon::now()->setTimezone('Europe/London');
+        $finish = Carbon::now()->setTimezone('UTC');
 
-        $start = Carbon::now()->setTimezone('Europe/London')->subMinutes($period);
+        $start = Carbon::now()->setTimezone('UTC')->subMinutes($period);
 
         $xmlString = $this->makeXML($id, $this->timeConvert($start), $this->timeConvert($finish));
 
         $header = $this->makeHeaders($xmlString);
 
         $response = $this->sendRequest($wsdl,$xmlString, $header);
-
+//        Logger::report('Start:', [
+//            'Start' => $start,
+//            'Finish' => $finish,
+//            'CarbonNow' => Carbon::now()->setTimezone('UTC')
+//        ]);
         /**
          * Раскомментить для отладки. Отразит исходные данные (или ошибку)
          */

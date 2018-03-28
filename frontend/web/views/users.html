@@ -12,21 +12,21 @@
 							</div>
 
 							<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
-								<select class="form-control" ng-model="country" ng-change="changeFilter()">
+								<select class="form-control" ng-model="country" ng-change="changeFilter('country')">
 									<option value="" selected>{{countryPlaceholder}}</option>
 									<option value="{{country.id}}"  ng-show="country.aid!=0" ng-repeat="country in countries">{{country.aName}}</option>
 								</select>
 							</div>
 
 							<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
-								<select class="form-control" ng-model="region" ng-change="changeFilter()">
+								<select class="form-control" ng-model="region" ng-change="changeFilter('region')">
 									<option value="" selected>{{regionPlaceholder}}</option>
 									<option ng-show="(country===region.aCountry || !country) && region.aid!=0" value="{{region.id}}"  ng-repeat="region in regions">{{region.aName}} {{region.aType}}</option>
 								</select>
 							</div>
 
 							<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
-								<select class="form-control" ng-model="city" ng-change="changeFilter()">
+								<select class="form-control" ng-model="city" ng-change="changeFilter('city')">
 									<option value="" selected>{{cityPlaceholder}}</option>
 									<option ng-show="(region===location.aRegion || !region && country===location.aCountry || !country) && location.aid!=0" value="{{location.id}}"  ng-repeat="location in locations">{{location.aName}}</option>
 								</select>

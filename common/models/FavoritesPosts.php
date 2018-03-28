@@ -55,6 +55,18 @@ class FavoritesPosts extends \yii\db\ActiveRecord
         return $favorite->save();
     }
 
+    public static function DropPost($id)
+    {
+        $favorite = self::findOne(
+            [
+                'post_id' => $id,
+                'user_id' => Yii::$app->user->id
+            ]
+        );
+
+        return $favorite->delete();
+    }
+
     public static function GetPostTLG($id, $tid, $return_message=false)
     {
         $favorite = new self();

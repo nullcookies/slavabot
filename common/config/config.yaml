@@ -59,6 +59,6 @@ postsNotifications:
 #  Конфиг для выгрузки постов
 ReportsConfig:
   # Интервал от времени запуска в минутах
-  period: 60
+  period: 15
   # Адрес для получения выгрузки
   wsdl: 'http://sm.mlg.ru/services/CubusService.svc?wsdl'
