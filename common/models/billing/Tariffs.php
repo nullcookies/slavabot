@@ -3,6 +3,8 @@
 namespace common\models\billing;
 
 use Yii;
+use yii\helpers\Json;
+use common\models\User;
 
 /**
  * This is the model class for table "slava_tariffs".
@@ -79,5 +81,48 @@ class Tariffs extends \yii\db\ActiveRecord
             'color' => 'Фон',
             'sort' => 'Сортировка',
         ];
+    }
+
+
+    public function fields(){
+        return [
+            'id',
+            'title',
+            'description',
+            'cost',
+            'constraints' => function(){
+                return Json::decode($this->constraints);
+            },
+            'current' => function(){
+                return User::currentTariff()->tariffValue->id == $this->id;
+            },
+            'active' => function(){
+                return User::currentTariff();
+            },
+            'expire' => function(){
+                if(User::currentTariff()->tariffValue->id == $this->id){
+                    return User::expireToString();
+                }else{
+                    return false;
+                }
+            },
+            'color'
+        ];
+    }
+
+    static function getList()
+    {
+        return self::find()
+            ->where(['active' => 1, 'displayed' => 1])
+            ->orderBy(['sort' => 'ACS'])
+            ->all();
+    }
+
+    static function getTariffByID($id)
+    {
+        return self::find()
+            ->where(['active' => 1])
+            ->andWhere(['id'=>$id])
+            ->one();
     }
 }
