@@ -74,13 +74,21 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
         foreach($ids as $id){
 
             $response = $this->getReport($id, $period, $wsdl);
-
+            Logger::report('Data:', [
+                'theme' => $id,
+                'response' => $response
+            ]);
             if(is_array($response)){
-                foreach($response as $post){
+                foreach($response as $main => $post){
+                    if(!is_array($post)){
+                        $data = $this->convertPost($post, $id);
+                    }else{
+                        $data = $this->convertPost($main, $id);
+                    }
 
-                    $data = $this->convertPost($post, $id);
 
                     if(is_array($data)){
+
                         $res[] = Webhooks::savePost($data);
                     }
                 }
@@ -101,9 +109,9 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
 
     public function getReport($id, $period, $wsdl){
 
-        $finish = Carbon::now()->setTimezone('UTC');
+        $finish = Carbon::now()->setTimezone('UTC')->subMinutes(60);
 
-        $start = Carbon::now()->setTimezone('UTC')->subMinutes($period);
+        $start = Carbon::now()->setTimezone('UTC')->subMinutes(60 + $period);
 
         $xmlString = $this->makeXML($id, $this->timeConvert($start), $this->timeConvert($finish));
 
@@ -111,9 +119,10 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
 
         $response = $this->sendRequest($wsdl,$xmlString, $header);
         Logger::report('Start:', [
-            'Start' => $start,
-            'Finish' => $finish,
-            'CarbonNow' => Carbon::now()->setTimezone('UTC')
+            'Start' => $this->timeConvert($start),
+            'Finish' => $this->timeConvert($finish),
+            'Report' => $id,
+            'CarbonNow' => Carbon::now()->setTimezone('Europe/Moscow')
         ]);
         /**
          * Раскомментить для отладки. Отразит исходные данные (или ошибку)
@@ -146,7 +155,7 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
      * @return string
      */
     public function makeXML($reposrt_id, $start, $finish){
-         return "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\" xmlns:mlg=\"http://schemas.datacontract.org/2004/07/MlgBuzz.Web.Services\">
+        $xml = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\" xmlns:mlg=\"http://schemas.datacontract.org/2004/07/MlgBuzz.Web.Services\">
                        <soapenv:Header/>
                        <soapenv:Body>
                           <tem:GetPosts>
@@ -170,6 +179,11 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
                           </tem:GetPosts>
                        </soapenv:Body>
                     </soapenv:Envelope>";
+
+//                Logger::report('Try to get data:', [
+//            'xml' => $xml
+//        ]);
+         return $xml;
     }
 
     /**
@@ -232,48 +246,63 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
 
     public function convertPost ($post, $theme){
         if(isset($post['aPostId'])){
-            $aCountry = ACountry::getCountry(
-                $post['aCountry']
-            );
+            try{
+                $aCountry = ACountry::getCountry(
+                    $post['aCountry']
+                );
 
-            $aRegion = ARegion::getRegion(
-                $post['aRegion'],
-                $aCountry
-            );
+                $aRegion = ARegion::getRegion(
+                    $post['aRegion'],
+                    $aCountry
+                );
 
-            $aCity = ACity::getCity(
-                $post['aCity'],
-                $aCountry,
-                $aRegion
-            );
+                $aCity = ACity::getCity(
+                    $post['aCity'],
+                    $aCountry,
+                    $aRegion
+                );
 
-            return [
-                'post_id' => $post['aPostId'],
+                return [
+                    'post_id' => $post['aPostId'],
 
-                'category' => (int)$theme,
+                    'category' => (int)$theme,
 
-                'aCity' => $aCity,
-                'aCountry' => $aCountry,
-                'aRegion' => $aRegion,
+                    'aCity' => $aCity,
+                    'aCountry' => $aCountry,
+                    'aRegion' => $aRegion,
 
-                'post_url' => $post['aUrl'],
-                'author_image_url' => $post['aAuthorImageUrl'],
-                'author_url' => $post['aAuthorUrl'],
-                'post_content' => $post['aContent'],
-                'author_name' => $post['aAuthorName'],
+                    'post_url' => $post['aUrl'],
+                    'author_image_url' => $post['aAuthorImageUrl'],
+                    'author_url' => $post['aAuthorUrl'],
+                    'post_content' => $post['aContent'],
+                    'author_name' => $post['aAuthorName'],
 
-                'blog' => ABlog::getBlog(
-                                $post['aBlogHost'],
-                                $post['aBlogHostId'],
-                                $post['aBlogHostType']
-                            ),
+                    'blog' => ABlog::getBlog(
+                        $post['aBlogHost'],
+                        $post['aBlogHostId'],
+                        $post['aBlogHostType']
+                    ),
 
-                'type'=> (int)$post['aMessageType'],
+                    'type'=> (int)$post['aMessageType'],
 
-                'published_at' => $this->setTime(
-                                    $post['aPublishDate']
-                                )
-            ];
+                    'published_at' => $this->setTime(
+                        $post['aPublishDate']
+                    )
+                ];
+            }catch (\Exception $e) {
+                Logger::report('Error:', [
+                    $post['aPostId'] => $e->getMessage()
+                ]);
+                return false;
+            }
+
+
+
+        }else{
+            Logger::report('Error:', [
+                'type' => 'no post id'
+            ]);
+            return false;
         }
 
     }
@@ -286,7 +315,7 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
     public function setTime($time){
 
         $time = Carbon::parse($time)
-            ->setTimezone('Europe/London')
+            ->setTimezone('UTC')
             ->getTimestamp();
 
         return $time;
