@@ -78,14 +78,18 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
                 'theme' => $id,
                 'response' => $response
             ]);
-            if(is_array($response)){
-                foreach($response as $main => $post){
-                    if(!is_array($post)){
-                        $data = $this->convertPost($post, $id);
-                    }else{
-                        $data = $this->convertPost($main, $id);
-                    }
 
+            if(isset($response['aPostId'])){
+                $data = $this->convertPost($response, $id);
+
+                if(is_array($data)){
+
+                    $res[] = Webhooks::savePost($data);
+                }
+
+            }else if(is_array($response) && !isset($response['aPostId'])){
+                foreach($response as $post){
+                    $data = $this->convertPost($post, $id);
 
                     if(is_array($data)){
 
@@ -300,7 +304,7 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
 
         }else{
             Logger::report('Error:', [
-                'type' => 'no post id'
+                'data' => $post
             ]);
             return false;
         }
