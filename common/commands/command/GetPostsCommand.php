@@ -113,9 +113,9 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
 
     public function getReport($id, $period, $wsdl){
 
-        $finish = Carbon::now()->setTimezone('UTC')->subMinutes(60);
+        $finish = Carbon::now()->setTimezone('UTC')->subMinutes(80);
 
-        $start = Carbon::now()->setTimezone('UTC')->subMinutes(60 + $period);
+        $start = Carbon::now()->setTimezone('UTC')->subMinutes(80 + $period);
 
         $xmlString = $this->makeXML($id, $this->timeConvert($start), $this->timeConvert($finish));
 
