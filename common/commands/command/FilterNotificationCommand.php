@@ -10,6 +10,7 @@
  */
 
 namespace common\commands\command;
+use Carbon\Carbon;
 use common\models\Filters;
 use common\models\User;
 use frontend\controllers\bot\commands\PostNotificationCommand;
@@ -38,19 +39,21 @@ class FilterNotificationCommand extends BaseObject implements SelfHandlingComman
     {
         $item = $command->item;
         $filters = Filters::checkFilters($item);
-
         if($filters){
             foreach($filters as $filter){
 
-//                \Yii::$app->commandBus->handle(
-//                    new SendTelegramNotificationCommand(
-//                        [
-//                            'tid' => User::getTID($filter['user_id']),
-//                            'text' => "Новый пост по фильтру \"".$filter['name']."\":\n\n".strip_tags($item['post_content'])
-//                        ]
-//                    )
-//                );
+                try{
+                    $time = Carbon::createFromTimestamp($item->published_at, User::getTZ($filter['user_id']))->format('H:i');
 
+                }catch (\Exception $e) {
+                    $time=  $e->getMessage();
+                }
+
+                try{
+                    $str = "Новый пост по фильтру \"".$filter['name']."\":\n\n" . $item->author_name . ', ' . $item->dataBlog->aBlogHost . ', ' . $time . "\n\n" . strip_tags($item['post_content']);
+                }catch (\Exception $e) {
+                    $str =  $e->getMessage();
+                }
                 try {
                     $this->GetCommand();
 
@@ -58,7 +61,7 @@ class FilterNotificationCommand extends BaseObject implements SelfHandlingComman
 
                     $command->prepareParams([
                         'tid' => User::getTID($filter['user_id']),
-                        'message' => "Новый пост по фильтру \"".$filter['name']."\":\n\n".strip_tags($item['post_content']),
+                        'message' => $str,
                     ]);
 
                     $result = $command->execute($item['id'], $item['post_url']);

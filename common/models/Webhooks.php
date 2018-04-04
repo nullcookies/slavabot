@@ -299,12 +299,12 @@ class Webhooks extends \yii\db\ActiveRecord
 
 
                 $webhook->save(false);
-
+                
                 try{
                     \Yii::$app->commandBus->handle(
                         new FilterNotificationCommand(
                             [
-                                'item' => $webhook,
+                                'item' => $webhook
                             ]
                         )
                     );

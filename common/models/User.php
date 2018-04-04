@@ -152,6 +152,11 @@ class User extends ActiveRecord implements IdentityInterface
         return User::findOne(['id' => $id, 'status' => self::STATUS_ACTIVE])->telegram_id;
     }
 
+    public static function getTZ($id)
+    {
+        return User::findOne(['id' => $id, 'status' => self::STATUS_ACTIVE])->timezone;
+    }
+
     /**
      * Finds user by id
      *
