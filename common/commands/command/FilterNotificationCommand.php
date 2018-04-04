@@ -42,18 +42,18 @@ class FilterNotificationCommand extends BaseObject implements SelfHandlingComman
         if($filters){
             foreach($filters as $filter){
 
-                try{
+//                try{
                     $time = Carbon::createFromTimestamp($item->published_at, User::getTZ($filter['user_id']))->format('H:i');
 
-                }catch (\Exception $e) {
-                    $time=  $e->getMessage();
-                }
+//                }catch (\Exception $e) {
+//                    $time=  $e->getMessage();
+//                }
 
-                try{
+                //try{
                     $str = "Новый пост по фильтру \"".$filter['name']."\":\n\n" . $item->author_name . ', ' . $item->dataBlog->aBlogHost . ', ' . $time . "\n\n" . strip_tags($item['post_content']);
-                }catch (\Exception $e) {
-                    $str =  $e->getMessage();
-                }
+//                }catch (\Exception $e) {
+//                    $str =  $e->getMessage();
+//                }
                 try {
                     $this->GetCommand();
 
