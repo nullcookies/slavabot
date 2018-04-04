@@ -113,8 +113,10 @@ class Tariffs extends \yii\db\ActiveRecord
     static function getList()
     {
         return self::find()
-            ->where(['active' => 1, 'displayed' => 1])
-            ->orderBy(['sort' => 'ACS'])
+            ->where(['active' => 1])
+            ->andWhere(['displayed' => 1])
+            ->orderBy(['sort' => 'ASC'])
+            ->asArray()
             ->all();
     }
 
