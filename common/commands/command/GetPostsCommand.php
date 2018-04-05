@@ -113,17 +113,21 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
 
     public function getReport($id, $period, $wsdl){
 
-        $finish = Carbon::now()->setTimezone('UTC')->subMinutes(80);
+        //$finish = Carbon::now()->setTimezone('UTC')->subMinutes(80);
 
-        $start = Carbon::now()->setTimezone('UTC')->subMinutes(80 + $period);
+        //$start = Carbon::now()->setTimezone('UTC')->subMinutes(80 + $period);
 
-        $xmlString = $this->makeXML($id, $this->timeConvert($start), $this->timeConvert($finish));
+        //$xmlString = $this->makeXML($id, $this->timeConvert($start), $this->timeConvert($finish));
+
+        $finish = Carbon::now()->setTimezone('UTC')->subMinutes($period);
+
+        $xmlString = $this->makeTimestampXML($id,  $this->timeConvert($finish));
 
         $header = $this->makeHeaders($xmlString);
 
         $response = $this->sendRequest($wsdl,$xmlString, $header);
         Logger::report('Start:', [
-            'Start' => $this->timeConvert($start),
+            //'Start' => $this->timeConvert($start),
             'Finish' => $this->timeConvert($finish),
             'Report' => $id,
             'CarbonNow' => Carbon::now()->setTimezone('Europe/Moscow')
@@ -190,6 +194,37 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
          return $xml;
     }
 
+    public function makeTimestampXML($reposrt_id, $finish){
+
+        $xml = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\" xmlns:mlg=\"http://schemas.datacontract.org/2004/07/MlgBuzz.Web.Services\">
+                   <soapenv:Header/>
+                   <soapenv:Body>
+                      <tem:GetPostsFromTimestamp>
+                         <!--Optional:-->
+                         <tem:credentials>
+                            <!--Optional:-->
+                            <mlg:Login>leads.im</mlg:Login>
+                            <!--Optional:-->
+                            <mlg:Password>дуфвы1423</mlg:Password>
+                         </tem:credentials>
+                         <!--Optional:-->
+                         <tem:reportId>".$reposrt_id."</tem:reportId>
+                         <!--Optional:-->
+                         <tem:timestamp>".$finish."</tem:timestamp>
+                         <!--Optional:-->
+                         <tem:pageIndex>1</tem:pageIndex>
+                         <!--Optional:-->
+                         <tem:pageSize>100</tem:pageSize>
+                      </tem:GetPostsFromTimestamp>
+                   </soapenv:Body>
+                </soapenv:Envelope>";
+
+//                Logger::report('Try to get data:', [
+//            'xml' => $xml
+//        ]);
+        return $xml;
+    }
+
     /**
      * Заголовки запроса
      *
@@ -202,7 +237,7 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
             "Accept: text/xml",
             "Cache-Control: no-cache",
             "Pragma: no-cache",
-            "SOAPAction: \"http://tempuri.org/ICubusService/GetPosts\"",
+            "SOAPAction: \"http://tempuri.org/ICubusService/GetPostsFromTimestamp\"",
             "Content-length: ".strlen($xmlString),
             "Host: sm.mlg.ru"
         );
@@ -236,8 +271,8 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
         $xml = simplexml_load_string($xml);
         $json = json_encode($xml);
         $responseArray = json_decode($json,true);
-
-        return $responseArray['sBody']['GetPostsResponse']['GetPostsResult']['aPosts']['aCubusPost'];
+        //var_dump($responseArray['sBody']);
+        return $responseArray['sBody']['GetPostsFromTimestampResponse']['GetPostsFromTimestampResult']['aPosts']['aCubusPost'];
     }
 
     /**
@@ -324,4 +359,5 @@ class GetPostsCommand extends BaseObject implements SelfHandlingCommand
 
         return $time;
     }
+
 }
