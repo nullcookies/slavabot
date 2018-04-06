@@ -37,7 +37,7 @@ class SiteController extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['logout', 'index', 'ig-callback'],
+                        'actions' => ['signup', 'logout', 'index', 'ig-callback'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
