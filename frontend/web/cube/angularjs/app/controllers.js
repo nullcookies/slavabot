@@ -509,6 +509,7 @@ angular.module('cubeWebApp')
         $scope.city;
         $scope.country;
         $scope.region;
+        $scope.theme;
 
         $scope.sce = $sce;
 
@@ -579,10 +580,6 @@ angular.module('cubeWebApp')
             $scope.filterName = response.data.filter.name;
             $scope.country = (response.data.filter.aCountry) ? response.data.filter.aCountry.toString() : response.data.filter.aCountry;
             $scope.region = (response.data.filter.aRegion) ? response.data.filter.aRegion.toString() : response.data.filter.aRegion;
-
-
-
-            console.log('Posts request')
 
             $scope.setPage(0);
         });
