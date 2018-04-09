@@ -50,7 +50,7 @@ class TariffsController extends Controller
 
     public function actionIndex()
     {
-        return Tariffs::getList();
+        return Tariffs::getList(false);
     }
 
     public function actionGet(){

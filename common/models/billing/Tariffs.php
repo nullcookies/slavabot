@@ -29,7 +29,7 @@ class Tariffs extends \yii\db\ActiveRecord
         return 'slava_tariffs';
     }
 
-
+    public $current;
     /**
      * @inheritdoc
      */
@@ -46,7 +46,10 @@ class Tariffs extends \yii\db\ActiveRecord
     public function afterFind()
     {
         parent::afterFind();
+
         $this->constraints = json_decode($this->constraints, true);
+        $this->current = User::currentTariff()->tariffValue->id === $this->id;
+
     }
 
     /**
@@ -60,7 +63,7 @@ class Tariffs extends \yii\db\ActiveRecord
             [['title'], 'string', 'max' => 300],
             [['description'], 'string', 'max' => 5000],
             [['color'], 'string', 'max' => 255],
-            [['constraints'], 'default']
+            [['constraints'], 'default'],
         ];
     }
 
@@ -90,15 +93,13 @@ class Tariffs extends \yii\db\ActiveRecord
             'title',
             'description',
             'cost',
-            'constraints' => function(){
-                return Json::decode($this->constraints);
-            },
+            'constraints',
             'current' => function(){
-                return User::currentTariff()->tariffValue->id == $this->id;
+                return $this->current;
             },
-            'active' => function(){
-                return User::currentTariff();
-            },
+//            'active' => function(){
+//                return User::currentTariff();
+//            },
             'expire' => function(){
                 if(User::currentTariff()->tariffValue->id == $this->id){
                     return User::expireToString();
@@ -110,14 +111,18 @@ class Tariffs extends \yii\db\ActiveRecord
         ];
     }
 
-    static function getList()
+    static function getList($asArray = true)
     {
-        return self::find()
+        $model = self::find()
             ->where(['active' => 1])
             ->andWhere(['displayed' => 1])
-            ->orderBy(['sort' => 'ASC'])
-            ->asArray()
-            ->all();
+            ->orderBy(['sort' => 'ASC']);
+
+        if($asArray){
+            $model->asArray();
+        }
+
+        return $model->all();
     }
 
     static function getTariffByID($id)

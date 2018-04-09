@@ -4,6 +4,7 @@ namespace frontend\controllers;
 use common\commands\command\FilterNotificationCommand;
 use common\commands\command\GetPostsCommand;
 use common\commands\command\SendTelegramNotificationCommand;
+use common\models\billing\Tariffs;
 use common\models\Filters;
 use common\models\User;
 use common\models\Webhooks;
@@ -58,17 +59,9 @@ class DevController extends Controller
 
     public function actionIndex(){
 
-        $item = Webhooks::findOne(['id' => 742]);
-
-        $result = \Yii::$app->commandBus->handle(
-            new FilterNotificationCommand(
-                [
-                    'item' => $item,
-                ]
-            )
+        return (
+            Tariffs::getList(false)
         );
-
-        return json_encode($result);
 
 
     }
