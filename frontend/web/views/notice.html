@@ -23,7 +23,8 @@
                             <div ng-repeat="notification in userNotifications" class="story">
                                 <div class="story-user">
                                     <a href="#" style="display:block; width:75px; height:75px; overflow:hidden; border-radius:50%;">
-                                        <img src="{{notification.peer.avatar}}" style="width:100%; border-radius:0%; height:auto;" alt="">
+                                        <img ng-show="notification.peer.avatar" src="{{notification.peer.avatar}}" style="width:100%; border-radius:0%; height:auto;" alt="">
+                                        <img ng-show="!notification.peer.avatar" src="https://vk.com/images/camera_100.png" alt="">
                                     </a>
                                 </div>
 

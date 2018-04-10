@@ -3,6 +3,7 @@
 namespace common\models;
 use common\models\SocialDialoguesSimple;
 use common\models\User;
+use frontend\controllers\bot\libs\Logger;
 use yii\db\ActiveRecord;
 use Carbon\Carbon;
 use Yii;
@@ -87,7 +88,7 @@ class SocialDialoguesPeer extends ActiveRecord
             [['peer_id', 'psid'], 'integer'],
             [['created_at'], 'safe'],
             [['social'], 'string', 'max' => 2],
-            [['type', 'title', 'avatar'], 'string', 'max' => 255],
+            [['type', 'title'], 'string', 'max' => 255],
         ];
     }
 
@@ -119,7 +120,9 @@ class SocialDialoguesPeer extends ActiveRecord
             $model->type = $type;
             $model->peer_id = $peerId;
         }
-
+        Logger::peer(json_encode([
+            'save peer' => $peerId
+        ]));
         $peer = $model->getVkPeer($peerId, $group_access_token, $access_token);
         $model->title = $peer['title'];
         $model->avatar = $peer['avatar'];
@@ -133,6 +136,7 @@ class SocialDialoguesPeer extends ActiveRecord
 
     public static function getVkPeerType($peerId)
     {
+        Logger::peer($peerId);
         if($peerId < 0) {
             //от группы
             $type = static::TYPE_GROUP;
@@ -155,6 +159,10 @@ class SocialDialoguesPeer extends ActiveRecord
             'access_token' => $group_access_token
         ]);
 
+        Logger::peer(json_encode([
+            'get peer' => $peerId
+        ]));
+
         if($peerId < 0) {
             //от группы
             $group = $vk->api('groups.getById', [
@@ -176,8 +184,11 @@ class SocialDialoguesPeer extends ActiveRecord
                 'lang' => 0
             ]);
 
-            $name = $chat[0]['title'];
-            $avatar = $chat[0]['photo_100'];
+                Logger::peer(json_encode([
+                    'chat' => $chat
+                ]));
+            $name = $chat['title'];
+            $avatar = $chat['photo_100'];
         } else {
             //от пользователя
             $user = $vk->api('users.get', [
