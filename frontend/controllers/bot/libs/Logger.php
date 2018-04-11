@@ -41,4 +41,10 @@ class Logger
         $logger->addRecord(\Monolog\Logger::INFO, $message, $context);
     }
 
+    public static function payment($message, $context = [], $filename = '')
+    {
+        $logger = self::logger('Payment');
+        $logger->addRecord(\Monolog\Logger::INFO, $message, $context);
+    }
+
 }

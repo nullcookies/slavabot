@@ -33,6 +33,7 @@ return [
                     'facebook-webhooks',
                     'check',
                     'aviso',
+                    'fail',
                     'success',
                     'fail',
                     'fb-webhook'
@@ -66,7 +67,7 @@ return [
         ],
         'yakassa' => [
             'class' => 'kroshilin\yakassa\YaKassa',
-            'shopPassword' => 'password',
+            'shopPassword' => 'effect',
             'securityType' => 'MD5',
             'shopId' => '180533',
             'scId' => '561226',
@@ -74,6 +75,15 @@ return [
             //'paymentAction' => 'https://demomoney.yandex.ru/eshop.xml',
 
         ],
+//        yakassa' => [
+    //		'class' => 'kroshilin\yakassa\YaKassa',
+    //		'paymentAction' => YII_DEBUG ? 'https://demomoney.yandex.ru/eshop.xml' : 'https://money.yandex.ru/eshop.xml',
+    //		'shopPassword' => 'password',
+    //		'securityType' => 'MD5',
+    //		'shopId' => '12345',
+    //		'scId' => '123',
+    //		'currency' => '10643'
+//	]
         'request' => [
             'baseUrl' => '/',
             'csrfParam' => '_csrf-frontend',

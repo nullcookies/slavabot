@@ -97,9 +97,9 @@ class Tariffs extends \yii\db\ActiveRecord
             'current' => function(){
                 return $this->current;
             },
-//            'active' => function(){
-//                return User::currentTariff();
-//            },
+            'period' => function(){
+                return User::currentTariff()->tariffValue->id == $this->id && (bool)User::currentTariff()->tariffValue->active;
+            },
             'expire' => function(){
                 if(User::currentTariff()->tariffValue->id == $this->id){
                     return User::expireToString();
