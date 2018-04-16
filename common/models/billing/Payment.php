@@ -112,6 +112,12 @@ class Payment extends ActiveRecord
         }
     }
 
+    public function setActivePayment()
+    {
+        $this->active = 1;
+        $this->save();
+    }
+
     public static function getOrderByID($id){
         return self::find()
             ->andWhere(['id'=>$id])

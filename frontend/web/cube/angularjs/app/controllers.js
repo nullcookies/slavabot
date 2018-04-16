@@ -1831,7 +1831,7 @@ angular.module('cubeWebApp')
         $scope.getTariffs();
 
     })
-    .controller('paymentCtrl', function($scope, $http, $sce, $routeParams){
+    .controller('paymentCtrl', function($scope, $http, $sce, $routeParams, $location){
         $scope.tariff = [];
         $scope.pay = false;
         $scope.payMarkUp = '';
@@ -1875,8 +1875,7 @@ angular.module('cubeWebApp')
                     ),
                     config
                 ).then(function success(response) {
-                    $scope.pay = true;
-                    $scope.payMarkUp = response.data;
+                    window.location.href = response.data.redirectUrl;
                 });
             });
         };

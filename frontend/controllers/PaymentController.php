@@ -8,14 +8,13 @@
  */
 
 namespace frontend\controllers;
-
-use kroshilin\yakassa\widgets\Payment;
+use common\models\billing\Payment;
+use YandexCheckout\Request\Payments\Payment\CreateCaptureResponse;
 use Yii;
-use yii\base\InvalidParamException;
-use yii\web\BadRequestHttpException;
-use yii\web\Controller;
 use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
+use yii\helpers\Json;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 
@@ -32,48 +31,61 @@ class PaymentController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'index' => ['post'],
-                    'check' => ['post'],
-                    'aviso' => ['post'],
+                    'info' => ['post'],
                 ],
-            ]
+            ],
+            [
+                'class' => \yii\filters\ContentNegotiator::className(),
+                'only' => ['index','info'],
+                'formats' => [
+                    'application/json' => Response::FORMAT_JSON,
+                ],
+            ],
         ];
     }
 
-    public function actionIndex(){
-        return  Payment::widget([
-            'order' => \common\models\billing\Payment::getOrderByID(
-                Yii::$app->request->post('order')
-            ),
-            'userIdentity' => Yii::$app->user->identity,
-            'data' => ['customParam' => 'value'],
-            'paymentType' => ['AC' => 'С банковской карты']
-        ]);
-
-    }
-
-    public function actions()
+    public function beforeAction($action)
     {
+        if (in_array($action->id, ['info'])) {
+            $this->enableCsrfValidation = false;
+        }
+
+        return parent::beforeAction($action);
+    }
+
+    /**
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionIndex()
+    {
+        $orderId = Yii::$app->request->post('order');
+        $order = Payment::findOne($orderId);
+        if (!$order) {
+            throw new NotFoundHttpException();
+        }
+        $payment = Yii::$app->yakassa->createPayment($order->getTotalPrice(), $order->getId());
         return [
-            'check' => [
-                'class' => 'kroshilin\yakassa\actions\CheckOrderAction',
-                'beforeResponse' => function ($request) {
-                    /**
-                     * @var \yii\web\Request $request
-                     */
-                    $invoice_id = (int) $request->post('orderNumber');
-                    Yii::warning("Кто-то хотел купить несуществующую подписку! InvoiceId: {$invoice_id}", Yii::$app->yakassa->logCategory);
-                    return false;
-                }
-            ],
-            'aviso' => [
-                'class' => 'kroshilin\yakassa\actions\PaymentAvisoAction',
-                'beforeResponse' => function ($request) {
-                    /**
-                     * @var \yii\web\Request $request
-                     */
-                }
-            ],
+            'redirectUrl' => $payment->getConfirmationUrl()
         ];
+    }
+
+    public function actionSuccess()
+    {
+
+    }
+
+    public function actionInfo()
+    {
+        $request = Yii::$app->request->getRawBody();
+        $info = Json::decode($request, false);
+        $orderId = $info->object->metadata->orderId;
+        /** @var CreateCaptureResponse $capture */
+        $capture = Yii::$app->yakassa->capturePayment($info);
+        if ($capture->getStatus() === 'succeeded') {
+            $order = Payment::findOne($orderId);
+            $order->setActivePayment();
+        }
     }
 
 }
