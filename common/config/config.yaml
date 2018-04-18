@@ -62,3 +62,5 @@ ReportsConfig:
   period: 20
   # Адрес для получения выгрузки
   wsdl: 'http://sm.mlg.ru/services/CubusService.svc?wsdl'
+
+PostsClearPeriod: 14

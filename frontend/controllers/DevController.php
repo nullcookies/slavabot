@@ -3,7 +3,7 @@ namespace frontend\controllers;
 
 use common\commands\command\FilterNotificationCommand;
 use common\commands\command\GetPostsCommand;
-use common\commands\command\SendTelegramNotificationCommand;
+use common\commands\command\ClearPostsCommand;
 use common\models\Filters;
 use common\models\User;
 use common\models\Webhooks;
@@ -58,17 +58,16 @@ class DevController extends Controller
 
     public function actionIndex(){
 
-        $item = Webhooks::findOne(['id' => 742]);
 
         $result = \Yii::$app->commandBus->handle(
-            new FilterNotificationCommand(
+            new ClearPostsCommand(
                 [
-                    'item' => $item,
+                    'period' => 28,
                 ]
             )
         );
 
-        return json_encode($result);
+        return $result;
 
 
     }

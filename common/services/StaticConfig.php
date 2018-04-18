@@ -72,4 +72,7 @@ class StaticConfig
         return self::config('ReportsConfig');
     }
 
+    public static function clearPostsPeriod(){
+        return self::config('PostsClearPeriod');
+    }
 }

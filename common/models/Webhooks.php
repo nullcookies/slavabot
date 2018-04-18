@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\commands\command\FilterNotificationCommand;
+use common\commands\command\ClearPostsCommand;
 use Yii;
 use yii\base\Exception;
 use yii\db\Expression;
@@ -433,6 +434,19 @@ class Webhooks extends \yii\db\ActiveRecord
         return array(
             'webhooks'  =>  $webhooks
         );
+    }
+
+    public static function removeOldPosts($period){
+
+        $result = \Yii::$app->commandBus->handle(
+            new ClearPostsCommand(
+                [
+                    'period' => $period,
+                ]
+            )
+        );
+
+        return $result;
     }
 
 }
