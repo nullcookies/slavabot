@@ -47,4 +47,10 @@ class Logger
         $logger->addRecord(\Monolog\Logger::INFO, $message, $context);
     }
 
+    public static function peer($message, $context = [], $filename = '')
+    {
+        $logger = self::logger('peer');
+        $logger->addRecord(\Monolog\Logger::INFO, $message, $context);
+    }
+
 }

@@ -113,8 +113,19 @@ class Filters extends \yii\db\ActiveRecord
             ->asArray()
             ->all();
 
-        if($model){
-            return $model;
+        $search_filter = array_filter($model,
+            function($val) use ($item) {
+                if(
+                    stripos($item->post_content, $val['search']) ||
+                    $val['search']==null ||
+                    $val['search']=='') {
+
+                    return true;
+                }
+            });
+
+        if($search_filter){
+            return $search_filter;
         }else{
             return false;
         }

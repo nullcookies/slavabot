@@ -32,8 +32,8 @@
         "nickcv/yii2-encrypter": "*",
         "longman/telegram-bot": "^0.51.0",
         "kicken/gearman-php": "^1.3",
-        "kroshilin/yii2-yandex-kassa": "*",
-        "php-ffmpeg/php-ffmpeg": "0.11.0"
+        "php-ffmpeg/php-ffmpeg": "0.11.0",
+        "yandex-money/yandex-checkout-sdk-php": "^1.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

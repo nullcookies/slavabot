@@ -11,12 +11,13 @@ namespace frontend\controllers;
 
 use frontend\controllers\bot\libs\Logger;
 use kroshilin\yakassa\widgets\Payment;
+use common\models\billing\Payment;
+use YandexCheckout\Request\Payments\Payment\CreateCaptureResponse;
 use Yii;
-use yii\base\InvalidParamException;
-use yii\web\BadRequestHttpException;
-use yii\web\Controller;
 use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
+use yii\helpers\Json;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 
@@ -29,92 +30,65 @@ class PaymentController extends Controller
     public function behaviors()
     {
         return [
-//                'access' => [
-//                'class' => AccessControl::className(),
-//                'rules' => [
-//                        [
-//                            'actions' => ['index', 'fail'],
-//                            'allow' => true,
-//                            'roles' => ['?'],
-//                        ],
-//                    ],
-//                ],
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'index' => ['post'],
-                        'check' => ['post'],
-                        'aviso' => ['post'],
-                    ],
-                ]
-            ];
-    }
-
-    public function actionIndex(){
-        Logger::payment('Index: ' . json_encode(Yii::$app->request->post()));
-
-        return  Payment::widget([
-            'order' => \common\models\billing\Payment::getOrderByID(
-                Yii::$app->request->post('order')
-            ),
-            'userIdentity' => Yii::$app->user->identity,
-            'data' => ['customParam' => 'value'],
-            'paymentType' => ['AC' => 'С банковской карты']
-        ]);
-
-    }
-
-    public function actionFail(){
-        Logger::payment('Index: ' . json_encode(Yii::$app->request->get()));
-        var_dump(Yii::$app->request->get());
-//        return  Payment::widget([
-//            'order' => \common\models\billing\Payment::getOrderByID(
-//                Yii::$app->request->post('order')
-//            ),
-//            'userIdentity' => Yii::$app->user->identity,
-//            'data' => ['customParam' => 'value'],
-//            'paymentType' => ['AC' => 'С банковской карты']
-//        ]);
-
-    }
-
-
-
-    public function actions()
-    {
-        return [
-            'check' => [
-                'class' => 'kroshilin\yakassa\actions\CheckOrderAction',
-                'beforeResponse' => function ($request) {
-                    /**
-                     * @var \yii\web\Request $request
-                     */
-
-                    Logger::payment('check: ' . json_encode($request));
-
-                    $invoice_id = (int) $request->post('orderNumber');
-                    Yii::warning("Кто-то хотел купить несуществующую подписку! InvoiceId: {$invoice_id}", \Yii::$app->yakassa->logCategory);
-                    return false;
-                }
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'index' => ['post'],
+                    'info' => ['post'],
+                ],
             ],
-            'aviso' => [
-                'class' => 'kroshilin\yakassa\actions\PaymentAvisoAction',
-                'beforeResponse' => function ($request) {
-                    Logger::payment('aviso: ' . json_encode($request));
-
-                    /**
-                     * @var \yii\web\Request $request
-                     */
-                }
+            [
+                'class' => \yii\filters\ContentNegotiator::className(),
+                'only' => ['index','info'],
+                'formats' => [
+                    'application/json' => Response::FORMAT_JSON,
+                ],
             ],
-//            'fail' => [
-//                'class' => 'frontend\controllers\PaymentController',
-//                'beforeResponse' => function ($request) {
-//                    Logger::payment('Fail: ' . json_encode($request));
-//
-//                }
-//            ]
         ];
+    }
+
+    public function beforeAction($action)
+    {
+        if (in_array($action->id, ['info'])) {
+            $this->enableCsrfValidation = false;
+        }
+
+        return parent::beforeAction($action);
+    }
+
+    /**
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionIndex()
+    {
+        $orderId = Yii::$app->request->post('order');
+        $order = Payment::findOne($orderId);
+        if (!$order) {
+            throw new NotFoundHttpException();
+        }
+        $payment = Yii::$app->yakassa->createPayment($order->getTotalPrice(), $order->getId());
+        return [
+            'redirectUrl' => $payment->getConfirmationUrl()
+        ];
+    }
+
+    public function actionSuccess()
+    {
+
+    }
+
+    public function actionInfo()
+    {
+        $request = Yii::$app->request->getRawBody();
+        $info = Json::decode($request, false);
+        $orderId = $info->object->metadata->orderId;
+        /** @var CreateCaptureResponse $capture */
+        $capture = Yii::$app->yakassa->capturePayment($info);
+        if ($capture->getStatus() === 'succeeded') {
+            $order = Payment::findOne($orderId);
+            $order->setActivePayment();
+        }
     }
 
 }

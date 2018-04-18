@@ -8,10 +8,10 @@
 			<div class="main-box-body clearfix">
 				<div class="" id="top">
 					<div class="row webhooks__filters">
-						<div ng-class="{'has-error' : nameError}" class="col-lg-3">
+						<div ng-class="{'has-error' : nameError}" class="col-lg-2">
 							<input type="text" class="form-control"  placeholder="Название фильтра" ng-model="filterName">
 						</div>
-						<div class="col-lg-3" ng-class="{'has-error' : noFilter}">
+						<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
 							<input type="text" class="form-control" placeholder="Поиск" ng-model="search" ng-keyup="changeFilter()">
 						</div>
 
@@ -32,7 +32,11 @@
 								<option value="" >{{cityPlaceholder}}</option>
 							</select>
 						</div>
-
+						<div class="col-lg-2" ng-class="{'has-error' : noFilter}">
+							<select class="form-control" ng-model="theme" ng-change="changeFilter()" ng-options="theme.mlg_id as theme.title for theme in themes">
+								<option value="" >{{themePlaceholder}}</option>
+							</select>
+						</div>
 					</div>
 					<div class="row webhooks__filters">
 						<div class="checkbox-nice col-lg-2" style="margin-left: 7px;">
