@@ -72,6 +72,11 @@ class StaticConfig
         return self::config('ReportsConfig');
     }
 
+    /**
+     * Получаем период для очистки устаревших постов
+     * @return mixed
+     */
+
     public static function clearPostsPeriod(){
         return self::config('PostsClearPeriod');
     }

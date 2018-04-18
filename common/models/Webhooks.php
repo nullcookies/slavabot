@@ -436,6 +436,12 @@ class Webhooks extends \yii\db\ActiveRecord
         );
     }
 
+    /**
+     * Вызов комманды для удаления устаревших постов
+     *
+     * @param $period - количество дней, после которого посты удаляются
+     * @return mixed
+     */
     public static function removeOldPosts($period){
 
         $result = \Yii::$app->commandBus->handle(

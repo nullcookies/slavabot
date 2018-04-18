@@ -2,8 +2,11 @@
 /**
  * Created by PhpStorm.
  * User: lexgorbachev
- * Date: 12.01.2018
- * Time: 10:00
+ * Date: 18.04.2018
+ * Time: 13:00
+ *
+ * Команда для удаления устаревших постов.
+ *
  */
 
 namespace common\commands\command;
@@ -18,6 +21,12 @@ class ClearPostsCommand extends BaseObject implements SelfHandlingCommand
 {
     public $period;
 
+    /**
+     * Вызываем обработчик
+     *
+     * @param $command
+     * @return int|string
+     */
 
     public function handle($command)
     {
@@ -31,20 +40,44 @@ class ClearPostsCommand extends BaseObject implements SelfHandlingCommand
 
             $condition = $this->condition($timestamp);
 
-            return $this->getOldPosts($condition);
+            return $this->deleteOldPosts($condition);
         }
         catch (\Exception $e) {
             return $e->getMessage();
         }
     }
 
-    public function getOldPosts($condition){
+    /**
+     * Удаляем посты подходящие по условию
+     *
+     * @param $condition (array) - условие фильтрации
+     * @return int
+     */
+
+    public function deleteOldPosts($condition){
         return Webhooks::deleteAll($condition);
     }
+
+    /**
+     * Получаем количество постов подходящих по условию
+     *
+     * Функция для логирования/отладки
+     *
+     * @param $condition (array) - условие фильтрации
+     * @return int
+     */
 
     public function getCountOldPosts($condition){
         return Webhooks::find()->where($condition)->count();
     }
+
+    /**
+     * Возвращаем сформированный массив условий для поиска.
+     * Выбираем все посты, которые не были добавлены в избранное и были созданны раньше, чем $timestamp
+     *
+     * @param $timestamp
+     * @return array
+     */
 
     public function condition($timestamp){
         return

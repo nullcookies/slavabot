@@ -1,8 +1,7 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: Eric Mikhaelyan
- * Date: 14.12.2017
+ * Консольная комманда для очистки устаревших постов.
  */
 
 namespace console\controllers;
@@ -15,6 +14,11 @@ use yii\console\Controller;
 
 class ClearPostsController extends Controller
 {
+
+    /**
+     *  Запуск очистки.
+     *  Период берем из настроек common/config/config.yaml
+     */
     public function actionStart()
     {
         $period = StaticConfig::clearPostsPeriod();

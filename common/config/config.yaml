@@ -63,4 +63,5 @@ ReportsConfig:
   # Адрес для получения выгрузки
   wsdl: 'http://sm.mlg.ru/services/CubusService.svc?wsdl'
 
+# Настройка периода, после которого будут удаляться посты (Webhooks)
 PostsClearPeriod: 14
