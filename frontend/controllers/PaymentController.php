@@ -11,7 +11,6 @@ namespace frontend\controllers;
 
 use frontend\controllers\bot\libs\Logger;
 use kroshilin\yakassa\widgets\Payment;
-use common\models\billing\Payment;
 use YandexCheckout\Request\Payments\Payment\CreateCaptureResponse;
 use Yii;
 use yii\filters\VerbFilter;
