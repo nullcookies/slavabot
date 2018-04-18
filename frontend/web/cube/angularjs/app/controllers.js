@@ -1835,7 +1835,7 @@ angular.module('cubeWebApp')
         $scope.tariff = [];
         $scope.pay = false;
         $scope.payMarkUp = '';
-        $scope.count = 3;
+        $scope.count = {'value' : 3};
         $scope.sce = $sce;
 
 
@@ -1857,12 +1857,16 @@ angular.module('cubeWebApp')
         };
 
         $scope.submit = function(){
+            //
+            // console.log($scope.tariff.id);
+            // console.log($scope.count.value);
+
             $http.post(
                 '/billing/order',
                 $.param(
                     {
                         'id' : $scope.tariff.id,
-                        'count':$scope.count}
+                        'count':$scope.count.value}
                         ),
                 config
             ).then(function success(response) {
