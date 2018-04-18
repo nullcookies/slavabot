@@ -66,7 +66,7 @@ class User extends ActiveRecord implements IdentityInterface
     }
     public function getTariffValue()
     {
-        return $this->hasOne(Payment::className(), ['user_id' => 'id'])->where(['active' => 1]);
+        return $this->hasOne(Payment::className(), ['user_id' => 'id'])->where(['active' => 1])->orderBy('id DESC');
 
     }
 
