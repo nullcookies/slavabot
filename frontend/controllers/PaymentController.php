@@ -74,6 +74,10 @@ class PaymentController extends Controller
 
     public function actionSuccess()
     {
+        // /#/payment/success
+
+        //return Yii::$app->response->redirect(['site/index']);
+        return Yii::$app->response->redirect('/#/payment/success');
 
     }
 

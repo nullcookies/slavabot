@@ -34,22 +34,11 @@
                                     <h4>Период</h4>
                                 </div>
                                 <div class="col-lg-6">
-                                    <div class="radio">
-                                        <input type="radio" name="optionsRadios" ng-model="count.value" id="optionsRadios1" value="3" checked="">
-                                        <label for="optionsRadios1">
-                                            3 мес. - {{(tariff.cost * 3 * (1 - 5 / 100)).toFixed(2)}} р. <span class="label label-primary">Скидка 5%</span>
-                                        </label>
-                                    </div>
-                                    <div class="radio">
-                                        <input type="radio" name="optionsRadios" ng-model="count.value" id="optionsRadios2" value="6">
-                                        <label for="optionsRadios2">
-                                            6 мес. - {{(tariff.cost * 6 * (1 - 10 / 100)).toFixed(2)}} р. <span class="label label-primary">Скидка 10%</span>
-                                        </label>
-                                    </div>
-                                    <div class="radio">
-                                        <input type="radio" name="optionsRadios" ng-model="count.value" id="optionsRadios3" value="12">
-                                        <label for="optionsRadios3">
-                                            12 мес. - {{(tariff.cost * 12 * (1 - 15 / 100)).toFixed(2)}} р. <span class="label label-primary">Скидка 15%</span>
+
+                                    <div class="radio" ng-repeat="type in monthArr">
+                                        <input type="radio" name="optionsRadios" ng-model="count.value" id="optionsRadios{{type.count}}" value="{{type.count}}" ng-checked="type.active">
+                                        <label for="optionsRadios{{type.count}}">
+                                            {{type.count}} мес. - {{(tariff.cost * type.count * (1 - type.discount / 100)).toFixed(2)}} р. <span class="label label-primary" ng-show="type.discount>0">Скидка {{type.discount}}%</span>
                                         </label>
                                     </div>
                                 </div>
@@ -58,11 +47,9 @@
                                 Оплатить
                             </button>
                         </div>
-
                     </div>
                 </div>
                 <div class="main-box clearfix"  ng-show="pay" ng-bind-html="sce.trustAsHtml(payMarkUp)">
-
                 </div>
             </div>
         </div>

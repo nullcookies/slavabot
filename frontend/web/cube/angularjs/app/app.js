@@ -98,6 +98,11 @@ app.config(['$routeProvider', function ($routeProvider) {
             controller: "postsCtrl",
             title: 'Посты и комментарии'
         })
+        .when("/payment/success", {
+            templateUrl: "views/paymentSuccess.html",
+            controller: "paymentSuccessCtrl",
+            title: 'Тариф активирован'
+        })
         .when("/payment/:id", {
             templateUrl: "views/payment.html",
             controller: "paymentCtrl",

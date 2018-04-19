@@ -1836,6 +1836,25 @@ angular.module('cubeWebApp')
         $scope.pay = false;
         $scope.payMarkUp = '';
         $scope.count = {'value' : 3};
+
+        $scope.monthArr = {
+            0 : {
+                'count' : 3,
+                'discount' : 0,
+                'active' : true
+            },
+            1 : {
+                'count' : 6,
+                'discount' : 10,
+                'active' : false
+            },
+            2 : {
+                'count' : 12,
+                'discount' : 25,
+                'active' : false
+            },
+        };
+
         $scope.sce = $sce;
 
 
@@ -1879,12 +1898,38 @@ angular.module('cubeWebApp')
                     ),
                     config
                 ).then(function success(response) {
+
+                    //console.log(response);
+
                     window.location.href = response.data.redirectUrl;
                 });
             });
         };
 
         $scope.getTariffs();
+    })
+
+    .controller('paymentSuccessCtrl', function($scope, $http, $sce, $routeParams, $location){
+
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+                'X-CSRF-Token': getCSRF()
+            }
+        };
+
+        $scope.getUserData = function(){
+            $http.post('/system/main-data', {}, config).then(function success(response) {
+                $scope.tariff = response.data.user.tariff;
+                $scope.telegramStatus = response.data.user.telegram;
+                $scope.UserName = response.data.user.name;
+
+                console.log(response);
+
+            });
+        };
+
+        $scope.getUserData();
     })
 
     app.filter('startFrom', function() {

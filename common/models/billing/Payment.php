@@ -93,6 +93,15 @@ class Payment extends ActiveRecord
 
     static function newOrder($user, $tariff, $count)
     {
+        $discount = 0;
+
+        if($count >= 6 && $count < 12){
+            $discount = 10;
+        }elseif($count >= 12){
+            $discount = 25;
+        }
+
+
         $elem = new Payment();
         $tariffInfo = Tariffs::getTariffByID($tariff);
 
@@ -103,7 +112,9 @@ class Payment extends ActiveRecord
         $elem->expire = Carbon::now()->addDay($count * 30)->format('Y-m-d H:i');
         $elem->active = 0;
 
-        $elem->totalPrice = $tariffInfo->cost * $count;
+        $elem->totalPrice = (float)number_format(($tariffInfo->cost * $count * (1 - $discount / 100)), 2, '.', ''); //$tariffInfo->cost * $count;
+
+        //return $elem->totalPrice;
 
         if($elem->save()){
             return $elem;

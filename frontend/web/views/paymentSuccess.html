@@ -1,0 +1,43 @@
+<div class="row" style="opacity: 1;">
+    <div class="col-lg-12">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <ol class="breadcrumb">
+                    <li><a href="/">Главная</a></li>
+                    <li><a href="/#/tariffs">Тарифы</a></li>
+                    <li><span>{{tariff.title}}</span></li>
+                    <li class="active"><span>Активирован</span></li>
+                </ol>
+
+                <h1>
+
+                </h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="main-box clearfix">
+                    <div class="alert alert-block alert-success fade in">
+                        <h4>Тариф успешно активирован!</h4>
+                        <br>
+                        <br>
+                        <p>
+
+                            <b>Название тарифа:</b> {{tariff.title}} <br>
+                            <b> Оставшийся период:</b> {{tariff.expire}}
+
+                        </p>
+                        <br>
+                        <br>
+                        <p>
+                            <a class="btn btn-success" href="/">Перейти на главную</a>
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
