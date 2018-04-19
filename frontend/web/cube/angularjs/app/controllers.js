@@ -389,6 +389,7 @@ angular.module('cubeWebApp')
         };
 
         $scope.getList();
+
         $scope.paginationBlock = function(n){
             if($scope.currentPage < 4 && n < 7){
                 return true;
@@ -1892,8 +1893,14 @@ angular.module('cubeWebApp')
     });
 
     app.filter('range', function() {
+
         return function(input, total) {
+
             total = Math.ceil(total);
+
+            if(total>30 ){
+                total = 30;
+            }
             for (var i=0; i<total; i++) {
                 input.push(i);
             }

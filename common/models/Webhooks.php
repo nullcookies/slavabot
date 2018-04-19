@@ -420,9 +420,9 @@ class Webhooks extends \yii\db\ActiveRecord
         return array(
             'webhooks'  =>  $models,
             'pages'     => $pages,
-            'location'  =>  ACity::find()->asArray()->all(),
+            'location'  =>  ACity::find()->limit(100)->asArray()->all(),
             'countries' => ACountry::find()->asArray()->all(),
-            'regions' => ARegion::find()->asArray()->all(),
+            'regions' => ARegion::find()->limit(100)->asArray()->all(),
             'theme'     =>  Reports::getActive()
         );
     }
