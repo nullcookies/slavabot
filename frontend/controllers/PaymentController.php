@@ -62,7 +62,7 @@ class PaymentController extends Controller
     public function actionIndex()
     {
         $orderId = Yii::$app->request->post('order');
-        $order = Payment::findOne($orderId);
+        $order =  \common\models\billing\Payment::findOne($orderId);
         if (!$order) {
             throw new NotFoundHttpException();
         }
@@ -83,13 +83,14 @@ class PaymentController extends Controller
 
     public function actionInfo()
     {
+
         $request = Yii::$app->request->getRawBody();
         $info = Json::decode($request, false);
         $orderId = $info->object->metadata->orderId;
         /** @var CreateCaptureResponse $capture */
         $capture = Yii::$app->yakassa->capturePayment($info);
         if ($capture->getStatus() === 'succeeded') {
-            $order = Payment::findOne($orderId);
+            $order =  \common\models\billing\Payment::findOne($orderId);
             $order->setActivePayment();
         }
     }
