@@ -79,6 +79,11 @@ class Payment extends ActiveRecord
         ];
     }
 
+    /**
+     * Устанавливаем пользователю тариф по умолчанию, при регистрации.
+     *
+     * @param $user
+     */
     static function initDefaultTariff($user)
     {
         $tariff = StaticConfig::defaulTariff();
@@ -95,6 +100,14 @@ class Payment extends ActiveRecord
         $elem->save();
     }
 
+    /**
+     * Создание заказа
+     *
+     * @param $user
+     * @param $tariff
+     * @param $count
+     * @return bool|Payment
+     */
     static function newOrder($user, $tariff, $count)
     {
         $discount = 0;
@@ -127,6 +140,9 @@ class Payment extends ActiveRecord
         }
     }
 
+    /**
+     * Активация заказа после оплаты
+     */
     public function setActivePayment()
     {
         $this->active = 1;
