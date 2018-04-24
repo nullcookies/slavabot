@@ -2,6 +2,7 @@
 
 namespace common\models\billing;
 
+use Carbon\Carbon;
 use Yii;
 use yii\helpers\Json;
 use common\models\User;
@@ -98,7 +99,7 @@ class Tariffs extends \yii\db\ActiveRecord
                 return $this->current;
             },
             'period' => function(){
-                return User::currentTariff()->tariffValue->id == $this->id && (bool)User::currentTariff()->tariffValue->active;
+                return User::currentTariff()->tariffValue->id == $this->id && User::getTariffStatus();
             },
             'expire' => function(){
                 if(User::currentTariff()->tariffValue->id == $this->id){
@@ -107,7 +108,10 @@ class Tariffs extends \yii\db\ActiveRecord
                     return false;
                 }
             },
-            'color'
+            'color',
+            'balance' => function(){
+                return User::getTariffBalance();
+            }
         ];
     }
 

@@ -440,6 +440,26 @@ class User extends ActiveRecord implements IdentityInterface
         return \Yii::$app->user->identity->tariffValue;
     }
 
+    static function getTariffBalance()
+    {
+        $user = self::findByID(\Yii::$app->user->identity->id);
+        Carbon::setLocale('ru');
+        $full = Carbon::parse($user->tariffValue->begin)->diffInHours(\Carbon\Carbon::parse($user->tariffValue->expire));
+
+        $balance = Carbon::now()->diffInHours(\Carbon\Carbon::parse($user->tariffValue->expire));
+
+
+        return Carbon::parse($user->tariffValue->expire)->getTimestamp() - Carbon::now()->getTimestamp() > 0 ? $user->tariffValue->totalPrice * (( $balance * 100 ) / $full) / 100 : 0;
+    }
+
+    static function getTariffStatus()
+    {
+        $user = self::findByID(\Yii::$app->user->identity->id);
+        Carbon::setLocale('ru');
+
+        return Carbon::parse($user->tariffValue->expire)->getTimestamp() - Carbon::now()->getTimestamp() > 0;
+    }
+
     static function notification($day)
     {
         return \Yii::$app->commandBus->handle(

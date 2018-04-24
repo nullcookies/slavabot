@@ -1,6 +1,7 @@
 <?php
 namespace common\models\billing;
 
+use common\models\User;
 use yii\db\ActiveRecord;
 use common\models\billing\Tariffs;
 use common\services\StaticConfig;
@@ -53,6 +54,9 @@ class Payment extends ActiveRecord
                 }
 
                 return $dif;
+            },
+            'expire_date' => function(){
+                return $this->expire;
             },
             'active' => function(){
                 $td = (Carbon::parse($this->expire)->getTimestamp() - Carbon::now()->getTimestamp()) > 0;
@@ -112,7 +116,7 @@ class Payment extends ActiveRecord
         $elem->expire = Carbon::now()->addDay($count * 30)->format('Y-m-d H:i');
         $elem->active = 0;
 
-        $elem->totalPrice = (float)number_format(($tariffInfo->cost * $count * (1 - $discount / 100)), 2, '.', ''); //$tariffInfo->cost * $count;
+        $elem->totalPrice = (float)number_format((($tariffInfo->cost * $count * (1 - $discount / 100)) - User::getTariffBalance()), 2, '.', ''); //$tariffInfo->cost * $count;
 
         //return $elem->totalPrice;
 

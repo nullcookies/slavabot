@@ -59,10 +59,6 @@ class DevController extends Controller
 
     public function actionIndex(){
 
-        return (
-            Tariffs::getList(false)
-        );
-
-
+        return User::getTariffBalance();
     }
 }

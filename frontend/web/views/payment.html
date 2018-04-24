@@ -38,7 +38,7 @@
                                     <div class="radio" ng-repeat="type in monthArr">
                                         <input type="radio" name="optionsRadios" ng-model="count.value" id="optionsRadios{{type.count}}" value="{{type.count}}" ng-checked="type.active">
                                         <label for="optionsRadios{{type.count}}">
-                                            {{type.count}} мес. - {{(tariff.cost * type.count * (1 - type.discount / 100)).toFixed(2)}} р. <span class="label label-primary" ng-show="type.discount>0">Скидка {{type.discount}}%</span>
+                                            {{type.count}} мес. - {{(tariff.cost * type.count * (1 - type.discount / 100) - balance).toFixed(2)}} р. <span class="label label-primary" ng-show="type.discount>0">Скидка {{type.discount}}%</span>
                                         </label>
                                     </div>
                                 </div>

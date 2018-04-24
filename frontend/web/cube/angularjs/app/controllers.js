@@ -383,8 +383,6 @@ angular.module('cubeWebApp')
                 $scope.themes = response.data.webhooks.theme;
                 $scope.pages = response.data.webhooks.pages;
                 $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
-
-                console.log(response);
             });
         };
 
@@ -409,7 +407,6 @@ angular.module('cubeWebApp')
             }
         };
         $scope.saveFilter = function() {
-            console.log($scope.location);
             if($scope.filterName.length<3){
                 $scope.nameError = true;
                 return false;
@@ -725,8 +722,6 @@ angular.module('cubeWebApp')
 
         //$scope.setPage($scope.currentPage);
         $scope.Timer = $interval(function () {
-            console.log('Refresh request')
-
             $scope.setPage($scope.currentPage)
         }, 10000);
 
@@ -845,8 +840,6 @@ angular.module('cubeWebApp')
                 $scope.themes = response.data.webhooks.theme;
                 $scope.pages = response.data.webhooks.pages;
                 $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
-
-                console.log(response);
             });
         };
 
@@ -1744,7 +1737,6 @@ angular.module('cubeWebApp')
 
                 });
             }else if($scope.social=='FB'){
-                console.log($scope.data.psid);
                 $data = $.param({'user_id' : $scope.user_id, 'peer_id' : $scope.data.psid, 'message': $scope.message});
                 $scope.message = '';
                 $http.post('/rest/send/v1/fb-message', $data, config).then(function success(response) {
@@ -1867,18 +1859,20 @@ angular.module('cubeWebApp')
             }
         };
 
+        $scope.balance = 0;
+
         $scope.getTariffs = function(){
             $http.post('/billing/tariffs/get', data, config).then(function success(response) {
                 $scope.tariff = response.data;
+                $scope.balance = response.data.balance;
 
-                console.log($scope.tariff);
+                if($scope.balance < 0 ){
+                    $scope.balance = 0;
+                }
             });
         };
 
         $scope.submit = function(){
-            //
-            // console.log($scope.tariff.id);
-            // console.log($scope.count.value);
 
             $http.post(
                 '/billing/order',
@@ -1898,9 +1892,6 @@ angular.module('cubeWebApp')
                     ),
                     config
                 ).then(function success(response) {
-
-                    //console.log(response);
-
                     window.location.href = response.data.redirectUrl;
                 });
             });
@@ -1920,12 +1911,11 @@ angular.module('cubeWebApp')
 
         $scope.getUserData = function(){
             $http.post('/system/main-data', {}, config).then(function success(response) {
+
                 $scope.tariff = response.data.user.tariff;
                 $scope.telegramStatus = response.data.user.telegram;
                 $scope.UserName = response.data.user.name;
-
-                console.log(response);
-
+                $scope.balance = response.data.balance;
             });
         };
 
