@@ -72,12 +72,23 @@ class PaymentController extends Controller
         ];
     }
 
+    /**
+     * В случае успешной оплаты отображаем модальное окно с сообщением.
+     * В случае отсутсвия оплаты редиректим на тарифы
+     *
+     * @return $this
+     */
+    
     public function actionSuccess()
     {
-        // /#/payment/success
+        $order =  \common\models\billing\Payment::find()->where((['user_id' => \Yii::$app->user->identity->id]))->orderBy('id DESC')->one();
 
-        //return Yii::$app->response->redirect(['site/index']);
-        return Yii::$app->response->redirect('/#/payment/success');
+        if($order->active == 1){
+            return Yii::$app->response->redirect('/#/payment/success');
+        }else{
+            return Yii::$app->response->redirect('/#/tariffs');
+        }
+
 
     }
 
