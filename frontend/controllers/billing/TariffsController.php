@@ -56,4 +56,9 @@ class TariffsController extends Controller
     public function actionGet(){
         return Tariffs::getTariffByID(Yii::$app->request->post('id'));
     }
+
+    public function check()
+    {
+        return (bool)Tariffs::count() > 0;
+    }
 }

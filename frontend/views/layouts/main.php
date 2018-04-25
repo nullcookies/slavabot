@@ -33,7 +33,6 @@ AppAsset::register($this);
     <![endif]-->
 </head>
 <?php $this->beginBody() ?>
-
 <body class="theme-whbl pace-done fixed-header fixed-leftmenu">
 <div id="theme-wrapper">
     <header class="navbar" id="header-navbar" ng-controller="header">
@@ -64,7 +63,7 @@ AppAsset::register($this);
 
                 <div class="nav-no-collapse pull-right" id="header-nav" ng-controller="header">
                     <ul class="nav navbar-nav pull-right">
-
+                        <? if (\frontend\controllers\billing\TariffsController::check()) {?>
                         <li class="dropdown profile-dropdown">
                             <a href="#/tariffs" class=" fade in" ng-show="tariff.active">
                                 {{tariff.title}} : {{tariff.expire}}
@@ -73,7 +72,7 @@ AppAsset::register($this);
                                 {{tariff.title}} : окончен
                             </a>
                         </li>
-
+                        <? } ?>
                         <li class="dropdown profile-dropdown" ng-show="telegramStatus">
                             <span class=" fade in">
                                 <i class="fa fa-check-circle fa-fw fa-lg"></i>

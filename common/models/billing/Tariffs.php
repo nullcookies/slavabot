@@ -136,4 +136,9 @@ class Tariffs extends \yii\db\ActiveRecord
             ->andWhere(['id'=>$id])
             ->one();
     }
+
+    static function count()
+    {
+        return (int)self::find()->where(['active' => 1])->count();
+    }
 }
