@@ -3,6 +3,8 @@ namespace frontend\controllers;
 
 use common\commands\command\FilterNotificationCommand;
 use common\commands\command\GetPostsCommand;
+use common\commands\command\SendTelegramNotificationCommand;
+use common\models\billing\Tariffs;
 use common\commands\command\ClearPostsCommand;
 use common\models\Filters;
 use common\models\User;
@@ -70,5 +72,6 @@ class DevController extends Controller
         return $result;
 
 
+        return 'dev';
     }
 }

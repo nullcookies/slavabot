@@ -383,8 +383,6 @@ angular.module('cubeWebApp')
                 $scope.themes = response.data.webhooks.theme;
                 $scope.pages = response.data.webhooks.pages;
                 $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
-
-                console.log(response);
             });
         };
 
@@ -410,7 +408,6 @@ angular.module('cubeWebApp')
             }
         };
         $scope.saveFilter = function() {
-            console.log($scope.location);
             if($scope.filterName.length<3){
                 $scope.nameError = true;
                 return false;
@@ -726,8 +723,6 @@ angular.module('cubeWebApp')
 
         //$scope.setPage($scope.currentPage);
         $scope.Timer = $interval(function () {
-            console.log('Refresh request')
-
             $scope.setPage($scope.currentPage)
         }, 10000);
 
@@ -846,8 +841,6 @@ angular.module('cubeWebApp')
                 $scope.themes = response.data.webhooks.theme;
                 $scope.pages = response.data.webhooks.pages;
                 $scope.numberOfPages = $scope.pages.totalCount / $scope.pageSize;
-
-                console.log(response);
             });
         };
 
@@ -1745,7 +1738,6 @@ angular.module('cubeWebApp')
 
                 });
             }else if($scope.social=='FB'){
-                console.log($scope.data.psid);
                 $data = $.param({'user_id' : $scope.user_id, 'peer_id' : $scope.data.psid, 'message': $scope.message});
                 $scope.message = '';
                 $http.post('/rest/send/v1/fb-message', $data, config).then(function success(response) {
@@ -1832,11 +1824,30 @@ angular.module('cubeWebApp')
         $scope.getTariffs();
 
     })
-    .controller('paymentCtrl', function($scope, $http, $sce, $routeParams){
+    .controller('paymentCtrl', function($scope, $http, $sce, $routeParams, $location){
         $scope.tariff = [];
         $scope.pay = false;
         $scope.payMarkUp = '';
-        $scope.count = 3;
+        $scope.count = {'value' : 3};
+
+        $scope.monthArr = {
+            0 : {
+                'count' : 3,
+                'discount' : 0,
+                'active' : true
+            },
+            1 : {
+                'count' : 6,
+                'discount' : 10,
+                'active' : false
+            },
+            2 : {
+                'count' : 12,
+                'discount' : 25,
+                'active' : false
+            },
+        };
+
         $scope.sce = $sce;
 
 
@@ -1849,21 +1860,27 @@ angular.module('cubeWebApp')
             }
         };
 
+        $scope.balance = 0;
+
         $scope.getTariffs = function(){
             $http.post('/billing/tariffs/get', data, config).then(function success(response) {
                 $scope.tariff = response.data;
+                $scope.balance = response.data.balance;
 
-                console.log($scope.tariff);
+                if($scope.balance < 0 ){
+                    $scope.balance = 0;
+                }
             });
         };
 
         $scope.submit = function(){
+
             $http.post(
                 '/billing/order',
                 $.param(
                     {
                         'id' : $scope.tariff.id,
-                        'count':$scope.count}
+                        'count':$scope.count.value}
                         ),
                 config
             ).then(function success(response) {
@@ -1876,13 +1893,34 @@ angular.module('cubeWebApp')
                     ),
                     config
                 ).then(function success(response) {
-                    $scope.pay = true;
-                    $scope.payMarkUp = response.data;
+                    window.location.href = response.data.redirectUrl;
                 });
             });
         };
 
         $scope.getTariffs();
+    })
+
+    .controller('paymentSuccessCtrl', function($scope, $http, $sce, $routeParams, $location){
+
+        var config = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;',
+                'X-CSRF-Token': getCSRF()
+            }
+        };
+
+        $scope.getUserData = function(){
+            $http.post('/system/main-data', {}, config).then(function success(response) {
+
+                $scope.tariff = response.data.user.tariff;
+                $scope.telegramStatus = response.data.user.telegram;
+                $scope.UserName = response.data.user.name;
+                $scope.balance = response.data.balance;
+            });
+        };
+
+        $scope.getUserData();
     })
 
     app.filter('startFrom', function() {

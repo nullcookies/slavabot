@@ -40,8 +40,8 @@
                                         <span class="package-month"  style="opacity:0" >/месяц</span>
                                     </div>
                                     <ul class="package-top-features" style="min-height: 125px;">
-                                        <li ng-repeat="constraint in tariff.constraints">
-                                            {{constraint}}
+                                        <li>
+                                            {{tariff.description}}
                                         </li>
                                     </ul>
                                     <div class="package-footer" ng-show="!tariff.current">
@@ -51,11 +51,11 @@
                                     </div>
 
                                     <div class="package-footer" style="padding: 0px 0 0px;" ng-show="tariff.current">
-                                        <div class="alert alert-success" ng-show="tariff.active.active" style="margin: 8px 0px 11px;">
+                                        <div class="alert alert-success" ng-show="tariff.period" style="margin: 8px 0px 11px;">
                                             <i class="fa fa-check-circle fa-fw fa-lg"></i>
                                             Осталось {{tariff.expire}}
                                         </div>
-                                        <div class="alert alert-danger" ng-show="!tariff.active.active" style="margin: 8px 0px 11px;">
+                                        <div class="alert alert-danger" ng-show="!tariff.period" style="margin: 8px 0px 11px;">
                                             <i class="fa fa-times fa-fw fa-lg"></i>
                                             Окончен
                                         </div>

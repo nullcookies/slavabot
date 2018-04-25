@@ -36,8 +36,9 @@ return [
                     'clear-telegram',
                     'vk',
                     'facebook-webhooks',
-                    'check',
+                    'info',
                     'aviso',
+                    'fail',
                     'success',
                     'fail',
                     'fb-webhook'
@@ -70,14 +71,10 @@ return [
             ]
         ],
         'yakassa' => [
-            'class' => 'kroshilin\yakassa\YaKassa',
-            'shopPassword' => 'password',
-            'securityType' => 'MD5',
+            'class' => common\services\payment\YandexKassaService::class,
+            'secretKey' => 'live_sgIRmOfQX4sWM9jGqJbIVJ9at1i-iQDodPc8o66zARQ',
             'shopId' => '180533',
-            'scId' => '561226',
-            'currency' => '10643'
-            //'paymentAction' => 'https://demomoney.yandex.ru/eshop.xml',
-
+            'returnUrl' => '/payment/success'
         ],
         'request' => [
             'baseUrl' => '/',

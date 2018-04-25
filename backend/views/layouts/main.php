@@ -43,7 +43,8 @@ AppAsset::register($this);
             ['label' => 'Главная', 'url' => ['/site/index']],
             ['label' => 'Пользователи', 'url' => ['/user/index']],
             ['label' => 'Уведомления', 'url' => ['notifications-texts/index']],
-            ['label' => 'Выгрузки', 'url' => ['reports/index']]
+            ['label' => 'Выгрузки', 'url' => ['reports/index']],
+            ['label' => 'Тарифы', 'url' => ['tariffs/index']]
         ];
         $menuItems[] = '<li>'
             . Html::beginForm(['/site/logout'], 'post')

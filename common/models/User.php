@@ -66,7 +66,7 @@ class User extends ActiveRecord implements IdentityInterface
     }
     public function getTariffValue()
     {
-        return $this->hasOne(Payment::className(), ['user_id' => 'id'])->where(['active' => 1]);
+        return $this->hasOne(Payment::className(), ['user_id' => 'id'])->where(['active' => 1])->orderBy('id DESC');
 
     }
 
@@ -405,6 +405,11 @@ class User extends ActiveRecord implements IdentityInterface
         );
     }
 
+    /**
+     * Конвертируем дату окончания действия тарифа в строку виду "12 дней"
+     *
+     * @return string
+     */
     static function expireToString()
     {
         $user = self::findByID(\Yii::$app->user->identity->id);
@@ -435,11 +440,52 @@ class User extends ActiveRecord implements IdentityInterface
         return true;
     }
 
+    /**
+     * Получаем инормацию о тарифе текущего пользователя
+     * @return mixed
+     */
+
     static function currentTariff()
     {
         return \Yii::$app->user->identity->tariffValue;
     }
 
+    /**
+     *
+     * Получаем баланс пользователя на основе отношения оставшегося времени тарифа к сумме оплаты.
+     *
+     * @return float|int
+     */
+    static function getTariffBalance()
+    {
+        $user = self::findByID(\Yii::$app->user->identity->id);
+        Carbon::setLocale('ru');
+        $full = Carbon::parse($user->tariffValue->begin)->diffInHours(\Carbon\Carbon::parse($user->tariffValue->expire));
+
+        $balance = Carbon::now()->diffInHours(\Carbon\Carbon::parse($user->tariffValue->expire));
+
+
+        return Carbon::parse($user->tariffValue->expire)->getTimestamp() - Carbon::now()->getTimestamp() > 0 ? $user->tariffValue->totalPrice * (( $balance * 100 ) / $full) / 100 : 0;
+    }
+
+    /**
+     * Получаем статус активности текущего тарифа
+     * @return bool
+     */
+    static function getTariffStatus()
+    {
+        $user = self::findByID(\Yii::$app->user->identity->id);
+        Carbon::setLocale('ru');
+
+        return Carbon::parse($user->tariffValue->expire)->getTimestamp() - Carbon::now()->getTimestamp() > 0;
+    }
+
+    /**
+     * Уведомления об отсутсвии постов
+     *
+     * @param $day
+     * @return mixed
+     */
     static function notification($day)
     {
         return \Yii::$app->commandBus->handle(
@@ -451,6 +497,11 @@ class User extends ActiveRecord implements IdentityInterface
         );
     }
 
+    /**
+     * Уведомления о новом посте подходящем по фильтру пользователя
+     * @param $day
+     * @return mixed
+     */
     static function postingNotification($day)
     {
         return \Yii::$app->commandBus->handle(

@@ -31,20 +31,26 @@ class Logger
 
     public static function info($message, $context = [], $filename = '')
     {
-        $logger = self::logger('info');
-        $logger->addRecord(\Monolog\Logger::INFO, $message, $context);
+//        $logger = self::logger('info');
+//        $logger->addRecord(\Monolog\Logger::INFO, $message, $context);
     }
 
     public static function report($message, $context = [], $filename = '')
     {
-        $logger = self::logger('reports');
+//        $logger = self::logger('reports');
+//        $logger->addRecord(\Monolog\Logger::INFO, $message, $context);
+    }
+
+    public static function payment($message, $context = [], $filename = '')
+    {
+        $logger = self::logger('Payment');
         $logger->addRecord(\Monolog\Logger::INFO, $message, $context);
     }
 
     public static function peer($message, $context = [], $filename = '')
     {
-        $logger = self::logger('peer');
-        $logger->addRecord(\Monolog\Logger::INFO, $message, $context);
+//        $logger = self::logger('peer');
+//        $logger->addRecord(\Monolog\Logger::INFO, $message, $context);
     }
 
 }

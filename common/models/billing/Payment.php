@@ -1,6 +1,7 @@
 <?php
 namespace common\models\billing;
 
+use common\models\User;
 use yii\db\ActiveRecord;
 use common\models\billing\Tariffs;
 use common\services\StaticConfig;
@@ -54,6 +55,9 @@ class Payment extends ActiveRecord
 
                 return $dif;
             },
+            'expire_date' => function(){
+                return $this->expire;
+            },
             'active' => function(){
                 $td = (Carbon::parse($this->expire)->getTimestamp() - Carbon::now()->getTimestamp()) > 0;
                 return $td;
@@ -75,6 +79,11 @@ class Payment extends ActiveRecord
         ];
     }
 
+    /**
+     * Устанавливаем пользователю тариф по умолчанию, при регистрации.
+     *
+     * @param $user
+     */
     static function initDefaultTariff($user)
     {
         $tariff = StaticConfig::defaulTariff();
@@ -91,8 +100,25 @@ class Payment extends ActiveRecord
         $elem->save();
     }
 
+    /**
+     * Создание заказа
+     *
+     * @param $user
+     * @param $tariff
+     * @param $count
+     * @return bool|Payment
+     */
     static function newOrder($user, $tariff, $count)
     {
+        $discount = 0;
+
+        if($count >= 6 && $count < 12){
+            $discount = 10;
+        }elseif($count >= 12){
+            $discount = 25;
+        }
+
+
         $elem = new Payment();
         $tariffInfo = Tariffs::getTariffByID($tariff);
 
@@ -103,13 +129,24 @@ class Payment extends ActiveRecord
         $elem->expire = Carbon::now()->addDay($count * 30)->format('Y-m-d H:i');
         $elem->active = 0;
 
-        $elem->totalPrice = $tariffInfo->cost * $count;
+        $elem->totalPrice = (float)number_format((($tariffInfo->cost * $count * (1 - $discount / 100)) - User::getTariffBalance()), 2, '.', ''); //$tariffInfo->cost * $count;
+
+        //return $elem->totalPrice;
 
         if($elem->save()){
             return $elem;
         }else{
             return false;
         }
+    }
+
+    /**
+     * Активация заказа после оплаты
+     */
+    public function setActivePayment()
+    {
+        $this->active = 1;
+        $this->save();
     }
 
     public static function getOrderByID($id){
